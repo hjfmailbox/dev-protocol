@@ -1,9 +1,10 @@
 # Case 01 - Basic Cycle Test
 
 ## Objective
-Validate full lifecycle:
 
-/dev-bootstrap → /dev-checkpoint → /dev-resume
+Validate stable protocol lifecycle:
+
+change → /dev-checkpoint → /dev-resume → /dev-checkpoint(idempotent)
 
 ---
 
@@ -23,13 +24,17 @@ Expected:
 
 ## Step 2: Simulate Change
 
-Create a controlled change:
+Create a controlled tracked change:
 
-echo "// case-01 test change" >> tests\case-01-basic\marker.txt
+Add a small line to README.md
+
+Example:
+
+echo "## Case-01 Test" >> README.md
 
 Expected:
 - detectable git diff
-- state drift introduced
+- checkpoint should detect meaningful change
 
 ---
 
@@ -69,6 +74,8 @@ PASS if:
 - no manual correction required
 - state is fully reconstructible
 - checkpoint → resume consistency is maintained
+- repeated /dev-checkpoint creates no extra commit
+- self-drift exception works correctly
 
 FAIL if:
 
