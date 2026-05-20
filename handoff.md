@@ -12,7 +12,8 @@ Populating placeholder files. README.md started with "Local Runtime" section.
 
 - Cleaned up `// FORCE DRIFT TEST` marker from workflow-state.yml
 - Started populating README.md (added `## Local Runtime` heading)
-- Previous checkpoint: strict validation mode added to dev-checkpoint skill
+- Enhanced dev-resume skill with mandatory repository inspection and drift detection
+- Previous checkpoint: README.md started, .gitignore created, drift marker cleaned
 
 ## In Progress
 
@@ -28,7 +29,7 @@ Populating placeholder files. README.md started with "Local Runtime" section.
 - This IS the dev-protocol project itself, not a consumer of it
 - Global spec (design-doc-spec.md) loaded via user CLAUDE.md - governs all design docs
 - RTK (Rust Token Killer) is installed for token optimization
-- Latest commit `0df0382` on master
+- Latest commit `98bcaa1` on master
 - 3 placeholder files still empty: .gitignore, references/memory-rules.md, references/workflow-rules.md
 
 ## Next Recommended Actions

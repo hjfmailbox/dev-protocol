@@ -19,6 +19,7 @@ progress:
     - "initial commit: 23 files, full protocol structure"
     - "enhance dev-checkpoint skill with strict validation mode (A-LINE rules)"
     - "start populating README.md (local runtime section)"
+    - "enhance dev-resume skill with mandatory repository inspection and drift detection"
   in_progress:
     - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
   blocked: []
@@ -43,9 +44,9 @@ next:
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
 
 checkpoint:
-  last_updated: "2026-05-20"
-  last_commit: "f6b7e3a"
-  summary: "checkpoint - README.md started, .gitignore created, drift marker cleaned"
+  last_updated: "2026-05-21"
+  last_commit: "98bcaa1"
+  summary: "checkpoint - dev-resume skill enhanced with mandatory repository inspection flow"
 
 confidence:
   state_confidence: high

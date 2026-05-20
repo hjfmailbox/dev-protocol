@@ -84,3 +84,41 @@ Keep concise and actionable.
 - NEVER assume missing state
 - NEVER proceed if state is inconsistent without warning
 - ALWAYS favor correctness over completeness
+---
+
+## REPOSITORY INSPECTION (MANDATORY)
+
+Before generating recovery summary:
+
+You MUST inspect repository reality.
+
+Required checks:
+
+1. git status
+- branch
+- working tree clean/dirty
+- modified/untracked files
+
+2. git log -1
+- latest commit hash
+- latest commit message
+
+3. drift detection
+Compare:
+- workflow-state.yml
+- handoff.md
+- git reality
+
+Classify drift severity:
+- NONE
+- LOW
+- HIGH
+
+Recovery summary MUST include:
+
+- current phase
+- latest commit
+- working tree state
+- drift severity
+- blockers
+- recommended next action
