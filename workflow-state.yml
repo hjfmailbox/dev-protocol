@@ -18,7 +18,9 @@ progress:
     - "write MVP scope and basic test plan (case-01)"
     - "initial commit: 23 files, full protocol structure"
     - "enhance dev-checkpoint skill with strict validation mode (A-LINE rules)"
-  in_progress: []
+    - "start populating README.md (local runtime section)"
+  in_progress:
+    - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
   blocked: []
 
 context:
@@ -35,17 +37,15 @@ context:
 
 next:
   recommended_actions:
-    - "review and approve this bootstrap output"
-    - "commit initial protocol structure"
-    - "execute case-01 test plan: simulate change -> checkpoint -> resume"
-    - "fill empty reference docs (memory-rules.md, workflow-rules.md)"
-    - "write README.md overview"
+    - "complete README.md with full project overview"
     - "create .gitignore for typical dev artifacts"
+    - "fill references/memory-rules.md and references/workflow-rules.md"
+    - "execute case-01 test plan: simulate change -> checkpoint -> resume"
 
 checkpoint:
   last_updated: "2026-05-20"
-  last_commit: "5bb0984"
-  summary: "checkpoint state update after dev-checkpoint strict validation enhancement"
+  last_commit: "f6b7e3a"
+  summary: "checkpoint - README.md started, .gitignore created, drift marker cleaned"
 
 confidence:
   state_confidence: high
