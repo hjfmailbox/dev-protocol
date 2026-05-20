@@ -16,8 +16,8 @@ progress:
     - "create state file templates (workflow-state.yml, handoff.md, project-rules.md)"
     - "create skill definitions (dev-bootstrap, dev-checkpoint, dev-resume)"
     - "write MVP scope and basic test plan (case-01)"
-  in_progress:
-    - "initial bootstrap commit - first durable state"
+    - "initial commit: 23 files, full protocol structure"
+  in_progress: []
   blocked: []
 
 context:
@@ -43,8 +43,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-20"
-  last_commit: ""
-  summary: "initial bootstrap - protocol definition complete, ready for first commit"
+  last_commit: "8ec9f04"
+  summary: "initial commit - dev-protocol v1 structure, 23 files added"
 
 confidence:
   state_confidence: high
