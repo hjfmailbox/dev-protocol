@@ -14,7 +14,8 @@ Populating placeholder files. README.md started with "Local Runtime" section.
 - Started populating README.md (added `## Local Runtime` heading)
 - Enhanced dev-resume skill with mandatory repository inspection and drift detection
 - Enhanced dev-checkpoint skill with self-drift exception rule (Section 3.1)
-- Previous checkpoint: drift correction, state aligned to HEAD
+- Expanded self-drift exception scope to include summary, handoff refs, metadata
+- Previous checkpoint: add self-drift exception rule and sync state to HEAD
 
 ## In Progress
 
@@ -30,7 +31,7 @@ Populating placeholder files. README.md started with "Local Runtime" section.
 - This IS the dev-protocol project itself, not a consumer of it
 - Global spec (design-doc-spec.md) loaded via user CLAUDE.md - governs all design docs
 - RTK (Rust Token Killer) is installed for token optimization
-- Latest commit `84efe9e` on master
+- Latest commit `1643032` on master
 - 3 placeholder files still empty: .gitignore, references/memory-rules.md, references/workflow-rules.md
 
 ## Next Recommended Actions

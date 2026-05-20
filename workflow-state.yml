@@ -21,6 +21,7 @@ progress:
     - "start populating README.md (local runtime section)"
     - "enhance dev-resume skill with mandatory repository inspection and drift detection"
     - "enhance dev-checkpoint skill with self-drift exception rule (Section 3.1)"
+    - "expand self-drift exception to include summary, handoff refs, and metadata"
   in_progress:
     - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
   blocked: []
@@ -46,8 +47,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-21"
-  last_commit: "84efe9e"
-  summary: "checkpoint - add self-drift exception rule to dev-checkpoint skill"
+  last_commit: "1643032"
+  summary: "checkpoint - expand self-drift exception scope in dev-checkpoint skill"
 
 confidence:
   state_confidence: high
