@@ -136,3 +136,52 @@ NO partial success allowed.
 ## RULE ENFORCEMENT (ADDED)
 
 Always re-parse project-rules.md and validate workflow-state.yml against it before committing.
+
+---
+
+## STRICT VALIDATION MODE (A-LINE)
+
+### 1. State Strict Validation
+
+Before writing any updates to workflow-state.yml:
+
+- progress.completed MUST only include actions that are:
+  - actually executed
+  - reflected in git history OR filesystem changes
+- DO NOT include:
+  - planned tasks
+  - design tasks
+  - bootstrap intentions
+
+If violation detected:
+→ mark state validity = FAIL
+→ stop checkpoint update
+
+---
+
+### 2. Explicit Validation Output (MANDATORY)
+
+At end of checkpoint, output:
+
+- state validity: PASS | FAIL
+- rule compliance: PASS | FAIL
+- drift severity: NONE | LOW | HIGH
+
+---
+
+### 3. Drift Classification Rules
+
+- NONE: no code/state mismatch
+- LOW: minor doc-state inconsistency
+- HIGH: state contradicts git or filesystem reality
+
+---
+
+### 4. Hard Rule
+
+Checkpoint MUST NOT silently correct invalid state.
+
+It must:
+- detect
+- report
+- then decide to proceed or fail

@@ -17,6 +17,7 @@ progress:
     - "create skill definitions (dev-bootstrap, dev-checkpoint, dev-resume)"
     - "write MVP scope and basic test plan (case-01)"
     - "initial commit: 23 files, full protocol structure"
+    - "enhance dev-checkpoint skill with strict validation mode (A-LINE rules)"
   in_progress: []
   blocked: []
 
@@ -43,8 +44,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-20"
-  last_commit: "8ec9f04"
-  summary: "initial commit - dev-protocol v1 structure, 23 files added"
+  last_commit: "5bb0984"
+  summary: "checkpoint state update after dev-checkpoint strict validation enhancement"
 
 confidence:
   state_confidence: high
