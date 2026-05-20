@@ -1,0 +1,30 @@
+version: 1
+
+project:
+  name: ""
+  initialized: false
+
+current_state:
+  phase: ""
+  focus: ""
+  status: active
+
+progress:
+  completed: []
+  in_progress: []
+  blocked: []
+
+context:
+  important_constraints: []
+  recent_decisions: []
+
+next:
+  recommended_actions: []
+
+checkpoint:
+  last_updated: ""
+  last_commit: ""
+  summary: ""
+
+confidence:
+  state_confidence: medium
