@@ -171,6 +171,25 @@ At end of checkpoint, output:
 
 ### 3. Drift Classification Rules
 
+### 3.1 Checkpoint Self-Drift Exception
+
+SPECIAL RULE:
+
+If the ONLY detected drift is:
+
+- `workflow-state.yml.checkpoint.last_commit`
+- and it is caused solely by the previous `/dev-checkpoint` commit
+
+Then:
+
+- classify drift as `NONE`
+- do NOT update any state files
+- do NOT create a commit
+
+Return:
+
+`No meaningful changes detected`
+
 - NONE: no code/state mismatch
 - LOW: minor doc-state inconsistency
 - HIGH: state contradicts git or filesystem reality

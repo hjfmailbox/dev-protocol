@@ -20,6 +20,7 @@ progress:
     - "enhance dev-checkpoint skill with strict validation mode (A-LINE rules)"
     - "start populating README.md (local runtime section)"
     - "enhance dev-resume skill with mandatory repository inspection and drift detection"
+    - "enhance dev-checkpoint skill with self-drift exception rule (Section 3.1)"
   in_progress:
     - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
   blocked: []
@@ -45,8 +46,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-21"
-  last_commit: "2c0edc2"
-  summary: "checkpoint - drift correction, state aligned to HEAD"
+  last_commit: "84efe9e"
+  summary: "checkpoint - add self-drift exception rule to dev-checkpoint skill"
 
 confidence:
   state_confidence: high
