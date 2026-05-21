@@ -14,11 +14,24 @@ Allow development to continue without prior chat history.
 
 ### 1. Read Recoverable State
 
-Must read:
+State file resolution (MUST follow this order):
 
-- workflow-state.yml
-- handoff.md
-- project-rules.md
+1. **Priority**: `.agent/dev-protocol/`
+   - workflow-state.yml
+   - handoff.md
+   - project-rules.md
+   - If found here, use this path exclusively.
+   - Output the resolved path in recovery summary.
+   - Do NOT scan root for the same files.
+
+2. **Fallback**: repository root
+   - workflow-state.yml
+   - handoff.md
+   - project-rules.md
+   - Used only when `.agent/dev-protocol/` does not contain state files.
+
+3. **Missing**: if neither location has state files:
+   - Report: "State files not found. Run /dev-bootstrap to initialize."
 
 If available, also inspect:
 
@@ -46,6 +59,12 @@ Check for mismatch between:
 
 - workflow state
 - repository reality
+
+If `checkpoint.last_commit` is empty, absent, or null:
+
+- Output: "No previous checkpoint baseline"
+- Do NOT reference "since last checkpoint xxx" phrasing
+- Skip diff-based drift comparison
 
 Examples:
 

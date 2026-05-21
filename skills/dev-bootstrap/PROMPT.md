@@ -62,6 +62,7 @@ Ensure:
 - state reflects CURRENT reality
 - no historical logging
 - no duplication of past events
+- `checkpoint.last_commit` MUST be left empty/absent — no checkpoint baseline exists yet
 
 ---
 

@@ -58,6 +58,9 @@ Create or update:
 
 Must preserve useful existing information.
 
+Must set `checkpoint.last_commit` to empty/absent — no checkpoint baseline
+exists until the user explicitly runs /dev-checkpoint.
+
 ---
 
 ### 4. Detect Drift

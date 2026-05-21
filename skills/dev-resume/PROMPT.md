@@ -9,13 +9,29 @@ You MUST NOT rely on chat history.
 
 ## STEP 1: Load State
 
-Read and interpret:
+State file resolution path (MUST follow this order):
 
-- workflow-state.yml
-- handoff.md
-- project-rules.md (if exists)
+1. Priority: `.agent/dev-protocol/`
+   - workflow-state.yml
+   - handoff.md
+   - project-rules.md
 
-If missing, note degradation risk.
+2. Fallback: repository root
+   - workflow-state.yml
+   - handoff.md
+   - project-rules.md
+
+Rules:
+
+- If files exist in `.agent/dev-protocol/`, use that path exclusively.
+  - Do NOT scan root directory for the same files.
+  - Do NOT merge or override results from different locations.
+  - Output the resolved path: "State source: .agent/dev-protocol/"
+- If files exist only in repository root, use root path (backward compatibility).
+- If neither location has state files, report:
+  "State files not found. Run /dev-bootstrap to initialize."
+
+Read and interpret the resolved state files.
 
 ---
 
@@ -40,6 +56,12 @@ Check whether:
 - handoff is outdated
 - tasks marked complete are actually complete
 - blockers still exist or resolved
+
+If `checkpoint.last_commit` is empty, absent, or null:
+
+- Output: "No previous checkpoint baseline"
+- Do NOT reference "自上次 checkpoint xxx 以来" or similar phrasing
+- Do NOT attempt diff comparison against a non-existent baseline
 
 Classify drift:
 
@@ -84,6 +106,21 @@ Keep concise and actionable.
 - NEVER assume missing state
 - NEVER proceed if state is inconsistent without warning
 - ALWAYS favor correctness over completeness
+
+If valid state files exist:
+
+DO NOT re-analyze project architecture,
+DO NOT infer progress from docs,
+DO NOT inspect implementation status,
+DO NOT recompute phase completion.
+
+Trust state files first.
+
+Repository inspection is ONLY for:
+- drift detection
+- dirty working tree
+- missing commits
+- state inconsistency
 ---
 
 ## REPOSITORY INSPECTION (MANDATORY)
@@ -122,3 +159,11 @@ Recovery summary MUST include:
 - drift severity
 - blockers
 - recommended next action
+---
+
+## Recovery Source Priority
+1. workflow-state.yml
+2. handoff.md
+3. project-rules.md
+4. git status
+5. repo inspection (fallback only)

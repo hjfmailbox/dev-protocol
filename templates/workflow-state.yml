@@ -23,7 +23,7 @@ next:
 
 checkpoint:
   last_updated: ""
-  last_commit: ""
+  last_commit: ""  # Empty until first /dev-checkpoint; then HEAD of that checkpoint
   summary: ""
 
 confidence:

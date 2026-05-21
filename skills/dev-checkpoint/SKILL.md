@@ -34,15 +34,22 @@ Must NOT rely only on memory.
 
 ---
 
-### 1.5 Self-Drift Detection (EARLY EXIT)
+### 1.5 Checkpoint Baseline Check (EARLY EXIT)
 
 Must run BEFORE state reconciliation.
 
-If the ONLY changes since `checkpoint.last_commit` are:
+If `checkpoint.last_commit` is empty, absent, or null:
 
-- `workflow-state.yml` metadata fields (last_commit, summary, last_updated)
-- `handoff.md` commit references pointing to prior checkpoint commits
-- No other files modified (no code, docs, config, tests)
+- Project has never been checkpointed.
+- No baseline to compare against.
+- Proceed to STEP 2 (normal checkpoint flow).
+
+If `checkpoint.last_commit` has a value:
+
+- If the ONLY changes since `last_commit` are:
+  - `workflow-state.yml` metadata fields (last_commit, summary, last_updated)
+  - `handoff.md` commit references pointing to prior checkpoint commits
+  - No other files modified (no code, docs, config, tests)
 
 Then:
 
