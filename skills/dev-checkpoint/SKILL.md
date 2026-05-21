@@ -46,9 +46,10 @@ If `checkpoint.last_commit` is empty, absent, or null:
 
 If `checkpoint.last_commit` has a value:
 
-- If the ONLY changes since `last_commit` are:
-  - `workflow-state.yml` metadata fields (last_commit, summary, last_updated)
-  - `handoff.md` commit references pointing to prior checkpoint commits
+- Run `git diff --stat last_commit..HEAD`.
+- If the diff shows ONLY changes to:
+  - `workflow-state.yml` (checkpoint metadata)
+  - `handoff.md` (prior checkpoint commit references)
   - No other files modified (no code, docs, config, tests)
 
 Then:
@@ -107,15 +108,26 @@ Must:
 - generate commit message
 - follow commit convention
 
----
+### 6. Finalize (Single-Commit Guarantee)
 
-### 6. Finalize
+Must produce exactly ONE checkpoint commit:
+
+- Record `PRE_HEAD = git rev-parse HEAD` before committing.
+- Write `checkpoint.last_commit = PRE_HEAD` (parent of the checkpoint commit).
+- git add . + git commit → exactly one commit.
+- Do NOT amend. Do NOT create a drift correction commit.
+
+Note: `last_commit` is the parent hash, not the checkpoint hash itself.
+A commit cannot contain its own hash — this is a fundamental constraint.
+Early exit uses `git diff last_commit..HEAD` to detect self-drift.
 
 Must summarize:
 
 - state changes
 - updated files
 - next recommended actions
+
+---
 
 ---
 

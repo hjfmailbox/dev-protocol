@@ -41,26 +41,26 @@ If `last_commit` is empty, absent, or null:
 
 If `last_commit` has a value:
 
-Compare git diff against the files touched since `last_commit`.
+Run:
 
-Self-drift exception ONLY applies if ALL of the following are true:
+```
+git diff --stat last_commit..HEAD
+```
 
-- The only modified files are `workflow-state.yml` and/or `handoff.md`
-- The diff content is limited to:
-  - `checkpoint.last_commit` hash change
-  - `checkpoint.summary` text change
-  - `checkpoint.last_updated` date change
-  - handoff.md commit references that only point to prior checkpoint commits
-- No other files changed (no code, no docs, no config, no tests)
+If the diff output shows ONLY changes to:
 
-If ALL conditions above are satisfied:
+- `workflow-state.yml` (checkpoint metadata fields: last_commit, summary, last_updated)
+- `handoff.md` (commit references pointing to prior checkpoint commits)
 
-- classify drift as `NONE`
-- output:
+And NO other files changed (no code, no docs, no config, no tests):
+
+- The only commit between `last_commit` and HEAD is a prior checkpoint commit.
+- This is the self-drift exception.
+- Output:
   ```
   === Self-Drift Exception Triggered ===
   Drift: NONE
-  Cause: Only previous checkpoint metadata changed
+  Cause: Only previous checkpoint metadata changed (baseline = last_commit)
   No meaningful changes detected
   === Checkpoint Skipped (STOP) ===
   ```
@@ -73,7 +73,7 @@ This is a HARD STOP. The checkpoint flow terminates here.
 
 Otherwise:
 
-- Self-drift exception does NOT apply.
+- There are meaningful changes since `last_commit`.
 - Continue to STEP 2.
 
 ---
@@ -142,14 +142,33 @@ Must reflect:
 
 ## STEP 6: Commit
 
-Execute:
+Execute exactly ONE checkpoint commit.
+
+Record current HEAD before committing:
+
+```
+PRE_HEAD = git rev-parse HEAD
+```
+
+Write into `workflow-state.yml.checkpoint`:
+
+- `last_commit` = `PRE_HEAD` (the parent of the checkpoint commit)
+- `summary` = the commit summary
+
+Then:
 
 - git add .
-- git commit
+- git commit (using message from STEP 5)
 
-If commit fails:
+CRITICAL:
 
-FAIL checkpoint.
+- Do NOT create a separate drift correction commit.
+- Do NOT amend after the initial commit.
+- If commit fails, FAIL checkpoint.
+
+Note: `last_commit` is the PARENT of the checkpoint commit.
+This is by design — a commit cannot contain its own hash.
+Early exit (STEP 1.5) must compare diff since `last_commit`, not HEAD.
 
 ---
 
