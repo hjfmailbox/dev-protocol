@@ -15,12 +15,14 @@ Populating placeholder files. README.md started with "Local Runtime" section.
 - Enhanced dev-resume skill with mandatory repository inspection and drift detection
 - Enhanced dev-checkpoint skill with self-drift exception rule (Section 3.1)
 - Expanded self-drift exception scope to include summary, handoff refs, metadata
-- Previous checkpoint: add self-drift exception rule and sync state to HEAD
+- Updated README.md with case-01 test section
+- Previous checkpoint: expand self-drift exception scope in dev-checkpoint skill
 
 ## In Progress
 
 - Filling remaining placeholder files: .gitignore, references/memory-rules.md, references/workflow-rules.md
 - Completing README.md with full project overview
+- case-01 test plan execution
 
 ## Blockers
 
