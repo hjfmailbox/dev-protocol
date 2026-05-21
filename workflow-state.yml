@@ -24,6 +24,7 @@ progress:
     - "expand self-drift exception to include summary, handoff refs, and metadata"
     - "update README.md with case-01 test section"
     - "update lifecycle validation for checkpoint idempotency (case-01)"
+    - "fix self-drift exception control flow: add STEP 1.5 early exit in dev-checkpoint skill"
   in_progress:
     - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
   blocked: []
@@ -49,8 +50,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-21"
-  last_commit: "7da456d"
-  summary: "checkpoint - self-drift correction, sync to HEAD (pure checkpoint commit)"
+  last_commit: "6e109dc"
+  summary: "checkpoint - sync state to HEAD after self-drift early exit fix"
 
 confidence:
   state_confidence: high

@@ -10,8 +10,7 @@ Populating placeholder files. README.md started with "Local Runtime" section.
 
 ## Completed Since Last Checkpoint
 
-- Updated lifecycle validation for checkpoint idempotency (case-01 test plan)
-- Updated README.md with case-01 test section
+- Fixed self-drift exception control flow: added STEP 1.5 early exit in dev-checkpoint skill
 - Previous checkpoint: update lifecycle validation for checkpoint idempotency
 
 ## In Progress
@@ -29,7 +28,7 @@ Populating placeholder files. README.md started with "Local Runtime" section.
 - This IS the dev-protocol project itself, not a consumer of it
 - Global spec (design-doc-spec.md) loaded via user CLAUDE.md - governs all design docs
 - RTK (Rust Token Killer) is installed for token optimization
-- Latest commit `8e8defe` on master
+- Latest commit `6e109dc` on master
 - 3 placeholder files still empty: .gitignore, references/memory-rules.md, references/workflow-rules.md
 
 ## Next Recommended Actions
