@@ -49,8 +49,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-21"
-  last_commit: "8e8defe"
-  summary: "checkpoint - sync state to HEAD after idempotency validation commits"
+  last_commit: "7da456d"
+  summary: "checkpoint - self-drift correction, sync to HEAD (pure checkpoint commit)"
 
 confidence:
   state_confidence: high
