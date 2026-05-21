@@ -34,6 +34,24 @@ Must NOT rely only on memory.
 
 ---
 
+### 1.5 Self-Drift Detection (EARLY EXIT)
+
+Must run BEFORE state reconciliation.
+
+If the ONLY changes since `checkpoint.last_commit` are:
+
+- `workflow-state.yml` metadata fields (last_commit, summary, last_updated)
+- `handoff.md` commit references pointing to prior checkpoint commits
+- No other files modified (no code, docs, config, tests)
+
+Then:
+
+- classify drift as `NONE`
+- output "No meaningful changes detected"
+- **IMMEDIATELY STOP — do NOT proceed to any subsequent responsibility**
+
+---
+
 ### 2. Reconcile Project State
 
 Must update:
