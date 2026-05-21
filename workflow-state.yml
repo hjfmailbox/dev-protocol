@@ -23,6 +23,7 @@ progress:
     - "enhance dev-checkpoint skill with self-drift exception rule (Section 3.1)"
     - "expand self-drift exception to include summary, handoff refs, and metadata"
     - "update README.md with case-01 test section"
+    - "update lifecycle validation for checkpoint idempotency (case-01)"
   in_progress:
     - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
   blocked: []
@@ -48,8 +49,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-21"
-  last_commit: "f1d1bd8"
-  summary: "checkpoint - expand self-drift exception scope in dev-checkpoint skill"
+  last_commit: "8e8defe"
+  summary: "checkpoint - sync state to HEAD after idempotency validation commits"
 
 confidence:
   state_confidence: high
