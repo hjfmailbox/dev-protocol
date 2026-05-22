@@ -62,12 +62,15 @@ Then:
 
 ### 2. Reconcile Project State
 
-Must update:
+All state writes MUST target `.agent/dev-protocol/`:
 
-- workflow-state.yml
-- handoff.md
+- `.agent/dev-protocol/workflow-state.yml`
+- `.agent/dev-protocol/handoff.md`
 - relevant memory files
 - affected documentation
+
+MUST NOT create or update root-level copies of state files.
+Root-level `workflow-state.yml`, `handoff.md`, `project-rules.md` exist for backward compatibility only.
 
 Must prefer:
 

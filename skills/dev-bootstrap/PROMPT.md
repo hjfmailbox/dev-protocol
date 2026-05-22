@@ -51,11 +51,14 @@ Report only high-confidence drift.
 
 ## STEP 4: Generate State Files
 
-Create or update:
+Create or update in `.agent/dev-protocol/`:
 
-- workflow-state.yml
-- handoff.md
-- project-rules.md (only if missing or outdated)
+- `.agent/dev-protocol/workflow-state.yml`
+- `.agent/dev-protocol/handoff.md`
+- `.agent/dev-protocol/project-rules.md` (only if missing or outdated)
+
+DO NOT create or update root-level copies of these files.
+Root-level files exist for backward compatibility only.
 
 Ensure:
 

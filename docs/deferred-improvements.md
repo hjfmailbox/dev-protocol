@@ -17,9 +17,9 @@ Only consciously deferred items — no brainstormed ideas.
 
 ## 2. Duplicate state files (root + `.agent/dev-protocol/`)
 
-**Why deferred:** State files (`workflow-state.yml`, `handoff.md`, `project-rules.md`) exist in both the repository root and `.agent/dev-protocol/`. Only `.agent/dev-protocol/` is checked by `run-tests.ps1`. Root copies may diverge over time. Fixing requires a migration decision on which location is authoritative.
+**Why deferred:** State files (`workflow-state.yml`, `handoff.md`, `project-rules.md`) exist in both the repository root and `.agent/dev-protocol/`. The skill docs (`dev-bootstrap`, `dev-checkpoint`, `dev-resume`) now all specify `.agent/dev-protocol/` as the canonical path — root copies are legacy compatibility only. However, root copies are still git-tracked and have not been removed or `.gitignore`'d. Content divergence between the two copies exists (e.g. `workflow-state.yml.checkpoint.last_commit` differs).
 
-**Suggested revisit trigger:** A test failure caused by state file divergence between the two locations.
+**Suggested revisit trigger:** A checkpoint or resume behavior writes to the wrong location due to ambiguity, or root copies become an active source of confusion.
 
 **Priority:** Medium
 

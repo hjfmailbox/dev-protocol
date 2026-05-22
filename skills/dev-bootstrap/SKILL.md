@@ -48,9 +48,22 @@ Must prefer current code reality over outdated docs.
 
 ---
 
+### 2.5 State File Location Policy
+
+All state files MUST be written to `.agent/dev-protocol/`:
+
+- `.agent/dev-protocol/workflow-state.yml`
+- `.agent/dev-protocol/handoff.md`
+- `.agent/dev-protocol/project-rules.md`
+
+Root-level copies (`workflow-state.yml`, `handoff.md`, `project-rules.md`) exist for backward compatibility only.
+MUST NOT create, update, or reconcile root-level copies during bootstrap.
+
+---
+
 ### 3. Initialize Protocol Files
 
-Create or update:
+Create or update in `.agent/dev-protocol/`:
 
 - workflow-state.yml
 - handoff.md
