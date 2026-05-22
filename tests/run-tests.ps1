@@ -138,6 +138,7 @@ if ($Case -eq '06') {
     }
     Pass-Check "case-06 test-plan.md exists"
 
+    # git diff checks already done in section A; re-assert for clarity
     & git diff --quiet
     if ($LASTEXITCODE -ne 0) {
         Fail "case-06: workspace has uncommitted tracked changes"
@@ -154,6 +155,13 @@ if ($Case -eq '06') {
         Fail "case-06: no recent commit history available"
     }
     Pass-Check "case-06: recent commit history available"
+
+    # Verify workspace is in a valid post-goal state (not mid-checkpoint)
+    $HeadCommit = & git log --format=%s -1
+    if ($HeadCommit -match "dev-checkpoint.*baseline") {
+        Fail "case-06: HEAD is a checkpoint commit, not a goal workflow commit"
+    }
+    Pass-Check "case-06: HEAD is not a checkpoint commit"
 }
 
 # ── K. Final result ──────────────────────────────────────────────────
