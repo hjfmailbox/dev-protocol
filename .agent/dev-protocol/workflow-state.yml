@@ -49,9 +49,9 @@ next:
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
 
 checkpoint:
-  last_updated: "2026-05-21"
-  last_commit: "12b1db0"
-  summary: "checkpoint - sync state to HEAD after case-06 test integration"
+  last_updated: "2026-05-23"
+  last_commit: "73b1b78"
+  summary: "migrate to sole authoritative state location at .agent/dev-protocol/"
 
 confidence:
   state_confidence: high
