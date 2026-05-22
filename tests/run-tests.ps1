@@ -182,6 +182,13 @@ if ($Case -eq '06') {
         Fail "case-06: HEAD commit changed $DiffCount files but zero lines of content (empty or metadata-only)"
     }
     Pass-Check "case-06: HEAD commit has $Insertions insertions, $Deletions deletions (content changes confirmed)"
+
+    # Verify HEAD commit follows conventional commit format (validated implementation)
+    $HeadFullMsg = & git log --format=%s -1
+    if ($HeadFullMsg -notmatch '^(feat|fix|docs|test|chore|refactor)(\(.+\))?: .+') {
+        Fail "case-06: HEAD commit message does not follow conventional commit format: $HeadFullMsg"
+    }
+    Pass-Check "case-06: HEAD commit follows conventional commit format"
 }
 
 # ── K. Final result ──────────────────────────────────────────────────
