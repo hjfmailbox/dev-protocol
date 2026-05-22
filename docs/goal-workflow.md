@@ -134,7 +134,8 @@ The completing goal should explicitly state:
 - **Context to carry forward**: what the next goal needs to know
 - **Boundary note**: what was intentionally NOT changed and why
 - **Next candidate goal**: one concrete suggestion for follow-up
+- **Prompt seed**: a ready-to-use `/goal` prompt the next session can paste directly
 
-This reduces repeated analysis and scope drift between consecutive goals.
+This eliminates the translation step between sessions and prevents scope drift.
 
 A goal that completes without a continuation handoff has not fully completed its output contract.

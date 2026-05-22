@@ -115,8 +115,25 @@ Provide:
 - **Context to carry forward**: what the next goal needs to know about this change
 - **Boundary note**: what was intentionally NOT changed and why
 - **Next candidate goal**: one concrete suggestion for follow-up work
+- **Prompt seed**: one ready-to-use `/goal` prompt the next session can paste as-is
 
-This section exists so consecutive goals do not restart analysis from zero.
+The prompt seed should include:
+
+```text
+/goal
+
+## Goal
+<one-sentence objective>
+
+## Scope
+Allowed files:
+<explicit file list>
+
+Forbidden:
+<boundaries inherited from this goal + any new constraints>
+```
+
+This eliminates the translation step between sessions and prevents scope drift.
 
 ---
 

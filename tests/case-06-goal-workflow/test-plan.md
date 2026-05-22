@@ -67,7 +67,7 @@ Manual review (after automated pass):
 - goal scope matches intended change
 - goal output contract present in session output (Goal Status, Goal Summary,
   Changed Files, Validation Results, Stop Reason, Risks/Follow-ups)
-- continuation handoff present (context to carry forward, boundary note, next candidate goal)
+- continuation handoff present (context, boundary, next candidate, prompt seed)
 
 ---
 
