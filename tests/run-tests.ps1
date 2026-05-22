@@ -162,6 +162,14 @@ if ($Case -eq '06') {
         Fail "case-06: HEAD is a checkpoint commit, not a goal workflow commit"
     }
     Pass-Check "case-06: HEAD is not a checkpoint commit"
+
+    # Verify goal scope was respected (no unexpected broad modifications)
+    $DiffFiles = (& git diff --name-only HEAD~1..HEAD 2>$null)
+    $DiffCount = ($DiffFiles | Measure-Object).Count
+    if ($DiffCount -gt 10) {
+        Fail "case-06: HEAD commit changed $DiffCount files, exceeds goal scope threshold (10)"
+    }
+    Pass-Check "case-06: HEAD commit changed $DiffCount files (within goal scope)"
 }
 
 # ── K. Final result ──────────────────────────────────────────────────
