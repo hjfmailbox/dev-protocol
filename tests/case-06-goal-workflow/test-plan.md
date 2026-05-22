@@ -59,13 +59,14 @@ Automated assertions (all must pass):
 - HEAD commit changed ≤10 files (scope respected)
 - HEAD commit has non-zero content changes (not empty or metadata-only)
 - HEAD commit follows conventional commit format
-- HEAD commit has body text (Goal Summary per output contract)
 
 Manual review (after automated pass):
 
 - `/goal` workflow completed without errors
 - workspace consistent after completion
 - goal scope matches intended change
+- goal output contract present in session output (Goal Status, Goal Summary,
+  Changed Files, Validation Results, Stop Reason, Risks/Follow-ups)
 
 ---
 
@@ -80,7 +81,6 @@ Automated failures (any triggers FAIL immediately):
 - HEAD commit exceeds scope threshold (>10 files)
 - HEAD commit has zero content lines (empty or metadata-only)
 - HEAD commit message breaks conventional commit format
-- HEAD commit has no body (missing Goal Summary)
 
 Manual review failures:
 
@@ -122,10 +122,11 @@ Automated validation covers:
 - Commit integrity (conventional format, content changes, scope limit)
 - Workflow correctness (not a checkpoint commit)
 - Test plan presence
-- Output contract (commit body present as Goal Summary)
 
 Manual review should cover:
 
 - Goal intent alignment (did the change match the stated goal?)
 - File-level quality (are the changes correct, not just present?)
 - Validation completeness (were relevant tests run during goal execution?)
+- Goal output contract (session output contains required sections — not automatable
+  without output capture infrastructure)

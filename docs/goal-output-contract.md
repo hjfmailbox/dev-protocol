@@ -121,3 +121,28 @@ Never modify unrelated files without reporting them.
 Always provide a reviewable stopping summary.
 
 Never declare completion without confirming the expected file content actually changed.
+
+---
+
+## Validation Gap
+
+The output contract is defined as session text, not a file artifact.
+
+Current automation (`tests/run-tests.ps1` case-06) validates:
+
+- workspace cleanliness
+- commit integrity (conventional format, content changes, scope limit)
+- workflow correctness (not a checkpoint commit)
+
+It does NOT validate:
+
+- Goal Status section presence
+- Goal Summary section presence
+- Changed Files section presence
+- Validation Results section presence
+- Stop Reason section presence
+- Risks/Follow-ups section presence
+
+These sections exist only in session output and require manual review.
+
+Output contract automation would require session output capture (e.g., logging to a file), which is outside the current architecture scope.
