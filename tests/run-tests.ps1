@@ -79,7 +79,42 @@ if (-not $Match.Success) {
 }
 Pass-Check "last_commit matches valid hash: $($Match.Groups[1].Value)"
 
-# ── E. Final result ─────────────────────────────────────────────────
+# ── F. last_commit matches HEAD~1 ───────────────────────────────────
+
+$HeadParent = & git -C $Root rev-parse --short HEAD~1 2>$null
+if ($LASTEXITCODE -ne 0) {
+    Fail "Cannot resolve HEAD~1 in project root ($ProjectRoot)"
+}
+
+if ($Match.Groups[1].Value -ne $HeadParent) {
+    Fail "last_commit ($($Match.Groups[1].Value)) does not match HEAD~1 ($HeadParent)"
+}
+Pass-Check "last_commit matches HEAD~1: $HeadParent"
+
+# ── G. Project workspace clean ──────────────────────────────────────
+
+& git -C $Root diff --quiet
+if ($LASTEXITCODE -ne 0) {
+    Fail "Project workspace has uncommitted tracked changes"
+}
+
+& git -C $Root diff --cached --quiet
+if ($LASTEXITCODE -ne 0) {
+    Fail "Project workspace has staged changes"
+}
+Pass-Check "Project workspace clean"
+
+# ── H. HEAD is checkpoint commit ────────────────────────────────────
+
+$HeadCommit = & git -C $Root log --format=%s -1
+if ($HeadCommit -match "dev-checkpoint.*baseline") {
+    Pass-Check "HEAD commit indicates checkpoint baseline"
+}
+else {
+    Fail "HEAD commit does not indicate a checkpoint baseline"
+}
+
+# ── I. Final result ──────────────────────────────────────────────────
 
 Write-Host ""
 Write-Host "RESULT: PASS"
