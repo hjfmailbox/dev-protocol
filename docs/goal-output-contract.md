@@ -119,3 +119,5 @@ Never continue indefinitely after repeated failure.
 Never modify unrelated files without reporting them.
 
 Always provide a reviewable stopping summary.
+
+Never declare completion without confirming the expected file content actually changed.
