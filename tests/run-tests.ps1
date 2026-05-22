@@ -170,6 +170,18 @@ if ($Case -eq '06') {
         Fail "case-06: HEAD commit changed $DiffCount files, exceeds goal scope threshold (10)"
     }
     Pass-Check "case-06: HEAD commit changed $DiffCount files (within goal scope)"
+
+    # Verify changed files have actual content (not empty or metadata-only changes)
+    $DiffStat = (& git diff --shortstat HEAD~1..HEAD 2>$null)
+    $Insertions = 0
+    $Deletions = 0
+    if ($DiffStat -match '(\d+) insertion') { $Insertions = [int]$Matches[1] }
+    if ($DiffStat -match '(\d+) deletion') { $Deletions = [int]$Matches[1] }
+    $TotalLines = $Insertions + $Deletions
+    if ($TotalLines -eq 0 -and $DiffCount -gt 0) {
+        Fail "case-06: HEAD commit changed $DiffCount files but zero lines of content (empty or metadata-only)"
+    }
+    Pass-Check "case-06: HEAD commit has $Insertions insertions, $Deletions deletions (content changes confirmed)"
 }
 
 # ── K. Final result ──────────────────────────────────────────────────
