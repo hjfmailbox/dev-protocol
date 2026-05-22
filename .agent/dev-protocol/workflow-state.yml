@@ -50,8 +50,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-21"
-  last_commit: "6e109dc"
-  summary: "checkpoint - sync state to HEAD after self-drift early exit fix"
+  last_commit: "12b1db0"
+  summary: "checkpoint - sync state to HEAD after case-06 test integration"
 
 confidence:
   state_confidence: high
