@@ -52,3 +52,13 @@ Only consciously deferred items — no brainstormed ideas.
 **Suggested revisit trigger:** The file grows large enough that reducing redundancy becomes a readability concern.
 
 **Priority:** Low
+
+---
+
+## 6. Continuation handoff prompt hardening
+
+**Why deferred:** Cold-start recovery worked only after explicitly forbidding repository scanning and prior assumptions. The original continuation prompt was too weak and allowed the agent to expand scope, recovering global repo context instead of the current development phase.
+
+**Suggested revisit trigger:** Cold-start recovery fails again or agents repeatedly expand beyond documented continuation boundaries.
+
+**Priority:** Medium
