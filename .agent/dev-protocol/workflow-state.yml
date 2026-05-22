@@ -1,0 +1,57 @@
+version: 1
+
+project:
+  name: "dev-protocol"
+  initialized: true
+
+current_state:
+  phase: "p1"
+  focus: "protocol-definition-and-bootstrap"
+  status: active
+
+progress:
+  completed:
+    - "define protocol commands (bootstrap, checkpoint, resume)"
+    - "define commit rules, failure policy, sync rules"
+    - "create state file templates (workflow-state.yml, handoff.md, project-rules.md)"
+    - "create skill definitions (dev-bootstrap, dev-checkpoint, dev-resume)"
+    - "write MVP scope and basic test plan (case-01)"
+    - "initial commit: 23 files, full protocol structure"
+    - "enhance dev-checkpoint skill with strict validation mode (A-LINE rules)"
+    - "start populating README.md (local runtime section)"
+    - "enhance dev-resume skill with mandatory repository inspection and drift detection"
+    - "enhance dev-checkpoint skill with self-drift exception rule (Section 3.1)"
+    - "expand self-drift exception to include summary, handoff refs, and metadata"
+    - "update README.md with case-01 test section"
+    - "update lifecycle validation for checkpoint idempotency (case-01)"
+    - "fix self-drift exception control flow: add STEP 1.5 early exit in dev-checkpoint skill"
+  in_progress:
+    - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
+  blocked: []
+
+context:
+  important_constraints:
+    - "state over history"
+    - "recoverable without chat history"
+    - "fail over partial success"
+    - "LLM for reasoning, scripts for enforcement"
+    - "protocol logic must be reusable across projects"
+  recent_decisions:
+    - "v1 scope: single-agent only, no auto-repair, no advanced hooks"
+    - "three core commands: /dev-bootstrap, /dev-checkpoint, /dev-resume"
+    - "three state files: workflow-state.yml, handoff.md, project-rules.md"
+
+next:
+  recommended_actions:
+    - "complete README.md with full project overview"
+    - "create .gitignore for typical dev artifacts"
+    - "fill references/memory-rules.md and references/workflow-rules.md"
+    - "execute case-01 test plan: simulate change -> checkpoint -> resume"
+
+checkpoint:
+  last_updated: "2026-05-21"
+  last_commit: "6e109dc"
+  summary: "checkpoint - sync state to HEAD after self-drift early exit fix"
+
+confidence:
+  state_confidence: high
