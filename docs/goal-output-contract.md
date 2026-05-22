@@ -98,13 +98,25 @@ Repeated failures exceeded retry limit
 
 ### 6. Risks / Follow-ups
 
-Optional.
-
-Include:
+Include when applicable:
 
 - unresolved concerns
 - recommended next step
 - suggested future goal
+
+---
+
+### 7. Continuation Handoff
+
+Always include, even if brief.
+
+Provide:
+
+- **Context to carry forward**: what the next goal needs to know about this change
+- **Boundary note**: what was intentionally NOT changed and why
+- **Next candidate goal**: one concrete suggestion for follow-up work
+
+This section exists so consecutive goals do not restart analysis from zero.
 
 ---
 

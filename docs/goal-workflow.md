@@ -120,3 +120,21 @@ At completion, the workflow should provide:
 - validation results
 - remaining risks or blockers
 - recommended next step
+
+See `docs/goal-output-contract.md` for the full required output structure.
+
+---
+
+## Continuation Contract
+
+After one goal finishes, the output must support the next goal to start efficiently.
+
+The completing goal should explicitly state:
+
+- **Context to carry forward**: what the next goal needs to know
+- **Boundary note**: what was intentionally NOT changed and why
+- **Next candidate goal**: one concrete suggestion for follow-up
+
+This reduces repeated analysis and scope drift between consecutive goals.
+
+A goal that completes without a continuation handoff has not fully completed its output contract.
