@@ -189,6 +189,13 @@ if ($Case -eq '06') {
         Fail "case-06: HEAD commit message does not follow conventional commit format: $HeadFullMsg"
     }
     Pass-Check "case-06: HEAD commit follows conventional commit format"
+
+    # Verify HEAD commit has a body (Goal Summary per output contract)
+    $HeadBody = & git log --format=%b -1
+    if ([string]::IsNullOrWhiteSpace($HeadBody)) {
+        Fail "case-06: HEAD commit has no body — missing Goal Summary required by output contract"
+    }
+    Pass-Check "case-06: HEAD commit has body (Goal Summary present)"
 }
 
 # ── K. Final result ──────────────────────────────────────────────────
