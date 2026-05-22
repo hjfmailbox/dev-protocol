@@ -49,17 +49,41 @@ git log --oneline -3
 
 ## PASS Conditions
 
+Automated assertions (all must pass):
+
 - git workspace clean before test start
-- `/goal` workflow completes without errors
+- no staged changes
+- test-plan.md exists
+- recent commit history available (≥1 commit)
+- HEAD is not a checkpoint commit
+- HEAD commit changed ≤10 files (scope respected)
+- HEAD commit has non-zero content changes (not empty or metadata-only)
+- HEAD commit follows conventional commit format
+
+Manual review (after automated pass):
+
+- `/goal` workflow completed without errors
 - workspace consistent after completion
+- goal scope matches intended change
 
 ---
 
 ## FAIL Conditions
 
+Automated failures (any triggers FAIL immediately):
+
 - Dirty workspace before test start
+- Uncommitted tracked changes
+- Staged changes detected
+- HEAD is a checkpoint commit (wrong workflow executed)
+- HEAD commit exceeds scope threshold (>10 files)
+- HEAD commit has zero content lines (empty or metadata-only)
+- HEAD commit message breaks conventional commit format
+
+Manual review failures:
+
 - `/goal` workflow aborts
-- Workspace inconsistent after completion
+- Workspace inconsistent after completion (file content mismatch)
 
 ---
 
@@ -90,8 +114,15 @@ Development must stop when any of the following conditions are met:
 
 ## Validation Strategy
 
-- Prefer automated validation before manual review
-- Use existing tests when available
-- Add focused tests for new behavior when needed
-- Keep scope minimal for each goal
-- Validate only files relevant to the goal
+Automated validation covers:
+
+- Workspace cleanliness (git diff, staged changes)
+- Commit integrity (conventional format, content changes, scope limit)
+- Workflow correctness (not a checkpoint commit)
+- Test plan presence
+
+Manual review should cover:
+
+- Goal intent alignment (did the change match the stated goal?)
+- File-level quality (are the changes correct, not just present?)
+- Validation completeness (were relevant tests run during goal execution?)
