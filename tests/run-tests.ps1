@@ -242,17 +242,18 @@ if ($Case -eq '06') {
     Pass-Check "case-06: continuation_handoff all 4 sub-fields present and non-empty"
 
     # ── M. changed_files integrity ──────────────────────────────────
-    $ActualFiles = & git diff-tree --no-commit-id --name-only -r HEAD 2>$null
-    $DeclaredFiles = $OutputJson.changed_files
-    $ActualSet = [System.Collections.Generic.HashSet[string]]::new($ActualFiles, [System.StringComparer]::Ordinal)
-    $DeclaredSet = [System.Collections.Generic.HashSet[string]]::new($DeclaredFiles, [System.StringComparer]::Ordinal)
+    $ActualFiles = @(& git diff-tree --no-commit-id --name-only -r HEAD 2>$null) | Sort-Object
+    $DeclaredFiles = @($OutputJson.changed_files) | Sort-Object
 
-    if (-not $ActualSet.SetEquals($DeclaredSet)) {
-        $Missing = $DeclaredSet | Where-Object { -not $ActualSet.Contains($_) }
-        $Extra = $ActualSet | Where-Object { -not $DeclaredSet.Contains($_) }
+    $Missing = @()
+    $Extra = @()
+    foreach ($f in $DeclaredFiles) { if ($f -notin $ActualFiles) { $Missing += $f } }
+    foreach ($f in $ActualFiles) { if ($f -notin $DeclaredFiles) { $Extra += $f } }
+
+    if ($Missing.Count -gt 0 -or $Extra.Count -gt 0) {
         $Msg = "case-06: changed_files mismatch with HEAD commit:"
-        if ($Missing) { $Msg += "`n  Declared but not in commit: $($Missing -join ', ')" }
-        if ($Extra) { $Msg += "`n  In commit but not declared: $($Extra -join ', ')" }
+        if ($Missing.Count -gt 0) { $Msg += "`n  Declared but not in commit: $($Missing -join ', ')" }
+        if ($Extra.Count -gt 0) { $Msg += "`n  In commit but not declared: $($Extra -join ', ')" }
         Fail $Msg
     }
     Pass-Check "case-06: changed_files matches HEAD commit"
