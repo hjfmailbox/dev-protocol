@@ -150,6 +150,16 @@ if ($Case -eq '06') {
     }
     Pass-Check "case-06: git diff and git diff --cached are empty"
 
+    # ── Untracked file detection ────────────────────────────────────
+    # git diff only sees tracked changes. Untracked + non-ignored files
+    # are invisible to diff but can indicate workspace pollution.
+    $Untracked = & git ls-files --others --exclude-standard 2>$null
+    if ($Untracked -and $Untracked.Count -gt 0) {
+        $FileList = $Untracked -join "`n"
+        Fail "case-06: untracked files detected:`n$FileList"
+    }
+    Pass-Check "case-06: no untracked files"
+
     $LogCount = (& git log --oneline -3 | Measure-Object).Count
     if ($LogCount -eq 0) {
         Fail "case-06: no recent commit history available"

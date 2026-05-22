@@ -53,6 +53,7 @@ Automated assertions (all must pass):
 
 - git workspace clean before test start
 - no staged changes
+- no untracked + non-ignored files
 - test-plan.md exists
 - recent commit history available (≥1 commit)
 - HEAD is not a checkpoint commit
@@ -78,6 +79,7 @@ Automated failures (any triggers FAIL immediately):
 - Dirty workspace before test start
 - Uncommitted tracked changes
 - Staged changes detected
+- Untracked + non-ignored files detected
 - HEAD is a checkpoint commit (wrong workflow executed)
 - HEAD commit exceeds scope threshold (>10 files)
 - HEAD commit has zero content lines (empty or metadata-only)
