@@ -74,6 +74,19 @@ Execution must stop when:
 
 ---
 
+## Repeated Failures
+
+When the same failure occurs more than twice:
+
+- stop attempting the same approach
+- document what was tried and why it failed
+- flag the blocker in the output summary
+- wait for user guidance
+
+Do not retry indefinitely or silently switch strategies.
+
+---
+
 ## Validation Priority
 
 Validation order:
