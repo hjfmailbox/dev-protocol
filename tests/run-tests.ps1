@@ -199,6 +199,63 @@ if ($Case -eq '06') {
         Fail "case-06: HEAD commit message does not follow conventional commit format: $HeadFullMsg"
     }
     Pass-Check "case-06: HEAD commit follows conventional commit format"
+
+    # ── H. Goal output contract artifact ────────────────────────────
+    $Artifact = Join-Path ".agent/dev-protocol" "goal-output.json"
+    if (-not (Test-Path $Artifact)) {
+        Fail "case-06: goal-output.json missing at $Artifact"
+    }
+    Pass-Check "case-06: goal-output.json exists"
+
+    # ── I. Valid JSON ───────────────────────────────────────────────
+    try {
+        $OutputJson = Get-Content $Artifact -Raw | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        Fail "case-06: goal-output.json is malformed JSON: $_"
+    }
+    Pass-Check "case-06: goal-output.json is valid JSON"
+
+    # ── J. Required top-level fields ────────────────────────────────
+    $RequiredFields = @('goal_status', 'goal_summary', 'changed_files', 'validation_results', 'stop_reason', 'risks_followups', 'continuation_handoff')
+    foreach ($field in $RequiredFields) {
+        if ($null -eq $OutputJson.$field) {
+            Fail "case-06: goal-output.json missing required field: $field"
+        }
+    }
+    Pass-Check "case-06: all required top-level fields present"
+
+    # ── K. goal_status enum validation ──────────────────────────────
+    $ValidStatuses = @('COMPLETED', 'PARTIALLY_COMPLETED', 'BLOCKED', 'FAILED', 'ABORTED')
+    if ($OutputJson.goal_status -notin $ValidStatuses) {
+        Fail "case-06: goal_status '$($OutputJson.goal_status)' is not a valid value (must be one of: $($ValidStatuses -join ', '))"
+    }
+    Pass-Check "case-06: goal_status is valid: $($OutputJson.goal_status)"
+
+    # ── L. Continuation handoff completeness ────────────────────────
+    $HandoffFields = @('context', 'boundary', 'next_candidate_goal', 'prompt_seed')
+    foreach ($field in $HandoffFields) {
+        $value = $OutputJson.continuation_handoff.$field
+        if ($null -eq $value -or [string]::IsNullOrWhiteSpace($value)) {
+            Fail "case-06: continuation_handoff missing or empty required field: $field"
+        }
+    }
+    Pass-Check "case-06: continuation_handoff all 4 sub-fields present and non-empty"
+
+    # ── M. changed_files integrity ──────────────────────────────────
+    $ActualFiles = & git diff-tree --no-commit-id --name-only -r HEAD 2>$null
+    $DeclaredFiles = $OutputJson.changed_files
+    $ActualSet = [System.Collections.Generic.HashSet[string]]::new($ActualFiles, [System.StringComparer]::Ordinal)
+    $DeclaredSet = [System.Collections.Generic.HashSet[string]]::new($DeclaredFiles, [System.StringComparer]::Ordinal)
+
+    if (-not $ActualSet.SetEquals($DeclaredSet)) {
+        $Missing = $DeclaredSet | Where-Object { -not $ActualSet.Contains($_) }
+        $Extra = $ActualSet | Where-Object { -not $DeclaredSet.Contains($_) }
+        $Msg = "case-06: changed_files mismatch with HEAD commit:"
+        if ($Missing) { $Msg += "`n  Declared but not in commit: $($Missing -join ', ')" }
+        if ($Extra) { $Msg += "`n  In commit but not declared: $($Extra -join ', ')" }
+        Fail $Msg
+    }
+    Pass-Check "case-06: changed_files matches HEAD commit"
 }
 
 # ── K. Final result ──────────────────────────────────────────────────

@@ -175,3 +175,56 @@ It does NOT validate:
 These sections exist only in session output and require manual review.
 
 Output contract automation would require session output capture (e.g., logging to a file), which is outside the current architecture scope.
+
+---
+
+## Artifact Contract (Machine-Validated)
+
+At goal completion, write `.agent/dev-protocol/goal-output.json` containing all
+required sections as structured data. This file is untracked (gitignored) and
+exists solely for automated validation by case-06.
+
+### Required Schema
+
+```json
+{
+  "goal_status": "COMPLETED",
+  "goal_summary": "Short description of what changed",
+  "changed_files": ["docs/example.md"],
+  "validation_results": ["PASS: automated validation"],
+  "stop_reason": "Goal completed successfully",
+  "risks_followups": ["Unresolved concern X"],
+  "continuation_handoff": {
+    "context": "What the next goal needs to know",
+    "boundary": "What was intentionally NOT changed",
+    "next_candidate_goal": "One concrete follow-up suggestion",
+    "prompt_seed": "/goal\n\n## Goal\n<one-sentence objective>"
+  }
+}
+```
+
+### Field Definitions
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `goal_status` | string | Yes | Must be one of: `COMPLETED`, `PARTIALLY_COMPLETED`, `BLOCKED`, `FAILED`, `ABORTED` |
+| `goal_summary` | string | Yes | Short description of what changed |
+| `changed_files` | array[string] | Yes | Paths relative to repo root |
+| `validation_results` | array[string] | Yes | Result strings from validation |
+| `stop_reason` | string | Yes | Explicit explanation of why execution stopped |
+| `risks_followups` | array[string] | Yes | May be empty `[]` if none |
+| `continuation_handoff` | object | Yes | Must contain all 4 sub-fields |
+
+### Handoff Sub-Fields
+
+| Sub-Field | Type | Required | Notes |
+|---|---|---|---|
+| `context` | string | Yes | Context to carry forward |
+| `boundary` | string | Yes | What was intentionally NOT changed |
+| `next_candidate_goal` | string | Yes | Concrete follow-up suggestion |
+| `prompt_seed` | string | Yes | Ready-to-use `/goal` prompt text |
+
+### Integrity Rule
+
+`changed_files` must exactly match `git diff-tree --no-commit-id --name-only -r HEAD`.
+Any mismatch is a validation failure.

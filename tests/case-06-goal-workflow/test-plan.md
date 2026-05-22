@@ -60,15 +60,19 @@ Automated assertions (all must pass):
 - HEAD commit changed ≤10 files (scope respected)
 - HEAD commit has non-zero content changes (not empty or metadata-only)
 - HEAD commit follows conventional commit format
+- goal-output.json exists in .agent/dev-protocol/
+- goal-output.json is valid JSON
+- all required top-level fields present (goal_status, goal_summary, changed_files, validation_results, stop_reason, risks_followups, continuation_handoff)
+- goal_status is one of: COMPLETED, PARTIALLY_COMPLETED, BLOCKED, FAILED, ABORTED
+- continuation_handoff has all 4 non-empty sub-fields (context, boundary, next_candidate_goal, prompt_seed)
+- changed_files matches git diff-tree HEAD commit exactly
 
 Manual review (after automated pass):
 
 - `/goal` workflow completed without errors
 - workspace consistent after completion
 - goal scope matches intended change
-- goal output contract present in session output (Goal Status, Goal Summary,
-  Changed Files, Validation Results, Stop Reason, Risks/Follow-ups)
-- continuation handoff present (context, boundary, next candidate, prompt seed)
+- file-level quality of changes (correct content, not just present files)
 
 ---
 
@@ -84,6 +88,12 @@ Automated failures (any triggers FAIL immediately):
 - HEAD commit exceeds scope threshold (>10 files)
 - HEAD commit has zero content lines (empty or metadata-only)
 - HEAD commit message breaks conventional commit format
+- goal-output.json missing
+- goal-output.json malformed JSON
+- missing required top-level fields
+- goal_status not a valid enum value
+- continuation_handoff missing or empty sub-fields
+- changed_files does not match HEAD commit
 
 Manual review failures:
 
@@ -121,15 +131,14 @@ Development must stop when any of the following conditions are met:
 
 Automated validation covers:
 
-- Workspace cleanliness (git diff, staged changes)
+- Workspace cleanliness (git diff, staged changes, untracked files)
 - Commit integrity (conventional format, content changes, scope limit)
 - Workflow correctness (not a checkpoint commit)
 - Test plan presence
+- Goal output contract (goal-output.json: fields, status enum, handoff completeness, changed_files integrity)
 
 Manual review should cover:
 
 - Goal intent alignment (did the change match the stated goal?)
-- File-level quality (are the changes correct, not just present?)
+- File-level quality (are the changes correct, not just present files?)
 - Validation completeness (were relevant tests run during goal execution?)
-- Goal output contract (session output contains required sections — not automatable
-  without output capture infrastructure)
