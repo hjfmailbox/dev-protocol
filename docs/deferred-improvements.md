@@ -70,3 +70,18 @@ Root duplicate state files (`workflow-state.yml`, `handoff.md`, `project-rules.m
 **Suggested revisit trigger:** A legitimate NO_OP goal consistently triggers case-06 FAIL, indicating the artifact requirement is too strict for goals that produce no file changes.
 
 **Priority:** Medium
+
+## 8. Bash heredoc artifact emission may silently fail on Windows
+
+**Why deferred:** During /goal validation, Claude reported successful
+creation of `.agent/dev-protocol/goal-output.json` using bash heredoc
+syntax (`cat > file <<EOF`) but no file was actually written.
+PowerShell-native file creation succeeded immediately.
+
+This appears to be an agent shell reliability issue rather than a
+protocol design problem.
+
+**Suggested revisit trigger:** Repeated missing artifact incidents
+despite case-06 contract enforcement.
+
+**Priority:** Medium
