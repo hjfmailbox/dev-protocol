@@ -72,6 +72,7 @@ PASS if:
 - last_commit == HEAD~1 (pre-commit HEAD, parent of checkpoint commit)
 - working tree clean
 - `git diff last_commit..HEAD` shows only state file changes
+- HEAD commit matches one of: `dev-checkpoint.*baseline`, `refactor(state):.*migrate`, or `^chore(checkpoint):`
 
 FAIL if:
 

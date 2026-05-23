@@ -128,8 +128,11 @@ if ($Case -eq '05') {
     elseif ($HeadCommit -match "refactor\(state\):.*migrate") {
         Pass-Check "HEAD is a state migration commit (skipping checkpoint baseline check)"
     }
+    elseif ($HeadCommit -match "^chore\(checkpoint\):") {
+        Pass-Check "HEAD is a /dev-checkpoint generated commit"
+    }
     else {
-        Fail "HEAD commit does not indicate a checkpoint baseline or state migration"
+        Fail "HEAD commit does not indicate a checkpoint baseline, state migration, or checkpoint sync"
     }
 }
 

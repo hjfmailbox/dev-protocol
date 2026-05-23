@@ -52,8 +52,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-23"
-  last_commit: "acab67a"
-  summary: "add .claude/worktrees/ to gitignore; state synced after runtime migration"
+  last_commit: "d6b4315"
+  summary: "accept chore(checkpoint) commit format in case-05 detection; update test-plan.md"
 
 confidence:
   state_confidence: high
