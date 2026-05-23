@@ -31,8 +31,9 @@ progress:
     - "remove redundant root-level MVP.md and PROTOCOL.md (content merged into README)"
     - "add deferred improvements: test numbering, .agents convention, real-project validation"
     - "expand deferred improvements: case-05/06 order, checkpoint commit contract, phase drift, status freshness"
+    - "fill references/memory-rules.md with v1 protocol memory document (68 lines, goal completed, case-06 PASS)"
   in_progress:
-    - "fill remaining placeholder files (memory-rules.md, workflow-rules.md)"
+    - "fill remaining placeholder file (workflow-rules.md)"
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
   blocked: []
 
@@ -55,9 +56,9 @@ next:
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
 
 checkpoint:
-  last_updated: "2026-05-23"
-  last_commit: "2b968898b4e26cc1a5515f70e7f7b166d99b1efa"
-  summary: "expand deferred improvements with real-project validation findings"
+  last_updated: "2026-05-24"
+  last_commit: "ae14bccd3f4e25e4a81b3e28c79df16a6f15c2f7"
+  summary: "fill references/memory-rules.md with v1 protocol memory document"
 
 confidence:
   state_confidence: high
