@@ -10,10 +10,15 @@ Executing case-01 test plan to validate full bootstrap → checkpoint → resume
 
 ## Completed Since Last Checkpoint
 
-- Filled references/workflow-rules.md with v1 workflow document (76 lines)
-- Covers: development lifecycle (5 commands), work categories, validation order, safe iteration rules, example workflow
-- All reference/ placeholder files now populated
-- Goal completed successfully, case-06 all 17 checks PASS
+- Created docs/retrospective-v1.md (100 lines)
+- Covers: what worked (bootstrap/checkpoint/resume lifecycle, goal artifact contract, case-05/06 validation, real-project validation success)
+- Covers: what failed (`.agent` → `.agents` migration, Windows heredoc artifact emission, rebase affecting last_commit, checkpoint commit vs baseline confusion)
+- Covers: deferred improvements (high and low priority items summarized from deferred-improvements.md)
+- Covers: decisions made (`.agents/dev-protocol/` location, markdown format, protocol frozen)
+- Covers: v1 exit criteria (MVP complete statement)
+- case-06 validation passed: 17/17 checks PASS
+- Only one file changed: docs/retrospective-v1.md
+- No speculative v2 design, no protocol changes
 
 ## In Progress
 
@@ -29,13 +34,13 @@ Executing case-01 test plan to validate full bootstrap → checkpoint → resume
 - Global spec (design-doc-spec.md) loaded via user CLAUDE.md - governs all design docs
 - RTK (Rust Token Killer) is installed for token optimization
 - Runtime directory is `.agents/dev-protocol/` (plural), docs at `.agents/dev-protocol/docs/`
-- README.md serves as the project entry point; MVP.md and PROTOCOL.md removed as redundant
-- All reference/ placeholder files now populated (memory-rules.md, workflow-rules.md)
+- v1 protocol is now frozen after successful real-project validation
 - case-06 test script has a path resolution bug when run from tests/ subdirectory (requires running from repo root)
 
 ## Next Recommended Actions
 
 1. Execute case-01 test plan to validate full bootstrap → checkpoint → resume cycle
+2. Consider addressing high-priority deferred improvements after case-01 passes
 
 ## Notes For Next Session
 
@@ -43,3 +48,4 @@ Executing case-01 test plan to validate full bootstrap → checkpoint → resume
 - Strict validation rules enforced in dev-checkpoint skill
 - Global spec prohibits the words "继承", "同上", "略" in design docs (word-level match)
 - Phase remains p2 — protocol definition complete, placeholder population in progress
+- v1 retrospective frozen, no further protocol changes within v1 scope

@@ -34,6 +34,7 @@ progress:
     - "fill references/memory-rules.md with v1 protocol memory document (68 lines, goal completed, case-06 PASS)"
     - "fill references/workflow-rules.md with v1 workflow document (76 lines, goal completed, case-06 PASS)"
     - "all reference/ placeholder files populated"
+    - "create v1 retrospective document (docs/retrospective-v1.md, 100 lines, case-06 PASS)"
   in_progress:
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
   blocked: []
@@ -57,8 +58,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "56d9827005c249ed7e39238a7f8dc51f22383f5b"
-  summary: "fill references/workflow-rules.md with v1 workflow document"
+  last_commit: "f42cf58949cc25f2e73062d52c4502f9be37d2b4"
+  summary: "docs(retrospective): add v1 retrospective document"
 
 confidence:
   state_confidence: high
