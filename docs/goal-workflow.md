@@ -61,6 +61,7 @@ During execution:
 - avoid unrelated refactors
 - validate continuously
 - stop immediately on unsafe state
+- prefer completing one scoped goal before starting another
 
 ---
 
