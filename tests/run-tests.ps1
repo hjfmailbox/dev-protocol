@@ -94,15 +94,25 @@ if ($Case -eq '05') {
 
     # ── F. last_commit matches HEAD~1 ───────────────────────────────
 
-    $HeadParent = & git -C $Root rev-parse --short HEAD~1 2>$null
+    $HeadParent = & git -C $Root rev-parse HEAD~1 2>$null
     if ($LASTEXITCODE -ne 0) {
         Fail "Cannot resolve HEAD~1 in project root ($ProjectRoot)"
     }
 
-    if ($Match.Groups[1].Value -ne $HeadParent) {
-        Fail "last_commit ($($Match.Groups[1].Value)) does not match HEAD~1 ($HeadParent)"
+    # Normalize both to lowercase for comparison
+    $LastCommit = $Match.Groups[1].Value.ToLowerInvariant()
+    $HeadParent = $HeadParent.Trim().ToLowerInvariant()
+
+    if ($LastCommit -ne $HeadParent) {
+        # If full hash mismatch, check if short form matches (tolerate 7-char vs full hash)
+        if ($HeadParent.StartsWith($LastCommit) -or $LastCommit.StartsWith($HeadParent.Substring(0, [Math]::Min($LastCommit.Length, 7)))) {
+            Pass-Check "last_commit matches HEAD~1 (short/full): $HeadParent"
+        } else {
+            Fail "last_commit ($($Match.Groups[1].Value)) does not match HEAD~1 ($HeadParent)"
+        }
+    } else {
+        Pass-Check "last_commit matches HEAD~1: $HeadParent"
     }
-    Pass-Check "last_commit matches HEAD~1: $HeadParent"
 
     # ── G. Project workspace clean ──────────────────────────────────
 

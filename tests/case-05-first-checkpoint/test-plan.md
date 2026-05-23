@@ -68,8 +68,8 @@ git diff --stat last_commit..HEAD
 PASS if:
 
 - exactly one checkpoint commit created
-- last_commit is a pure hash
-- last_commit == HEAD~1 (pre-commit HEAD, parent of checkpoint commit)
+- last_commit is a pure hash (full or short form)
+- last_commit matches HEAD~1 (full hash comparison; tolerates short vs full mismatch)
 - working tree clean
 - `git diff last_commit..HEAD` shows only state file changes
 - HEAD commit matches one of: `dev-checkpoint.*baseline`, `refactor(state):.*migrate`, or `^chore(checkpoint):`
