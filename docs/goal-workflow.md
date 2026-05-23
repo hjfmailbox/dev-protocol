@@ -20,9 +20,9 @@ Set Goal
 → Analyze Scope
 → Implement
 → Validate
-→ Stop
 → Write Output Artifact (goal-output.json or goal-output.md)
 → Terminal Summary
+→ Stop
 → Wait For Review
 ```
 

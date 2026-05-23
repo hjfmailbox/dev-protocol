@@ -85,11 +85,13 @@ Before stopping, MUST perform both:
 
 ### A. Write Output Artifact
 
-Write `.agent/dev-protocol/goal-output.json` with all required fields
-per `docs/goal-output-contract.md`. If JSON is not possible, write
-`.agent/dev-protocol/goal-output.md` with all seven section headers.
+Write at least one artifact:
 
-This is mandatory — a completed goal without the artifact is incomplete.
+- `.agent/dev-protocol/goal-output.json` (preferred when feasible)
+- `.agent/dev-protocol/goal-output.md` (fallback when JSON is impractical)
+
+The artifact must contain all required sections per `docs/goal-output-contract.md`.
+This is mandatory — a completed goal without at least one artifact is incomplete.
 
 ### B. Terminal Summary
 
