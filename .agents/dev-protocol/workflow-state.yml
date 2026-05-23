@@ -5,8 +5,8 @@ project:
   initialized: true
 
 current_state:
-  phase: "p1"
-  focus: "protocol-definition-and-bootstrap"
+  phase: "p2"
+  focus: "populate-placeholders-and-validation"
   status: active
 
 progress:
@@ -30,8 +30,10 @@ progress:
     - "replace placeholder README.md with complete project entry document"
     - "remove redundant root-level MVP.md and PROTOCOL.md (content merged into README)"
     - "add deferred improvements: test numbering, .agents convention, real-project validation"
+    - "expand deferred improvements: case-05/06 order, checkpoint commit contract, phase drift, status freshness"
   in_progress:
     - "fill remaining placeholder files (memory-rules.md, workflow-rules.md)"
+    - "execute case-01 test plan: simulate change -> checkpoint -> resume"
   blocked: []
 
 context:
@@ -45,6 +47,7 @@ context:
     - "v1 scope: single-agent only, no auto-repair, no advanced hooks"
     - "three core commands: /dev-bootstrap, /dev-checkpoint, /dev-resume"
     - "three state files: workflow-state.yml, handoff.md, project-rules.md"
+    - "README.md serves as project entry point; MVP.md and PROTOCOL.md removed"
 
 next:
   recommended_actions:
@@ -53,8 +56,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-23"
-  last_commit: "a655df5d47d067aaf4c9a10a93da0808f11f042b"
-  summary: "replace README.md, remove MVP.md and PROTOCOL.md"
+  last_commit: "2b968898b4e26cc1a5515f70e7f7b166d99b1efa"
+  summary: "expand deferred improvements with real-project validation findings"
 
 confidence:
   state_confidence: high

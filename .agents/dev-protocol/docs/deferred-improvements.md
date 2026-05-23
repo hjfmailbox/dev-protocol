@@ -155,3 +155,104 @@ Suggested scope:
 public release preparation.
 
 **Priority:** Low
+
+## 12. Clarify case-05 and case-06 execution order
+
+**Why deferred:** Real-project validation revealed ambiguity in
+the expected validation sequence.
+
+`case-06` validates a completed `/goal` commit and its associated
+goal-output artifact. However, after `/dev-checkpoint`, HEAD changes
+to a checkpoint commit, causing `case-06` to fail due to
+changed_files mismatch.
+
+`case-05` validates `/dev-checkpoint` behavior and therefore must
+run after checkpoint.
+
+Expected order should be explicitly documented:
+
+`/goal → case-06 → /dev-checkpoint → case-05`
+
+**Suggested revisit trigger:** Protocol documentation cleanup or
+further real-project validation.
+
+**Priority:** High
+
+## 13. /dev-checkpoint commit message contract may not be enforced
+
+**Why deferred:** During real-project validation, `/dev-checkpoint`
+appeared to reuse the previous goal commit message instead of
+creating a checkpoint-style commit message expected by `case-05`.
+
+This caused:
+
+`HEAD commit does not indicate a checkpoint baseline`
+
+Potential causes:
+
+- commit reuse behavior
+- skipped checkpoint commit path
+- prompt ambiguity
+
+**Suggested revisit trigger:** Repeated case-05 failures after
+successful checkpoint execution.
+
+**Priority:** High
+
+## 14. /dev-resume may restore outdated project phase
+
+**Why deferred:** During real-project validation, `/dev-resume`
+restored the repository as:
+
+`p1 — protocol-definition-and-bootstrap`
+
+despite the project having already completed:
+
+- bootstrap
+- checkpoint
+- resume
+- real-project validation
+- runtime migration
+- README onboarding
+- protocol hardening
+
+This suggests either:
+
+- workflow-state phase progression is not being updated
+- `/dev-checkpoint` does not persist phase changes
+- `/dev-resume` over-relies on stale persisted state
+
+Recovery context remained usable, but project maturity was
+significantly underestimated.
+
+**Suggested revisit trigger:** Repeated phase mismatch after
+successful checkpoint/resume cycles.
+
+**Priority:** High
+
+## 15. /dev-resume repository status freshness may drift
+
+**Why deferred:** During real-project validation, `/dev-resume`
+reported:
+
+`workspace clean (1 modified file: deferred-improvements.md)`
+
+after a successful `/dev-checkpoint` where the workspace was
+already clean.
+
+This suggests resume may rely partially on persisted metadata
+instead of fully recomputing current repository state from git.
+
+Potential causes:
+
+- stale handoff/workflow-state synchronization
+- cached repository status
+- insufficient runtime git refresh during resume
+
+Context reconstruction remained functional, but repository
+freshness reporting was inaccurate.
+
+**Suggested revisit trigger:** Repeated resume outputs that
+contradict `git status`.
+
+**Priority:** Medium
