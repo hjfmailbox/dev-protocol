@@ -60,3 +60,13 @@ Root duplicate state files (`workflow-state.yml`, `handoff.md`, `project-rules.m
 **Suggested revisit trigger:** Cold-start recovery fails again or agents repeatedly expand beyond documented continuation boundaries.
 
 **Priority:** Medium
+
+---
+
+## 7. NO_OP goals do not generate goal-output artifacts
+
+**Why deferred:** A goal that completes without changing any files (NO_OP — e.g., "add documentation that already exists", "refactor that is already clean") may not produce `goal-output.json` or `goal-output.md`. Case-06 will FAIL on artifact absence even though the goal completed legitimately. This creates false FAILs for valid no-change goals.
+
+**Suggested revisit trigger:** A legitimate NO_OP goal consistently triggers case-06 FAIL, indicating the artifact requirement is too strict for goals that produce no file changes.
+
+**Priority:** Medium
