@@ -25,8 +25,10 @@ progress:
     - "update README.md with case-01 test section"
     - "update lifecycle validation for checkpoint idempotency (case-01)"
     - "fix self-drift exception control flow: add STEP 1.5 early exit in dev-checkpoint skill"
+    - "migrate runtime directory from .agent/ to .agents/ and colocate protocol docs"
+    - "populate .gitignore with session artifact ignore rules"
   in_progress:
-    - "fill remaining placeholder files (.gitignore, memory-rules.md, workflow-rules.md)"
+    - "fill remaining placeholder files (memory-rules.md, workflow-rules.md)"
   blocked: []
 
 context:
@@ -44,14 +46,14 @@ context:
 next:
   recommended_actions:
     - "complete README.md with full project overview"
-    - "create .gitignore for typical dev artifacts"
     - "fill references/memory-rules.md and references/workflow-rules.md"
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
+    - "run /dev-checkpoint to validate end-to-end flow with new .agents/ paths"
 
 checkpoint:
   last_updated: "2026-05-23"
-  last_commit: "ee712b6"
-  summary: "migrate runtime directory from .agent/ to .agents/ and colocate protocol docs"
+  last_commit: "acab67a"
+  summary: "add .claude/worktrees/ to gitignore; state synced after runtime migration"
 
 confidence:
   state_confidence: high
