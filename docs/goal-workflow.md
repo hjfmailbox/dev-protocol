@@ -34,6 +34,7 @@ A valid `/goal` should:
 - define observable validation
 - define scope boundaries
 - avoid unrelated modifications
+- keep scope minimal: one clear objective, not a broad initiative
 
 Bad example:
 
