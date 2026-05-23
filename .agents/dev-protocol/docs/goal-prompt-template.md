@@ -87,10 +87,10 @@ Before stopping, MUST perform both:
 
 Write at least one artifact:
 
-- `.agent/dev-protocol/goal-output.json` (preferred when feasible)
-- `.agent/dev-protocol/goal-output.md` (fallback when JSON is impractical)
+- `.agents/dev-protocol/goal-output.json` (preferred when feasible)
+- `.agents/dev-protocol/goal-output.md` (fallback when JSON is impractical)
 
-The artifact must contain all required sections per `docs/goal-output-contract.md`.
+The artifact must contain all required sections per `.agents/dev-protocol/docs/goal-output-contract.md`.
 This is mandatory — a completed goal without at least one artifact is incomplete.
 
 ### B. Terminal Summary

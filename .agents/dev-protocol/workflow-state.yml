@@ -50,8 +50,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-23"
-  last_commit: "73b1b78"
-  summary: "migrate to sole authoritative state location at .agent/dev-protocol/"
+  last_commit: "ee712b6"
+  summary: "migrate runtime directory from .agent/ to .agents/ and colocate protocol docs"
 
 confidence:
   state_confidence: high

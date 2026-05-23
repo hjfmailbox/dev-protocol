@@ -62,10 +62,10 @@ Then:
 
 ### 2. Reconcile Project State
 
-All state writes MUST target `.agent/dev-protocol/`:
+All state writes MUST target `.agents/dev-protocol/`:
 
-- `.agent/dev-protocol/workflow-state.yml`
-- `.agent/dev-protocol/handoff.md`
+- `.agents/dev-protocol/workflow-state.yml`
+- `.agents/dev-protocol/handoff.md`
 - relevant memory files
 - affected documentation
 

@@ -15,11 +15,19 @@ Only consciously deferred items — no brainstormed ideas.
 
 ---
 
-## 2. Duplicate state files (root + `.agent/dev-protocol/`)
+## 2. Duplicate state files (root + `.agents/dev-protocol/`)
 
 **Status:** Completed
 
-Root duplicate state files (`workflow-state.yml`, `handoff.md`, `project-rules.md`) were removed from git tracking. `.agent/dev-protocol/` is now the sole authoritative state location. Skills already read/write exclusively to `.agent/dev-protocol/`; dev-resume fallback to root is preserved as dead code but never triggered since `.agent/dev-protocol/` always exists.
+Root duplicate state files (`workflow-state.yml`, `handoff.md`, `project-rules.md`) were removed from git tracking. `.agents/dev-protocol/` is now the sole authoritative state location. Skills already read/write exclusively to `.agents/dev-protocol/`; dev-resume fallback to root is preserved as dead code but never triggered since `.agents/dev-protocol/` always exists.
+
+---
+
+## 9. Runtime directory migration: `.agent/` → `.agents/`
+
+**Status:** Completed
+
+The runtime directory was renamed from `.agent/dev-protocol/` to `.agents/dev-protocol/`. Backward compatibility is preserved in `/dev-resume` (prefers `.agents/`, falls back to `.agent/`). The `.agent/` fallback is dead code until a future cleanup removes it entirely.
 
 ---
 
@@ -74,7 +82,7 @@ Root duplicate state files (`workflow-state.yml`, `handoff.md`, `project-rules.m
 ## 8. Bash heredoc artifact emission may silently fail on Windows
 
 **Why deferred:** During /goal validation, Claude reported successful
-creation of `.agent/dev-protocol/goal-output.json` using bash heredoc
+creation of `.agents/dev-protocol/goal-output.json` using bash heredoc
 syntax (`cat > file <<EOF`) but no file was actually written.
 PowerShell-native file creation succeeded immediately.
 

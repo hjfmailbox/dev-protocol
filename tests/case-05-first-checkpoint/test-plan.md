@@ -28,7 +28,7 @@ Expected:
 Validation:
 
 ```powershell
-Select-String "last_commit" .agent/dev-protocol/workflow-state.yml
+Select-String "last_commit" .agents/dev-protocol/workflow-state.yml
 git log --oneline -2
 git status
 ```
@@ -57,7 +57,7 @@ Expected:
 Validation:
 
 ```powershell
-Select-String "last_commit" .agent/dev-protocol/workflow-state.yml
+Select-String "last_commit" .agents/dev-protocol/workflow-state.yml
 git rev-parse HEAD
 git rev-parse HEAD~1
 git log --oneline -3
@@ -102,7 +102,7 @@ Validation:
 git log --oneline -3
 git status
 git diff
-Select-String "last_commit" .agent/dev-protocol/workflow-state.yml
+Select-String "last_commit" .agents/dev-protocol/workflow-state.yml
 git diff --stat last_commit..HEAD
 ```
 

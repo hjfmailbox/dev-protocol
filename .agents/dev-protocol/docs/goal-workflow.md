@@ -125,7 +125,7 @@ At completion, the workflow should provide:
 - remaining risks or blockers
 - recommended next step
 
-See `docs/goal-output-contract.md` for the full required output structure.
+See `.agents/dev-protocol/docs/goal-output-contract.md` for the full required output structure.
 
 ---
 

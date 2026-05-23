@@ -54,11 +54,11 @@ The core problem: if the artifact is tracked by git, every goal commit includes 
 
 ```
 # Session output artifacts — validated by case-06, not versioned
-.agent/dev-protocol/goal-output.*
+.agents/dev-protocol/goal-output.*
 ```
 
 This means:
-- Claude writes `.agent/dev-protocol/goal-output.json` or `.goal-output.md` at goal completion
+- Claude writes `.agents/dev-protocol/goal-output.json` or `.goal-output.md` at goal completion
 - File exists on disk for case-06 to validate
 - File is untracked — `git diff --name-only` does not include it
 - File does not count toward the 10-file scope threshold
@@ -164,7 +164,7 @@ JSON is cleaner for nested structure. Markdown requires multi-line regex which i
 
 **No explicit cleanup needed.** The artifact lifecycle is:
 
-1. **Create:** Claude writes `.agent/dev-protocol/goal-output.*` at goal completion
+1. **Create:** Claude writes `.agents/dev-protocol/goal-output.*` at goal completion
 2. **Validate:** `run-tests.ps1` reads it during case-06 execution
 3. **Overwrite:** Next goal completion overwrites the file automatically
 4. **Ignore:** `.gitignore` prevents tracking
@@ -191,12 +191,12 @@ If Claude crashes before writing the artifact: test FAILs with "missing artifact
 **1. `.gitignore` — add entry:**
 ```
 # Session output artifacts — validated by case-06, not versioned
-.agent/dev-protocol/goal-output.json
+.agents/dev-protocol/goal-output.json
 ```
 
-**2. `docs/goal-output-contract.md` — add under Hard Rules:**
+**2. `.agents/dev-protocol/docs/goal-output-contract.md` — add under Hard Rules:**
 ```
-At goal completion, write `.agent/dev-protocol/goal-output.json` containing all
+At goal completion, write `.agents/dev-protocol/goal-output.json` containing all
 required sections as structured data. This file is untracked (gitignored) and
 exists solely for automated validation.
 ```
@@ -206,7 +206,7 @@ Add a JSON schema appendix showing the exact expected structure.
 **3. `tests/case-06-goal-workflow/test-plan.md` — move output contract from Manual to Automated:**
 ```
 Automated assertions (additional):
-- goal-output.json exists in .agent/dev-protocol/
+- goal-output.json exists in .agents/dev-protocol/
 - contains goal_status field with valid value
 - contains stop_reason field with non-empty value
 - contains continuation_handoff with all 4 sub-fields
@@ -269,10 +269,10 @@ Without `.gitignore`, the session-output artifact has two failure modes:
 Add an untracked-file detection assertion to case-06:
 
 ```powershell
-# Detect unexpected untracked files in .agent/dev-protocol/
-$Untracked = & git ls-files --others --exclude-standard -- .agent/dev-protocol/
+# Detect unexpected untracked files in .agents/dev-protocol/
+$Untracked = & git ls-files --others --exclude-standard -- .agents/dev-protocol/
 # Filter out known-safe untracked files (e.g., goal-output.json)
-$KnownIgnored = @('.agent/dev-protocol/goal-output.json')
+$KnownIgnored = @('.agents/dev-protocol/goal-output.json')
 $Unexpected = $Untracked | Where-Object { $_ -notin $KnownIgnored }
 if ($Unexpected.Count -gt 0) {
     Fail "case-06: unexpected untracked files: $($Unexpected -join ', ')"

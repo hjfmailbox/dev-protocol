@@ -60,7 +60,7 @@ Automated assertions (all must pass):
 - HEAD commit changed ≤10 files (scope respected)
 - HEAD commit has non-zero content changes (not empty or metadata-only)
 - HEAD commit follows conventional commit format
-- goal-output.json or goal-output.md exists in .agent/dev-protocol/
+- goal-output.json or goal-output.md exists in .agents/dev-protocol/
 - goal-output.json is valid JSON, OR goal-output.md contains all 7 required sections
 - (JSON path) all required top-level fields present
 - (JSON path) goal_status is one of: COMPLETED, PARTIALLY_COMPLETED, BLOCKED, FAILED, ABORTED

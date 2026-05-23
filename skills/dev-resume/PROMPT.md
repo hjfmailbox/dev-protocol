@@ -11,7 +11,7 @@ You MUST NOT rely on chat history.
 
 State file resolution path (MUST follow this order):
 
-1. Priority: `.agent/dev-protocol/`
+1. Priority: `.agents/dev-protocol/` (preferred). If not found, fall back to `.agent/dev-protocol/` for legacy sessions.
    - workflow-state.yml
    - handoff.md
    - project-rules.md
@@ -23,10 +23,10 @@ State file resolution path (MUST follow this order):
 
 Rules:
 
-- If files exist in `.agent/dev-protocol/`, use that path exclusively.
+- If files exist in `.agents/dev-protocol/`, use that path exclusively.
   - Do NOT scan root directory for the same files.
   - Do NOT merge or override results from different locations.
-  - Output the resolved path: "State source: .agent/dev-protocol/"
+  - Output the resolved path: "State source: .agents/dev-protocol/" (or `.agent/dev-protocol/` if fallback was used)
 - If files exist only in repository root, use root path (backward compatibility).
 - If neither location has state files, report:
   "State files not found. Run /dev-bootstrap to initialize."

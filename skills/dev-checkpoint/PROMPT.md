@@ -80,11 +80,11 @@ Otherwise:
 
 ## STEP 2: Reconcile State
 
-All state writes MUST target `.agent/dev-protocol/`:
+All state writes MUST target `.agents/dev-protocol/`:
 
-- `.agent/dev-protocol/workflow-state.yml`
-- `.agent/dev-protocol/handoff.md`
-- `.agent/dev-protocol/project-rules.md` (if impacted)
+- `.agents/dev-protocol/workflow-state.yml`
+- `.agents/dev-protocol/handoff.md`
+- `.agents/dev-protocol/project-rules.md` (if impacted)
 
 MUST NOT create or update root-level copies of state files.
 Root-level files exist for backward compatibility only.

@@ -52,7 +52,7 @@ List only files modified for the goal.
 Example:
 
 ```text
-docs/goal-workflow.md
+.agents/dev-protocol/docs/goal-workflow.md
 tests/case-06-goal-workflow/test-plan.md
 ```
 
@@ -180,19 +180,19 @@ Output contract automation would require session output capture (e.g., logging t
 
 ## Artifact Contract (Machine-Validated)
 
-At goal completion, write `.agent/dev-protocol/goal-output.json` containing all
+At goal completion, write `.agents/dev-protocol/goal-output.json` containing all
 required sections as structured data. This file is untracked (gitignored) and
 exists solely for automated validation by case-06.
 
 **The output artifact is mandatory.** A completed goal without either
 `goal-output.json` or `goal-output.md` is incomplete and will fail case-06
-validation. The goal prompt template (`docs/goal-prompt-template.md`) enforces
+validation. The goal prompt template (`.agents/dev-protocol/docs/goal-prompt-template.md`) enforces
 this requirement by instructing the agent to write the artifact before stopping.
 
 ### Markdown Fallback
 
 If `goal-output.json` is malformed or absent, case-06 falls back to
-`.agent/dev-protocol/goal-output.md`. The markdown file must contain all seven
+`.agents/dev-protocol/goal-output.md`. The markdown file must contain all seven
 required section headers (Goal Status, Goal Summary, Changed Files, Validation
 Results, Stop Reason, Risks / Follow-ups, Continuation Handoff) with matching
 text. The markdown fallback validates section presence and goal_status enum but

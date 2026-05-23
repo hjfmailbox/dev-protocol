@@ -16,7 +16,7 @@ Allow development to continue without prior chat history.
 
 State file resolution (MUST follow this order):
 
-1. **Priority**: `.agent/dev-protocol/`
+1. **Priority**: `.agents/dev-protocol/` (preferred). If not found, fall back to `.agent/dev-protocol/` for legacy sessions.
    - workflow-state.yml
    - handoff.md
    - project-rules.md
@@ -28,7 +28,7 @@ State file resolution (MUST follow this order):
    - workflow-state.yml
    - handoff.md
    - project-rules.md
-   - Used only when `.agent/dev-protocol/` does not contain state files.
+   - Used only when `.agents/dev-protocol/` does not contain state files.
 
 3. **Missing**: if neither location has state files:
    - Report: "State files not found. Run /dev-bootstrap to initialize."
