@@ -57,7 +57,7 @@ next:
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "babeb414c871a58d13fe25a57b149c2dd4f88ffa"
+  last_commit: "56d9827005c249ed7e39238a7f8dc51f22383f5b"
   summary: "fill references/workflow-rules.md with v1 workflow document"
 
 confidence:
