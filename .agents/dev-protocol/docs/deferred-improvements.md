@@ -93,3 +93,65 @@ protocol design problem.
 despite case-06 contract enforcement.
 
 **Priority:** Medium
+
+## 9. Standardize test numbering and remove placeholder gaps
+
+**Why deferred:** Current test layout contains only active
+`case-05-first-checkpoint` and `case-06-goal-workflow`, while
+`case-01` through `case-04` were historical placeholders or removed
+during iteration. This creates numbering ambiguity and makes the
+test suite look incomplete.
+
+Possible future approaches:
+
+- renumber existing cases (`05 → 01`, `06 → 02`)
+- restore lightweight placeholder cases
+- explicitly document numbering history
+
+No functional impact today.
+
+**Suggested revisit trigger:** Major test-suite cleanup or public
+release preparation.
+
+**Priority:** Low
+
+## 10. Clarify `.agents` directory convention
+
+**Why deferred:** Protocol state migrated from `.agent/` to
+`.agents/` to align with broader multi-agent ecosystem conventions
+and shared skill discovery. However, directory rationale and naming
+decision are not yet explicitly documented.
+
+Potential confusion:
+
+- `.agent` vs `.agents`
+- relationship with `.claude/skills`
+- cross-agent compatibility expectations
+
+**Suggested revisit trigger:** Documentation cleanup or onboarding
+friction from new projects.
+
+**Priority:** Medium
+
+## 11. Real-project validation checklist
+
+**Why deferred:** The protocol has now been validated end-to-end
+against a real project (DesignDocMCP), but the validation sequence
+exists only in chat history and is not formalized.
+
+A reusable checklist would improve confidence when onboarding new
+projects.
+
+Suggested scope:
+
+- `/dev-bootstrap`
+- `/dev-checkpoint`
+- `/dev-resume`
+- `/goal`
+- `case-05`
+- `case-06`
+
+**Suggested revisit trigger:** Second real-project adoption or
+public release preparation.
+
+**Priority:** Low
