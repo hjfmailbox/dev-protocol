@@ -1,2 +1,3 @@
 .claude/
 .agent/dev-protocol/goal-output.json
+.agent/dev-protocol/goal-output.md

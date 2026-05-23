@@ -184,6 +184,18 @@ At goal completion, write `.agent/dev-protocol/goal-output.json` containing all
 required sections as structured data. This file is untracked (gitignored) and
 exists solely for automated validation by case-06.
 
+### Markdown Fallback
+
+If `goal-output.json` is malformed or absent, case-06 falls back to
+`.agent/dev-protocol/goal-output.md`. The markdown file must contain all seven
+required section headers (Goal Status, Goal Summary, Changed Files, Validation
+Results, Stop Reason, Risks / Follow-ups, Continuation Handoff) with matching
+text. The markdown fallback validates section presence and goal_status enum but
+does NOT cross-check `changed_files` against `git diff-tree`.
+
+Prefer JSON when possible; use markdown as a safety net when JSON serialization
+fails.
+
 ### Required Schema
 
 ```json

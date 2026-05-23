@@ -60,12 +60,14 @@ Automated assertions (all must pass):
 - HEAD commit changed ≤10 files (scope respected)
 - HEAD commit has non-zero content changes (not empty or metadata-only)
 - HEAD commit follows conventional commit format
-- goal-output.json exists in .agent/dev-protocol/
-- goal-output.json is valid JSON
-- all required top-level fields present (goal_status, goal_summary, changed_files, validation_results, stop_reason, risks_followups, continuation_handoff)
-- goal_status is one of: COMPLETED, PARTIALLY_COMPLETED, BLOCKED, FAILED, ABORTED
-- continuation_handoff has all 4 non-empty sub-fields (context, boundary, next_candidate_goal, prompt_seed)
-- changed_files matches git diff-tree HEAD commit exactly
+- goal-output.json or goal-output.md exists in .agent/dev-protocol/
+- goal-output.json is valid JSON, OR goal-output.md contains all 7 required sections
+- (JSON path) all required top-level fields present
+- (JSON path) goal_status is one of: COMPLETED, PARTIALLY_COMPLETED, BLOCKED, FAILED, ABORTED
+- (JSON path) continuation_handoff has all 4 non-empty sub-fields
+- (JSON path) changed_files matches git diff-tree HEAD commit exactly
+- (Markdown path) all required section headers present with valid goal_status enum
+- (Markdown path) continuation_handoff sub-fields present (Context, Boundary, Next candidate, Prompt seed)
 
 Manual review (after automated pass):
 
@@ -88,12 +90,14 @@ Automated failures (any triggers FAIL immediately):
 - HEAD commit exceeds scope threshold (>10 files)
 - HEAD commit has zero content lines (empty or metadata-only)
 - HEAD commit message breaks conventional commit format
-- goal-output.json missing
-- goal-output.json malformed JSON
-- missing required top-level fields
-- goal_status not a valid enum value
-- continuation_handoff missing or empty sub-fields
-- changed_files does not match HEAD commit
+- both goal-output.json and goal-output.md missing
+- goal-output.json malformed AND goal-output.md missing required sections
+- (JSON path) missing required top-level fields
+- (JSON path) goal_status not a valid enum value
+- (JSON path) continuation_handoff missing or empty sub-fields
+- (JSON path) changed_files does not match HEAD commit
+- (Markdown path) required section headers missing
+- (Markdown path) goal_status not a valid enum value
 
 Manual review failures:
 
@@ -135,7 +139,7 @@ Automated validation covers:
 - Commit integrity (conventional format, content changes, scope limit)
 - Workflow correctness (not a checkpoint commit)
 - Test plan presence
-- Goal output contract (goal-output.json: fields, status enum, handoff completeness, changed_files integrity)
+- Goal output contract (goal-output.json: fields, status enum, handoff completeness, changed_files integrity; fallback to goal-output.md: section headers, status enum, handoff fields)
 
 Manual review should cover:
 

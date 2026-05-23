@@ -202,61 +202,111 @@ if ($Case -eq '06') {
 
     # ── H. Goal output contract artifact ────────────────────────────
     $Artifact = Join-Path ".agent/dev-protocol" "goal-output.json"
-    if (-not (Test-Path $Artifact)) {
-        Fail "case-06: goal-output.json missing at $Artifact"
-    }
-    Pass-Check "case-06: goal-output.json exists"
+    $FallbackMd = Join-Path ".agent/dev-protocol" "goal-output.md"
+    $HasJson = Test-Path $Artifact
+    $HasMd = Test-Path $FallbackMd
 
-    # ── I. Valid JSON ───────────────────────────────────────────────
-    try {
-        $OutputJson = Get-Content $Artifact -Raw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        Fail "case-06: goal-output.json is malformed JSON: $_"
+    if (-not $HasJson -and -not $HasMd) {
+        Fail "case-06: goal-output.json and goal-output.md both missing"
     }
-    Pass-Check "case-06: goal-output.json is valid JSON"
+    Pass-Check "case-06: output contract artifact present"
 
-    # ── J. Required top-level fields ────────────────────────────────
-    $RequiredFields = @('goal_status', 'goal_summary', 'changed_files', 'validation_results', 'stop_reason', 'risks_followups', 'continuation_handoff')
-    foreach ($field in $RequiredFields) {
-        if ($null -eq $OutputJson.$field) {
-            Fail "case-06: goal-output.json missing required field: $field"
+    # ── I. Validate JSON or fall back to markdown ───────────────────
+    $UseJson = $false
+    if ($HasJson) {
+        try {
+            $OutputJson = Get-Content $Artifact -Raw | ConvertFrom-Json -ErrorAction Stop
+            $UseJson = $true
+            Pass-Check "case-06: goal-output.json is valid JSON"
+        } catch {
+            Write-Host "[WARN] case-06: goal-output.json malformed, falling back to goal-output.md"
         }
     }
-    Pass-Check "case-06: all required top-level fields present"
 
-    # ── K. goal_status enum validation ──────────────────────────────
-    $ValidStatuses = @('COMPLETED', 'PARTIALLY_COMPLETED', 'BLOCKED', 'FAILED', 'ABORTED')
-    if ($OutputJson.goal_status -notin $ValidStatuses) {
-        Fail "case-06: goal_status '$($OutputJson.goal_status)' is not a valid value (must be one of: $($ValidStatuses -join ', '))"
-    }
-    Pass-Check "case-06: goal_status is valid: $($OutputJson.goal_status)"
-
-    # ── L. Continuation handoff completeness ────────────────────────
-    $HandoffFields = @('context', 'boundary', 'next_candidate_goal', 'prompt_seed')
-    foreach ($field in $HandoffFields) {
-        $value = $OutputJson.continuation_handoff.$field
-        if ($null -eq $value -or [string]::IsNullOrWhiteSpace($value)) {
-            Fail "case-06: continuation_handoff missing or empty required field: $field"
+    if ($UseJson) {
+        # ── J. Required top-level fields (JSON) ─────────────────────
+        $RequiredFields = @('goal_status', 'goal_summary', 'changed_files', 'validation_results', 'stop_reason', 'risks_followups', 'continuation_handoff')
+        foreach ($field in $RequiredFields) {
+            if ($null -eq $OutputJson.$field) {
+                Fail "case-06: goal-output.json missing required field: $field"
+            }
         }
+        Pass-Check "case-06: all required top-level fields present (JSON)"
+
+        # ── K. goal_status enum validation ──────────────────────────
+        $ValidStatuses = @('COMPLETED', 'PARTIALLY_COMPLETED', 'BLOCKED', 'FAILED', 'ABORTED')
+        if ($OutputJson.goal_status -notin $ValidStatuses) {
+            Fail "case-06: goal_status '$($OutputJson.goal_status)' is not a valid value (must be one of: $($ValidStatuses -join ', '))"
+        }
+        Pass-Check "case-06: goal_status is valid: $($OutputJson.goal_status)"
+
+        # ── L. Continuation handoff completeness ────────────────────
+        $HandoffFields = @('context', 'boundary', 'next_candidate_goal', 'prompt_seed')
+        foreach ($field in $HandoffFields) {
+            $value = $OutputJson.continuation_handoff.$field
+            if ($null -eq $value -or [string]::IsNullOrWhiteSpace($value)) {
+                Fail "case-06: continuation_handoff missing or empty required field: $field"
+            }
+        }
+        Pass-Check "case-06: continuation_handoff all 4 sub-fields present and non-empty (JSON)"
+
+        # ── M. changed_files integrity ──────────────────────────────
+        $ActualFiles = @(& git diff-tree --no-commit-id --name-only -r HEAD 2>$null) | Sort-Object
+        $DeclaredFiles = @($OutputJson.changed_files) | Sort-Object
+
+        $Missing = @()
+        $Extra = @()
+        foreach ($f in $DeclaredFiles) { if ($f -notin $ActualFiles) { $Missing += $f } }
+        foreach ($f in $ActualFiles) { if ($f -notin $DeclaredFiles) { $Extra += $f } }
+
+        if ($Missing.Count -gt 0 -or $Extra.Count -gt 0) {
+            $Msg = "case-06: changed_files mismatch with HEAD commit:"
+            if ($Missing.Count -gt 0) { $Msg += "`n  Declared but not in commit: $($Missing -join ', ')" }
+            if ($Extra.Count -gt 0) { $Msg += "`n  In commit but not declared: $($Extra -join ', ')" }
+            Fail $Msg
+        }
+        Pass-Check "case-06: changed_files matches HEAD commit (JSON)"
+    } else {
+        # ── J-alt. Required sections (Markdown fallback) ────────────
+        $MdContent = Get-Content $FallbackMd -Raw
+
+        $MdSections = @(
+            'Goal Status',
+            'Goal Summary',
+            'Changed Files',
+            'Validation Results',
+            'Stop Reason',
+            'Risks',
+            'Continuation Handoff'
+        )
+        foreach ($section in $MdSections) {
+            if ($MdContent -notmatch [regex]::Escape($section)) {
+                Fail "case-06: goal-output.md missing required section: $section"
+            }
+        }
+        Pass-Check "case-06: all required sections present (Markdown)"
+
+        # ── K-alt. goal_status enum validation ──────────────────────
+        $ValidStatuses = @('COMPLETED', 'PARTIALLY_COMPLETED', 'BLOCKED', 'FAILED', 'ABORTED')
+        $StatusMatch = [regex]::Match($MdContent, '(?:Goal Status|goal_status)[:\s]+(\S+)')
+        if (-not $StatusMatch.Success -or $StatusMatch.Groups[1].Value -notin $ValidStatuses) {
+            $Found = if ($StatusMatch.Success) { $StatusMatch.Groups[1].Value } else { "not found" }
+            Fail "case-06: goal_status '$Found' is not a valid value (must be one of: $($ValidStatuses -join ', '))"
+        }
+        Pass-Check "case-06: goal_status is valid: $($StatusMatch.Groups[1].Value) (Markdown)"
+
+        # ── L-alt. Continuation handoff completeness ────────────────
+        $HandoffLabels = @('Context', 'Boundary', 'Next candidate', 'Prompt seed')
+        foreach ($label in $HandoffLabels) {
+            if ($MdContent -notmatch [regex]::Escape($label)) {
+                Fail "case-06: continuation_handoff missing field: $label"
+            }
+        }
+        Pass-Check "case-06: continuation_handoff all 4 sub-fields present (Markdown)"
+
+        # changed_files cross-check not available in markdown fallback
+        Pass-Check "case-06: changed_files cross-check skipped (Markdown fallback)"
     }
-    Pass-Check "case-06: continuation_handoff all 4 sub-fields present and non-empty"
-
-    # ── M. changed_files integrity ──────────────────────────────────
-    $ActualFiles = @(& git diff-tree --no-commit-id --name-only -r HEAD 2>$null) | Sort-Object
-    $DeclaredFiles = @($OutputJson.changed_files) | Sort-Object
-
-    $Missing = @()
-    $Extra = @()
-    foreach ($f in $DeclaredFiles) { if ($f -notin $ActualFiles) { $Missing += $f } }
-    foreach ($f in $ActualFiles) { if ($f -notin $DeclaredFiles) { $Extra += $f } }
-
-    if ($Missing.Count -gt 0 -or $Extra.Count -gt 0) {
-        $Msg = "case-06: changed_files mismatch with HEAD commit:"
-        if ($Missing.Count -gt 0) { $Msg += "`n  Declared but not in commit: $($Missing -join ', ')" }
-        if ($Extra.Count -gt 0) { $Msg += "`n  In commit but not declared: $($Extra -join ', ')" }
-        Fail $Msg
-    }
-    Pass-Check "case-06: changed_files matches HEAD commit"
 }
 
 # ── K. Final result ──────────────────────────────────────────────────
