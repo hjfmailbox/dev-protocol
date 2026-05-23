@@ -141,6 +141,9 @@ if ($Case -eq '05') {
     elseif ($HeadCommit -match "^chore\(checkpoint\):") {
         Pass-Check "HEAD is a /dev-checkpoint generated commit"
     }
+    elseif ($HeadCommit -match "chore:.*(/dev-checkpoint|checkpoint)") {
+        Pass-Check "HEAD is a /dev-checkpoint generated commit (no-scope format)"
+    }
     else {
         Fail "HEAD commit does not indicate a checkpoint baseline, state migration, or checkpoint sync"
     }

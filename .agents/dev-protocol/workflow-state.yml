@@ -52,8 +52,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-23"
-  last_commit: "f2554f13fe8239b5add5990a627a6dc8af113122"
-  summary: "fix case-05 hash comparison for cross-repo compatibility"
+  last_commit: "4e43f46cd4c55f8121558e51c5c2be1c040a25db"
+  summary: "fix case-05 hash comparison, expand checkpoint pattern"
 
 confidence:
   state_confidence: high
