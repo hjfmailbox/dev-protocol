@@ -32,8 +32,9 @@ progress:
     - "add deferred improvements: test numbering, .agents convention, real-project validation"
     - "expand deferred improvements: case-05/06 order, checkpoint commit contract, phase drift, status freshness"
     - "fill references/memory-rules.md with v1 protocol memory document (68 lines, goal completed, case-06 PASS)"
+    - "fill references/workflow-rules.md with v1 workflow document (76 lines, goal completed, case-06 PASS)"
+    - "all reference/ placeholder files populated"
   in_progress:
-    - "fill remaining placeholder file (workflow-rules.md)"
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
   blocked: []
 
@@ -52,13 +53,12 @@ context:
 
 next:
   recommended_actions:
-    - "fill references/memory-rules.md and references/workflow-rules.md"
     - "execute case-01 test plan: simulate change -> checkpoint -> resume"
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "ae14bccd3f4e25e4a81b3e28c79df16a6f15c2f7"
-  summary: "fill references/memory-rules.md with v1 protocol memory document"
+  last_commit: "babeb414c871a58d13fe25a57b149c2dd4f88ffa"
+  summary: "fill references/workflow-rules.md with v1 workflow document"
 
 confidence:
   state_confidence: high

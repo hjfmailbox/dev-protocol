@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Populating remaining placeholder files and validating end-to-end flow.
+Executing case-01 test plan to validate full bootstrap → checkpoint → resume cycle.
 
 ## Current Status
 
@@ -10,14 +10,13 @@ Populating remaining placeholder files and validating end-to-end flow.
 
 ## Completed Since Last Checkpoint
 
-- Filled references/memory-rules.md with v1 protocol memory document (68 lines)
-- Covers: purpose, state-over-history principle, state file role distinctions, /dev-resume memory usage, 5 reliability rules
-- Includes practical example showing how three state files complement each other
+- Filled references/workflow-rules.md with v1 workflow document (76 lines)
+- Covers: development lifecycle (5 commands), work categories, validation order, safe iteration rules, example workflow
+- All reference/ placeholder files now populated
 - Goal completed successfully, case-06 all 17 checks PASS
 
 ## In Progress
 
-- Filling remaining placeholder file: references/workflow-rules.md
 - case-01 test plan execution
 
 ## Blockers
@@ -31,13 +30,12 @@ Populating remaining placeholder files and validating end-to-end flow.
 - RTK (Rust Token Killer) is installed for token optimization
 - Runtime directory is `.agents/dev-protocol/` (plural), docs at `.agents/dev-protocol/docs/`
 - README.md serves as the project entry point; MVP.md and PROTOCOL.md removed as redundant
-- references/memory-rules.md now populated; references/workflow-rules.md is last placeholder
+- All reference/ placeholder files now populated (memory-rules.md, workflow-rules.md)
 - case-06 test script has a path resolution bug when run from tests/ subdirectory (requires running from repo root)
 
 ## Next Recommended Actions
 
-1. Fill references/workflow-rules.md
-2. Execute case-01 test plan to validate full bootstrap → checkpoint → resume cycle
+1. Execute case-01 test plan to validate full bootstrap → checkpoint → resume cycle
 
 ## Notes For Next Session
 
