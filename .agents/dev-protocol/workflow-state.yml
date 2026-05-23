@@ -52,8 +52,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-23"
-  last_commit: "d6b4315"
-  summary: "accept chore(checkpoint) commit format in case-05 detection; update test-plan.md"
+  last_commit: "8e6e5d1"
+  summary: "fix case-05 detection, untrack goal-output.json"
 
 confidence:
   state_confidence: high
