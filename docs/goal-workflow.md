@@ -21,6 +21,8 @@ Set Goal
 → Implement
 → Validate
 → Stop
+→ Write Output Artifact (goal-output.json or goal-output.md)
+→ Terminal Summary
 → Wait For Review
 ```
 

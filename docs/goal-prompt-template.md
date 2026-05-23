@@ -81,6 +81,18 @@ Ask for clarification when confidence is low.
 
 ## Required Final Output
 
+Before stopping, MUST perform both:
+
+### A. Write Output Artifact
+
+Write `.agent/dev-protocol/goal-output.json` with all required fields
+per `docs/goal-output-contract.md`. If JSON is not possible, write
+`.agent/dev-protocol/goal-output.md` with all seven section headers.
+
+This is mandatory — a completed goal without the artifact is incomplete.
+
+### B. Terminal Summary
+
 Must include:
 
 ```text
@@ -90,4 +102,5 @@ Changed Files
 Validation Results
 Stop Reason
 Risks / Follow-ups
+Continuation Handoff
 ```

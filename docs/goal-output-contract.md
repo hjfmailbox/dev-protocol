@@ -184,6 +184,11 @@ At goal completion, write `.agent/dev-protocol/goal-output.json` containing all
 required sections as structured data. This file is untracked (gitignored) and
 exists solely for automated validation by case-06.
 
+**The output artifact is mandatory.** A completed goal without either
+`goal-output.json` or `goal-output.md` is incomplete and will fail case-06
+validation. The goal prompt template (`docs/goal-prompt-template.md`) enforces
+this requirement by instructing the agent to write the artifact before stopping.
+
 ### Markdown Fallback
 
 If `goal-output.json` is malformed or absent, case-06 falls back to
