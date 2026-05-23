@@ -10,10 +10,10 @@ v1 frozen, deferred backlog review.
 
 ## Completed Since Last Checkpoint
 
-- v1 retrospective document completed and frozen (docs/retrospective-v1.md)
-- case-06 validation passed: 17/17 checks PASS
+- State synchronized via /goal: phase p2 → p3
+- v1 retrospective document completed and frozen
 - v1 protocol frozen after successful MVP validation
-- Protocol state synchronized: phase advanced to p3
+- case-06 validation passed (14/14 checks)
 
 ## In Progress
 
