@@ -27,10 +27,59 @@ $fixed = $false
 if (Test-Path $jsonPath) {
     try {
         $json = Get-Content $jsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $schemaFixed = $false
+
+        # Fix changed_files (deterministic from git)
         $json.changed_files = $changedFiles
+        Write-Host "[JSON] Fixed changed_files ($($changedFiles.Count) files)"
+
+        # Validate and fix schema: validation_results must be array
+        if ($json.validation_results -is [string]) {
+            Write-Host "[JSON] Fixing validation_results: string -> array" -ForegroundColor Yellow
+            $json.validation_results = @($json.validation_results)
+            $schemaFixed = $true
+        } elseif ($json.validation_results -isnot [array]) {
+            Write-Host "[JSON] Fixing validation_results: missing/invalid -> empty array" -ForegroundColor Yellow
+            $json.validation_results = @()
+            $schemaFixed = $true
+        }
+
+        # Validate and fix schema: risks_followups must be array
+        if ($json.risks_followups -is [string]) {
+            Write-Host "[JSON] Fixing risks_followups: string -> array" -ForegroundColor Yellow
+            $json.risks_followups = @($json.risks_followups)
+            $schemaFixed = $true
+        } elseif ($json.risks_followups -isnot [array]) {
+            Write-Host "[JSON] Fixing risks_followups: missing/invalid -> empty array" -ForegroundColor Yellow
+            $json.risks_followups = @()
+            $schemaFixed = $true
+        }
+
+        # Validate goal_status enum
+        if ($json.goal_status -notin @("COMPLETED", "PARTIALLY_COMPLETED", "BLOCKED", "FAILED", "ABORTED")) {
+            Write-Warning "[JSON] Invalid goal_status: $($json.goal_status) (must be COMPLETED/PARTIALLY_COMPLETED/BLOCKED/FAILED/ABORTED)"
+        }
+
+        # Ensure continuation_handoff is an object with required fields
+        if (-not $json.continuation_handoff -or $json.continuation_handoff -isnot [pscustomobject]) {
+            Write-Host "[JSON] Fixing continuation_handoff: missing/invalid -> object" -ForegroundColor Yellow
+            $json.continuation_handoff = @{
+                context = ""
+                boundary = ""
+                next_candidate_goal = ""
+                prompt_seed = ""
+            }
+            $schemaFixed = $true
+        }
+
         $json | ConvertTo-Json -Depth 10 | Set-Content $jsonPath -Encoding UTF8
         $fixed = $true
-        Write-Host "[JSON] Fixed changed_files in $jsonPath"
+
+        if ($schemaFixed) {
+            Write-Host "[JSON] Schema fixes applied and saved" -ForegroundColor Green
+        } else {
+            Write-Host "[JSON] Schema valid (no fixes needed)"
+        }
     } catch {
         Write-Warning "[JSON] Failed to parse $jsonPath — $($_.Exception.Message)"
         Write-Warning "[JSON] Deleting malformed JSON so test falls back to .md"

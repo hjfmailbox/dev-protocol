@@ -26,11 +26,31 @@ if [ -f "$JSON_PATH" ]; then
     if command -v jq >/dev/null 2>&1; then
         # Build JSON array from file list
         FILES_ARRAY=$(echo "$CHANGED_FILES" | jq -R -s 'split("\n") | map(select(. != ""))')
-        # Update changed_files field
-        jq --argjson files "$FILES_ARRAY" '.changed_files = $files' "$JSON_PATH" > "$JSON_PATH.tmp"
+        # Update changed_files field and fix schema
+        jq --argjson files "$FILES_ARRAY" '
+            .changed_files = $files |
+            if (.validation_results | type) == "string" then
+                .validation_results = [.validation_results]
+            elif (.validation_results | type) != "array" then
+                .validation_results = []
+            else . end |
+            if (.risks_followups | type) == "string" then
+                .risks_followups = [.risks_followups]
+            elif (.risks_followups | type) != "array" then
+                .risks_followups = []
+            else . end |
+            if (.continuation_handoff | type) != "object" then
+                .continuation_handoff = {
+                    context: "",
+                    boundary: "",
+                    next_candidate_goal: "",
+                    prompt_seed: ""
+                }
+            else . end
+        ' "$JSON_PATH" > "$JSON_PATH.tmp"
         mv "$JSON_PATH.tmp" "$JSON_PATH"
         FIXED=true
-        echo "[JSON] Fixed changed_files in $JSON_PATH"
+        echo "[JSON] Fixed changed_files and schema in $JSON_PATH"
     elif command -v python3 >/dev/null 2>&1; then
         python3 -c "
 import json, sys
@@ -38,12 +58,39 @@ files = '''$CHANGED_FILES'''.strip().split('\n')
 with open('$JSON_PATH', 'r') as f:
     data = json.load(f)
 data['changed_files'] = files
+
+# Fix schema: validation_results must be array
+if isinstance(data.get('validation_results'), str):
+    print('[JSON] Fixing validation_results: string -> array', file=sys.stderr)
+    data['validation_results'] = [data['validation_results']]
+elif not isinstance(data.get('validation_results'), list):
+    print('[JSON] Fixing validation_results: missing/invalid -> empty array', file=sys.stderr)
+    data['validation_results'] = []
+
+# Fix schema: risks_followups must be array
+if isinstance(data.get('risks_followups'), str):
+    print('[JSON] Fixing risks_followups: string -> array', file=sys.stderr)
+    data['risks_followups'] = [data['risks_followups']]
+elif not isinstance(data.get('risks_followups'), list):
+    print('[JSON] Fixing risks_followups: missing/invalid -> empty array', file=sys.stderr)
+    data['risks_followups'] = []
+
+# Ensure continuation_handoff is an object
+if not isinstance(data.get('continuation_handoff'), dict):
+    print('[JSON] Fixing continuation_handoff: missing/invalid -> object', file=sys.stderr)
+    data['continuation_handoff'] = {
+        'context': '',
+        'boundary': '',
+        'next_candidate_goal': '',
+        'prompt_seed': ''
+    }
+
 with open('$JSON_PATH', 'w') as f:
     json.dump(data, f, indent=2)
     f.write('\n')
 "
         FIXED=true
-        echo "[JSON] Fixed changed_files in $JSON_PATH (via python3)"
+        echo "[JSON] Fixed changed_files and schema in $JSON_PATH (via python3)"
     else
         echo "Warning: [JSON] Neither jq nor python3 available" >&2
         echo "Warning: [JSON] Deleting $JSON_PATH so test falls back to .md" >&2
