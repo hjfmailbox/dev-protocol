@@ -285,3 +285,47 @@ It must:
 - detect
 - report
 - then decide to proceed or fail
+
+---
+
+## INCIDENT LOGGING
+
+When checkpoint detects anomalies, log them.
+
+### When to Log
+
+| Condition | Type | Severity |
+|-----------|------|----------|
+| State validation fails (STEP 3) | `checkpoint-mismatch` | high |
+| `last_commit` commit no longer exists | `checkpoint-stale` | medium |
+| Artifact emission failure detected | `artifact-emission-failure` | high |
+| State files contradict each other | `protocol-inconsistency` | medium |
+| Workspace dirty during checkpoint | `dirty-checkpoint` | low |
+
+### How to Log
+
+1. Check if `.agents/dev-protocol/incidents.md` exists.
+2. If not, create it with header:
+   ```
+   # Incidents
+
+   Runtime protocol anomalies detected during command execution.
+   ```
+3. Append:
+   ```
+   ---
+
+   ## <YYYY-MM-DD> /dev-checkpoint — <incident-type>
+
+   **Context**: <what was detected>
+   **Detection**: <how it was found>
+   **Severity**: low | medium | high
+   **Status**: open
+   ```
+
+### Rules
+
+- Do NOT log for normal operations (no anomaly)
+- Do NOT log for self-drift exception (expected behavior)
+- Detect + record only. No auto-fix.
+- Incident file is append-only

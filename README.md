@@ -30,6 +30,9 @@ Repeat the checkpoint → clear → resume cycle as needed.
 | `/dev-bootstrap` | Yes | Initialize protocol, reconstruct state, no auto-commit |
 | `/dev-checkpoint` | Yes | Persist state, validate, commit (fails on inconsistency) |
 | `/dev-resume` | No | Recover context from state files (read-only) |
+| `/dev-goal-template` | No | Generate a standardized goal template for `/goal` |
+| `/dev-doctor` | No | Diagnose protocol health issues (read-only) |
+| `/dev-help` | No | Quick usage reference |
 
 Key guarantees:
 
@@ -62,34 +65,35 @@ Test cases are under `tests/`:
 
 ## Current Status
 
-**Phase**: p1 (protocol-definition-and-bootstrap) — **active**
+**Phase**: p3 (v1-frozen-deferred-backlog-review) — **active**
 
 **Completed**:
 - Three core commands defined and implemented
 - State file templates and validation rules
 - Runtime directory at `.agents/dev-protocol/`
 - Commit convention and failure policy
-- case-05 and case-06 test validation passed
+- case-05 and case-06 test validation passed (17/17 checks)
+- v1 retrospective completed and frozen
+- Usability commands added (goal-template, doctor, help)
+- Incident logging mechanism
+- Real-project onboarding guide
 
 **Known limitations (v1 scope)**:
 - Single-agent only (no multi-agent support)
 - No auto-repair or complex document inference
 - No advanced hooks or long-term memory
 
-**In progress**:
-- `references/memory-rules.md` and `references/workflow-rules.md` (placeholder files awaiting content)
-- case-01 full lifecycle test execution
-
 ## Project Structure
 
 ```
-.agents/dev-protocol/    State files (workflow-state.yml, handoff.md, project-rules.md)
-.claude/skills/          Claude Code skill definitions (dev-bootstrap, dev-checkpoint, dev-resume)
-docs/                    Detailed design documents
-references/              Protocol reference rules (commit, failure, sync, memory, workflow)
+.agents/dev-protocol/    State files (workflow-state.yml, handoff.md, project-rules.md, incidents.md)
+.claude/skills/          Claude Code skill definitions (symlinks to skills/)
+docs/                    Design documents, retrospective, onboarding guide
+references/              Protocol reference rules (commit, failure, sync, memory, workflow, incidents)
 skills/                  Skill definitions (PROMPT.md, SKILL.md per command)
 templates/               State file templates for new projects
 tests/                   Test cases and plans
 ```
 
 For detailed design documents, see `docs/`. For protocol rules, see `references/`.
+For onboarding a new project, see `docs/onboarding.md`.

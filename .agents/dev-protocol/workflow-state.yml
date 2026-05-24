@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "v1-frozen-deferred-backlog-review"
+  focus: "v1-usability-pass-complete"
   status: active
 
 progress:
@@ -37,6 +37,16 @@ progress:
     - "create v1 retrospective document (docs/retrospective-v1.md, 100 lines, case-06 PASS)"
     - "v1 retrospective completed and frozen"
     - "v1 protocol frozen after successful MVP validation"
+    - "add /dev-goal-template skill (standardized goal template generation)"
+    - "add /dev-help skill (quick usage reference)"
+    - "add /dev-doctor skill (lightweight protocol diagnosis)"
+    - "add lightweight incident logging mechanism (references/incident-rules.md)"
+    - "integrate incident logging into dev-resume and dev-checkpoint prompts"
+    - "improve self-documentation for dev-bootstrap, dev-checkpoint, dev-resume (When to use / NOT to use / Typical workflow)"
+    - "add real-project onboarding guide (docs/onboarding.md, 6 scenarios)"
+    - "update README.md with new commands and current status"
+    - "create symlinks for new skills in .claude/skills/"
+    - "add incidents.md to .gitignore"
   in_progress: []
   blocked: []
 
@@ -53,16 +63,20 @@ context:
     - "three state files: workflow-state.yml, handoff.md, project-rules.md"
     - "README.md serves as project entry point; MVP.md and PROTOCOL.md removed"
     - "v1 protocol frozen after MVP validation; retrospective complete"
+    - "usability pass adds: goal-template, doctor, help, incident logging, onboarding guide"
+    - "incident logging is detect+record only, no auto-fix, no daemon"
+    - "bootstrap remains detect+recommend, not detect+mutate"
 
 next:
   recommended_actions:
     - "review deferred improvements backlog"
     - "consider case-01 full lifecycle test when ready"
+    - "validate new skills (goal-template, doctor, help) in real project usage"
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "078f305df40b5df9b3f9342c5f604c41285c3b1f"
-  summary: "phase p3: v1 retrospective complete, state synced, deferred backlog ready"
+  last_commit: "47e3d7e8b6e77c9ca14ad81d099da1060081591a"
+  summary: "phase p3: v1 usability pass complete (goal-template, doctor, help, incidents, onboarding)"
 
 confidence:
   state_confidence: high

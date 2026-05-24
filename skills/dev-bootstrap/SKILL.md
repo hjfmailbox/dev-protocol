@@ -16,6 +16,50 @@ After bootstrap, the project must support:
 
 ---
 
+## When to Use
+
+- First time adopting dev-protocol on a project
+- State files are missing or corrupted
+- After accidentally deleting `.agents/dev-protocol/`
+- Switching to a new branch that needs its own state
+
+---
+
+## When NOT to Use
+
+- State files already exist and are current (use `/dev-resume` instead)
+- You just want to save progress (use `/dev-checkpoint` instead)
+- You want to recover context after `/clear` (use `/dev-resume` instead)
+
+---
+
+## What It Does
+
+Inspects the project (git history, code, docs) and creates three state files in `.agents/dev-protocol/`:
+
+- `workflow-state.yml` — machine-readable progress
+- `handoff.md` — human-readable session handoff
+- `project-rules.md` — project constraints
+
+Does NOT auto-commit. Does NOT modify existing code.
+
+**Important**: Bootstrap is detect + recommend, NOT detect + mutate.
+
+---
+
+## Typical Workflow
+
+```
+# Fresh or existing project
+/dev-bootstrap
+→ review generated state files
+→ git add .agents/
+→ git commit -m "chore(protocol): initialize dev-protocol"
+→ /dev-checkpoint
+```
+
+---
+
 ## Responsibilities
 
 ### 1. Inspect Project

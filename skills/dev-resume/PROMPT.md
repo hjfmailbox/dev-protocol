@@ -167,3 +167,45 @@ Recovery summary MUST include:
 3. project-rules.md
 4. git status
 5. repo inspection (fallback only)
+
+---
+
+## INCIDENT LOGGING (STEP 3.5)
+
+After STEP 3 (Validate State Freshness), if drift severity is WARNING or ERROR:
+
+1. Check if `.agents/dev-protocol/incidents.md` exists.
+2. If not, create it with header:
+   ```
+   # Incidents
+
+   Runtime protocol anomalies detected during command execution.
+   ```
+3. Append an incident entry:
+   ```
+   ---
+
+   ## <YYYY-MM-DD> /dev-resume — <incident-type>
+
+   **Context**: <what was detected>
+   **Detection**: <how it was found>
+   **Severity**: low | medium | high
+   **Status**: open
+   ```
+
+Incident types to log:
+
+| Condition | Type |
+|-----------|------|
+| Drift severity WARNING or ERROR | `resume-drift` |
+| State files missing | `missing-state-file` |
+| Phase mismatch between state and reality | `phase-drift` |
+| State files in multiple locations | `duplicate-state` |
+| `last_commit` commit no longer exists | `checkpoint-stale` |
+
+Do NOT log incidents for:
+- Normal operations (drift severity NONE)
+- First-time bootstrap (no prior state)
+- Clean resume with no anomalies
+
+This is detect + record only. Do NOT auto-fix.

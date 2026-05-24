@@ -10,6 +10,47 @@ Allow development to continue without prior chat history.
 
 ---
 
+## When to Use
+
+- After `/clear` or starting a new session
+- When you need to recall project context
+- At the start of any work session on a dev-protocol project
+- After switching branches (if state files exist on the branch)
+
+---
+
+## When NOT to Use
+
+- No state files exist yet (run `/dev-bootstrap` first)
+- You want to save progress (use `/dev-checkpoint`)
+- You want to diagnose protocol issues (use `/dev-doctor`)
+- State files are known to be corrupted (run `/dev-bootstrap` to reconstruct)
+
+---
+
+## What It Does
+
+1. Reads state files from `.agents/dev-protocol/`
+2. Inspects git status and recent history
+3. Validates state freshness (detects drift)
+4. Generates a recovery summary with phase, focus, and next actions
+
+Read-only. Never modifies files.
+
+---
+
+## Typical Workflow
+
+```
+# After /clear or new session
+/dev-resume
+→ context restored from state files
+→ review recovery summary
+→ /goal <task> or continue working
+```
+
+---
+
 ## Responsibilities
 
 ### 1. Read Recoverable State

@@ -12,6 +12,48 @@ The next session must NOT depend on prior conversation history.
 
 ---
 
+## When to Use
+
+- After completing meaningful development work
+- Before running `/clear` to reset conversation
+- At natural stopping points (end of task, end of session)
+- After implementing a `/goal`
+
+---
+
+## When NOT to Use
+
+- No changes since last checkpoint (self-drift will skip anyway)
+- Workspace is in an inconsistent state (fix first)
+- You haven't run `/dev-bootstrap` yet (bootstrap first)
+- Mid-implementation with incomplete work (commit or stash first)
+
+---
+
+## What It Does
+
+1. Inspects changes since last checkpoint
+2. Updates state files to reflect current reality
+3. Validates consistency between state, code, and docs
+4. Creates exactly ONE commit with the checkpoint
+5. Records the checkpoint baseline for future drift detection
+
+If no meaningful changes exist, exits early (self-drift exception).
+
+---
+
+## Typical Workflow
+
+```
+# After implementation
+/dev-checkpoint
+→ state reconciled and validated
+→ one commit created
+→ safe to /clear
+```
+
+---
+
 ## Responsibilities
 
 ### 1. Inspect Changes

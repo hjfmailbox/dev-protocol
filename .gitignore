@@ -1,4 +1,5 @@
 .claude/
 .agents/dev-protocol/goal-output.json
 .agents/dev-protocol/goal-output.md
+.agents/dev-protocol/incidents.md
 .claude/worktrees/
