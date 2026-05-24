@@ -93,6 +93,21 @@ Write at least one artifact:
 The artifact must contain all required sections per `.agents/dev-protocol/docs/goal-output-contract.md`.
 This is mandatory — a completed goal without at least one artifact is incomplete.
 
+**Critical: changed_files generation**
+
+The `changed_files` field MUST be derived from git, not memory:
+
+1. After committing goal changes, run:
+   ```bash
+   git diff-tree --no-commit-id --name-only -r HEAD
+   ```
+2. Use the command output verbatim as the `changed_files` value
+3. Do NOT manually list files from memory or task tracking
+4. Do NOT omit files, even if they seem minor (.gitignore, README.md, docs)
+
+Large goals often touch 15+ files. Only git state is authoritative.
+Manual lists will fail case-06 validation.
+
 ### B. Terminal Summary
 
 Must include:

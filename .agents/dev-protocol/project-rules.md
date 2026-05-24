@@ -21,6 +21,16 @@
 - Allowed types: feat, fix, refactor, docs, test, chore
 - Summary: present tense, concise, describes actual change
 
+## Goal Output Generation Rules (CRITICAL)
+
+- changed_files MUST come from `git diff-tree --no-commit-id --name-only -r HEAD`
+- Do NOT manually list files from memory or task tracking
+- Do NOT omit files, even if they seem minor
+- Run the git command AFTER committing, BEFORE writing the artifact
+- Use the command output verbatim
+- Large goals (15+ files) will fail validation if files are omitted
+- This rule exists because agent memory frequently misses files in large goals
+
 ## Important Patterns
 
 - State-over-history: prefer updating current truth over appending logs

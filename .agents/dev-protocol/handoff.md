@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-v1 usability pass complete.
+v1 protocol reliability hardened: goal-output changed_files now mandated from git state.
 
 ## Current Status
 
@@ -10,16 +10,11 @@ v1 usability pass complete.
 
 ## Completed Since Last Checkpoint
 
-- Added /dev-goal-template skill (standardized goal template generation)
-- Added /dev-help skill (quick usage reference)
-- Added /dev-doctor skill (lightweight protocol diagnosis, read-only)
-- Added lightweight incident logging mechanism (references/incident-rules.md)
-- Integrated incident logging into dev-resume and dev-checkpoint prompts
-- Improved self-documentation for dev-bootstrap, dev-checkpoint, dev-resume (When to use / NOT to use / Typical workflow sections)
-- Added real-project onboarding guide (docs/onboarding.md, 6 scenarios)
-- Updated README.md with new commands and current project status
-- Created symlinks for new skills in .claude/skills/
-- Added incidents.md to .gitignore
+- Fixed goal-output changed_files reliability issue discovered during real-project validation
+- Added mandatory generation procedure to goal-output-contract.md (git-derived file lists)
+- Updated goal-prompt-template.md with explicit changed_files generation instructions
+- Documented changed_files rule in project-rules.md as CRITICAL protocol rule
+- Root cause: agent memory frequently omits files in large goals (15+ files); only git state is authoritative
 
 ## In Progress
 

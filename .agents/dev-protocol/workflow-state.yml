@@ -47,6 +47,10 @@ progress:
     - "update README.md with new commands and current status"
     - "create symlinks for new skills in .claude/skills/"
     - "add incidents.md to .gitignore"
+    - "fix goal-output changed_files reliability: mandate git-derived file lists"
+    - "add mandatory generation procedure to goal-output-contract.md"
+    - "add changed_files generation instructions to goal-prompt-template.md"
+    - "document changed_files rule in project-rules.md as CRITICAL"
   in_progress: []
   blocked: []
 
