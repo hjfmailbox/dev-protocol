@@ -275,17 +275,28 @@ responsibility entirely.
 
 **What the script does:**
 
-- Runs `git diff-tree --no-commit-id --name-only -r HEAD`
-- Parses the goal-output.md file
-- Locates the `## Changed Files` section
-- Replaces it with the git-derived file list
-- Writes the file back
+1. **changed_files (deterministic):**
+   - Runs `git diff-tree --no-commit-id --name-only -r HEAD`
+   - Extracts authoritative file list from git state
+   - Overwrites `changed_files` field in JSON and `## Changed Files` section in Markdown
+
+2. **Schema validation and auto-fix:**
+   - Validates `validation_results` is an array (converts string to single-element array if needed)
+   - Validates `risks_followups` is an array (converts string to single-element array if needed)
+   - Validates `goal_status` is one of: COMPLETED, PARTIALLY_COMPLETED, BLOCKED, FAILED, ABORTED
+   - Validates `continuation_handoff` is an object with required fields (context, boundary, next_candidate_goal, prompt_seed)
+   - Reports all schema fixes applied
 
 **Why this works:**
 
-The script is deterministic and byte-for-byte equivalent to git state. The LLM
-never touches the file list. Even if the LLM writes an incorrect placeholder,
-the script corrects it before validation.
+The script is deterministic for changed_files (byte-for-byte equivalent to git state)
+and enforces schema compliance (all fields have correct types). The LLM never touches
+the file list, and schema violations are automatically corrected before the stop hook
+validates the artifact.
+
+This eliminates two failure modes:
+1. changed_files drift (LLM omits or rewrites files)
+2. Schema violations (LLM uses wrong types for fields)
 
 **Prohibited approaches:**
 
