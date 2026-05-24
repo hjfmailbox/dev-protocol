@@ -2,13 +2,15 @@
 
 How to adopt dev-protocol in existing repositories.
 
+**Runtime-agnostic**: This guide uses Claude Code as the reference runtime. If you use Cursor, GitHub Copilot, or manual workflows, the same steps apply using your runtime's interaction model. See [`runtime-integrations.md`](runtime-integrations.md) for non-Claude environments.
+
 ---
 
 ## Prerequisites
 
-- Claude Code installed and configured
+- AI assistant or manual workflow capable of reading/writing files and running shell commands
 - Repository accessible locally
-- Basic familiarity with dev-protocol commands (`/dev-help` for reference)
+- Basic familiarity with dev-protocol operations (`/dev-help` in Claude Code, or read `references/workflow-rules.md`)
 
 ---
 
@@ -21,11 +23,13 @@ git init
 git add . && git commit -m "initial commit"
 ```
 
-Then in Claude Code:
+Then bootstrap the protocol. In Claude Code:
 
 ```
 /dev-bootstrap
 ```
+
+Or manually: create `.agents/dev-protocol/workflow-state.yml`, `handoff.md`, and `project-rules.md` reflecting your project state.
 
 Bootstrap will:
 
@@ -38,8 +42,9 @@ After reviewing:
 ```bash
 git add .agents/
 git commit -m "chore(protocol): initialize dev-protocol"
-/dev-checkpoint
 ```
+
+Then checkpoint. In Claude Code: `/dev-checkpoint`. Or manually: update state files to reflect current progress and commit.
 
 ---
 
@@ -49,11 +54,13 @@ git commit -m "chore(protocol): initialize dev-protocol"
 cd existing-project
 ```
 
-In Claude Code:
+Then bootstrap. In Claude Code:
 
 ```
 /dev-bootstrap
 ```
+
+Or manually: inspect the project and create state files in `.agents/dev-protocol/`.
 
 Bootstrap will:
 
@@ -67,8 +74,9 @@ Review the generated state, then:
 ```bash
 git add .agents/
 git commit -m "chore(protocol): initialize dev-protocol"
-/dev-checkpoint
 ```
+
+Then checkpoint. In Claude Code: `/dev-checkpoint`. Or manually: update state files and commit.
 
 ---
 
@@ -188,9 +196,34 @@ After bootstrap and first checkpoint:
 - [ ] `.agents/dev-protocol/workflow-state.yml` exists and reflects project state
 - [ ] `.agents/dev-protocol/handoff.md` exists with current focus
 - [ ] `.agents/dev-protocol/project-rules.md` exists with project constraints
-- [ ] `/dev-checkpoint` succeeded (one commit created)
-- [ ] `/dev-resume` restores correct context after `/clear`
+- [ ] Checkpoint succeeded (one commit created) — in Claude Code: `/dev-checkpoint`; manual: commit state files
+- [ ] Resume restores correct context in a new session — in Claude Code: `/dev-resume`; manual: read `handoff.md`
 - [ ] `.agents/` is tracked in git (not in `.gitignore`)
+
+---
+
+## Manual Fallback Workflow (No Hooks)
+
+If your runtime does not support hooks or slash commands, use this manual workflow:
+
+1. **Bootstrap**: Create `.agents/dev-protocol/` state files manually or with a script.
+2. **Goal work**: Implement changes within a written scope.
+3. **Normalize**: Before completing a goal, always run:
+   ```powershell
+   pwsh scripts/fix-goal-output.ps1
+   ```
+4. **Validate**: Run case-06:
+   ```powershell
+   pwsh tests/run-tests.ps1 -Case 06
+   ```
+5. **Checkpoint**: Commit state files and changes:
+   ```bash
+   git add .
+   git commit -m "chore(checkpoint): describe change"
+   ```
+6. **Resume**: In a new session, read `.agents/dev-protocol/handoff.md` to recover context.
+
+The only difference from hook mode is that normalization and validation are triggered manually instead of automatically. The protocol behavior is identical.
 
 ---
 
@@ -203,6 +236,7 @@ After bootstrap and first checkpoint:
 | Skipping first checkpoint after bootstrap | Bootstrap creates state but no commit — always checkpoint after bootstrap |
 | State files in wrong location | Must be in `.agents/dev-protocol/`, not root or `.agent/` |
 | Running checkpoint before any commits | Make at least one commit before checkpoint |
+| Forgetting to run `fix-goal-output.ps1` before goal completion | Add it to your checklist, or use a runtime with hook support |
 
 ---
 
@@ -214,5 +248,6 @@ After bootstrap and first checkpoint:
 - Does NOT stash or reset changes
 - Does NOT configure CI/CD
 - Does NOT install dependencies
+- Does NOT require any specific AI runtime
 
 Bootstrap is **detect + recommend**, not detect + mutate.

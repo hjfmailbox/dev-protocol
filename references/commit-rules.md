@@ -79,9 +79,10 @@ update workflow recovery logic
 
 ## Checkpoint Rule
 
-/dev-checkpoint should generate commit message automatically.
+Checkpoint operations should generate commit messages automatically.
 
-Must infer:
+In Claude Code, `/dev-checkpoint` generates the message. In manual mode, the operator
+or a script must infer:
 
 - dominant change
 - correct type

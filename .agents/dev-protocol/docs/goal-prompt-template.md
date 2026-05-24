@@ -1,6 +1,8 @@
 # Goal Prompt Template (v0)
 
-Use this template when running `/goal`.
+Use this template when declaring a Goal.
+
+In Claude Code, this maps to the `/goal` command. Other runtimes may use function calls, chat prompts, or structured API requests with equivalent fields.
 
 ---
 

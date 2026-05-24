@@ -10,11 +10,11 @@ It replaces "figure out what to do next" with "follow a fixed sequence."
 
 ## Development Lifecycle
 
-1. `/dev-bootstrap` — recover or reconstruct project state on a fresh session
-2. develop — write code, test, iterate within a scoped goal
-3. `/goal` — declare a focused objective with explicit scope boundaries
-4. `/dev-checkpoint` — persist state, validate consistency, commit
-5. `/dev-resume` — restore context in the next session without chat history
+1. **Bootstrap** — recover or reconstruct project state on a fresh session (Claude Code: `/dev-bootstrap`)
+2. **Develop** — write code, test, iterate within a scoped goal
+3. **Goal** — declare a focused objective with explicit scope boundaries (Claude Code: `/goal`)
+4. **Checkpoint** — persist state, validate consistency, commit (Claude Code: `/dev-checkpoint`)
+5. **Resume** — restore context in the next session without chat history (Claude Code: `/dev-resume`)
 
 This sequence ensures every session can start, work, save, and resume
 predictably, regardless of time gaps or session boundaries.
@@ -25,8 +25,8 @@ predictably, regardless of time gaps or session boundaries.
 
 | Category | Definition | When to Do |
 |---|---|---|
-| **Goal work** | Implementing a scoped feature, fix, or document change | After declaring `/goal` with clear scope |
-| **Checkpoint work** | Updating state files, validating, committing current progress | After goal work completes or at natural breakpoints |
+| **Goal work** | Implementing a scoped feature, fix, or document change | After declaring a goal with clear scope (Claude Code: `/goal`) |
+| **Checkpoint work** | Updating state files, validating, committing current progress | After goal work completes or at natural breakpoints (Claude Code: `/dev-checkpoint`) |
 | **Maintenance edits** | Fixing typos, updating docs, adjusting rules without changing behavior | Between goals, when state is stable |
 
 **Example:** Filling `references/workflow-rules.md` with content is goal work.
@@ -59,17 +59,19 @@ documents are already consistent.
 3. **Checkpoint frequently.** A checkpoint after every completed goal is
    the minimum. Longer gaps between checkpoints increase drift risk.
 
-4. **Resume after clear.** When returning to work, always run `/dev-resume`
-   before writing code. Never assume you remember the exact state correctly.
+4. **Resume after session reset.** When returning to work, always resume
+   (Claude Code: `/dev-resume`) before writing code. Never assume you remember the exact state correctly.
 
 ---
 
 ## Example Workflow
 
 ```
-Session 1: /dev-bootstrap → /goal "fill workflow-rules.md" → write content → /dev-checkpoint
-Session 2: /dev-resume → /goal "run case-01 test" → execute tests → /dev-checkpoint
-Session 3: /dev-resume → /goal "fix case-01 failure" → patch → /dev-checkpoint
+Session 1: Bootstrap → Goal "fill workflow-rules.md" → write content → Checkpoint
+Session 2: Resume → Goal "run case-01 test" → execute tests → Checkpoint
+Session 3: Resume → Goal "fix case-01 failure" → patch → Checkpoint
+
+In Claude Code: Bootstrap = `/dev-bootstrap`, Goal = `/goal`, Checkpoint = `/dev-checkpoint`, Resume = `/dev-resume`.
 ```
 
 Each session starts with state recovery, declares a focused goal, works

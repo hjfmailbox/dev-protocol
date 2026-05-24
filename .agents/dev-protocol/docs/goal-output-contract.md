@@ -2,9 +2,11 @@
 
 ## Purpose
 
-Define the standard stopping output for `/goal`.
+Define the standard stopping output for the Goal semantic operation.
 
-A `/goal` execution must stop with a structured summary instead of continuing indefinitely.
+A Goal execution must stop with a structured summary instead of continuing indefinitely.
+
+In Claude Code, this maps to the `/goal` command.
 
 The output exists to:
 
@@ -17,7 +19,7 @@ The output exists to:
 
 ## Required Output Sections
 
-Every completed `/goal` should provide:
+Every completed Goal should provide:
 
 ### 1. Goal Status
 
@@ -115,9 +117,9 @@ Provide:
 - **Context to carry forward**: what the next goal needs to know about this change
 - **Boundary note**: what was intentionally NOT changed and why
 - **Next candidate goal**: one concrete suggestion for follow-up work
-- **Prompt seed**: one ready-to-use `/goal` prompt the next session can paste as-is
+- **Prompt seed**: one ready-to-use Goal prompt the next session can paste as-is
 
-The prompt seed should include:
+In Claude Code, this is a `/goal` block. The prompt seed should include:
 
 ```text
 /goal
@@ -239,7 +241,7 @@ fails.
 | `context` | string | Yes | Context to carry forward |
 | `boundary` | string | Yes | What was intentionally NOT changed |
 | `next_candidate_goal` | string | Yes | Concrete follow-up suggestion |
-| `prompt_seed` | string | Yes | Ready-to-use `/goal` prompt text |
+| `prompt_seed` | string | Yes | Ready-to-use Goal prompt text |
 
 ### Integrity Rule
 
