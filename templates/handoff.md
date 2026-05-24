@@ -2,7 +2,7 @@
 
 ## Current Focus
 
--
+- Runtime verification of stop-hook timing race fix
 
 ## Current Status
 
