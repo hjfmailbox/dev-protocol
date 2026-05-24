@@ -73,6 +73,8 @@ The Stop hook is **convenience automation**, not a protocol requirement. All of 
 
 These files are tracked in git for convenience but are **not** part of the protocol contract.
 
+> **Important:** `skills/` is the canonical source of truth for all skill definitions. `.claude/skills/` must contain **only symlinks or runtime wiring** — never duplicated copies. Editing files in `.claude/skills/` has no effect on the protocol; always modify the canonical files under `skills/`.
+
 ---
 
 ## Non-Hook Environments
