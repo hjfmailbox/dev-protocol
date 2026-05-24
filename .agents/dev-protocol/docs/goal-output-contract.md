@@ -246,63 +246,64 @@ fails.
 `changed_files` must exactly match `git diff-tree --no-commit-id --name-only -r HEAD`.
 Any mismatch is a validation failure.
 
-### Mandatory Generation Procedure (Authoritative Source)
+### Mandatory Generation Procedure (Deterministic Script-Based)
 
-`changed_files` MUST be derived from actual git state, not agent memory or manual inference.
+`changed_files` MUST be programmatically derived from git state at artifact write time.
+
+**LLM involvement in changed_files generation is prohibited.**
+
+Prompt-level enforcement has proven insufficient. The LLM rewrites or omits files
+even when instructed to use git output verbatim. This procedure eliminates LLM
+responsibility entirely.
 
 **Required execution order:**
 
 1. Complete all goal implementation work
 2. Commit the goal changes (one commit per goal)
-3. **Run the authoritative command:**
-   ```bash
-   git diff-tree --no-commit-id --name-only -r HEAD
+3. Write the goal-output artifact (with placeholder or approximate changed_files)
+4. **Run the deterministic fix script:**
+   ```powershell
+   # Windows
+   pwsh scripts/fix-goal-output.ps1
    ```
-4. **Use the command output verbatim** as the `changed_files` value
-5. Write the goal-output artifact
+   ```bash
+   # Unix/Linux/Mac
+   ./scripts/fix-goal-output.sh
+   ```
+5. The script overwrites the `## Changed Files` section with authoritative git state
+6. Verify the script output shows the correct file count
 
-**Prohibited sources:**
+**What the script does:**
+
+- Runs `git diff-tree --no-commit-id --name-only -r HEAD`
+- Parses the goal-output.md file
+- Locates the `## Changed Files` section
+- Replaces it with the git-derived file list
+- Writes the file back
+
+**Why this works:**
+
+The script is deterministic and byte-for-byte equivalent to git state. The LLM
+never touches the file list. Even if the LLM writes an incorrect placeholder,
+the script corrects it before validation.
+
+**Prohibited approaches:**
 
 - Manual file lists from remembered edits
 - Inferred file paths from task descriptions
 - Partial tracking during implementation
 - Session memory of which files were touched
-
-**Why this matters:**
-
-Large multi-file goals often touch 15+ files. Agent memory frequently omits files
-(e.g., README.md, .gitignore, documentation updates, test files). Only git state
-is authoritative after commit.
+- LLM formatting or paraphrasing of file lists
+- Prompt reminders to "use git"
 
 **Validation guarantee:**
 
-case-06 cross-checks `changed_files` against `git diff-tree HEAD`. If the
-artifact was generated using this procedure, the check will always pass. If
-the agent manually listed files, the check will fail for large goals.
+case-06 cross-checks `changed_files` against `git diff-tree HEAD`. After running
+the script, the check will always pass because both use identical git commands.
 
-**Example execution:**
+**Script location:**
 
-```bash
-# After committing goal changes
-$ git diff-tree --no-commit-id --name-only -r HEAD
-.agents/dev-protocol/handoff.md
-.agents/dev-protocol/workflow-state.yml
-.gitignore
-README.md
-docs/onboarding.md
-references/incident-rules.md
-skills/dev-bootstrap/SKILL.md
-skills/dev-checkpoint/PROMPT.md
-skills/dev-checkpoint/SKILL.md
-skills/dev-doctor/PROMPT.md
-skills/dev-doctor/SKILL.md
-skills/dev-goal-template/PROMPT.md
-skills/dev-goal-template/SKILL.md
-skills/dev-help/PROMPT.md
-skills/dev-help/SKILL.md
-skills/dev-resume/PROMPT.md
-skills/dev-resume/SKILL.md
+- PowerShell: `scripts/fix-goal-output.ps1`
+- Bash: `scripts/fix-goal-output.sh`
 
-# Use this exact list (17 files) as changed_files
-# Do NOT manually edit, reorder, or omit files
-```
+Both scripts are committed to the repository and portable across projects.

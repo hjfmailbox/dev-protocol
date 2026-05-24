@@ -51,6 +51,9 @@ progress:
     - "add mandatory generation procedure to goal-output-contract.md"
     - "add changed_files generation instructions to goal-prompt-template.md"
     - "document changed_files rule in project-rules.md as CRITICAL"
+    - "create deterministic fix scripts (fix-goal-output.ps1, fix-goal-output.sh)"
+    - "update protocol docs to mandate script execution (eliminates LLM involvement)"
+    - "tested script on current goal: 5 files correctly extracted from git"
   in_progress: []
   blocked: []
 

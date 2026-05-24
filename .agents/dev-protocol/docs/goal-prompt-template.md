@@ -93,20 +93,35 @@ Write at least one artifact:
 The artifact must contain all required sections per `.agents/dev-protocol/docs/goal-output-contract.md`.
 This is mandatory — a completed goal without at least one artifact is incomplete.
 
-**Critical: changed_files generation**
+**Critical: changed_files generation (deterministic script required)**
 
-The `changed_files` field MUST be derived from git, not memory:
+After writing the artifact, you MUST run the fix script to set changed_files:
 
-1. After committing goal changes, run:
-   ```bash
-   git diff-tree --no-commit-id --name-only -r HEAD
-   ```
-2. Use the command output verbatim as the `changed_files` value
-3. Do NOT manually list files from memory or task tracking
-4. Do NOT omit files, even if they seem minor (.gitignore, README.md, docs)
+```powershell
+# Windows
+pwsh scripts/fix-goal-output.ps1
+```
 
-Large goals often touch 15+ files. Only git state is authoritative.
-Manual lists will fail case-06 validation.
+```bash
+# Unix/Linux/Mac
+./scripts/fix-goal-output.sh
+```
+
+**Why this is mandatory:**
+
+The LLM is not trusted to generate file lists. Even with explicit instructions,
+the LLM omits or rewrites files. The script uses `git diff-tree` to extract the
+authoritative file list and overwrites the `## Changed Files` section.
+
+**Workflow:**
+
+1. Commit goal changes
+2. Write goal-output.md (with any placeholder for changed_files)
+3. Run the fix script
+4. Verify script output shows correct file count
+5. Proceed to terminal summary
+
+The script is deterministic and makes changed_files drift impossible.
 
 ### B. Terminal Summary
 

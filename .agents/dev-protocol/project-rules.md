@@ -23,13 +23,42 @@
 
 ## Goal Output Generation Rules (CRITICAL)
 
-- changed_files MUST come from `git diff-tree --no-commit-id --name-only -r HEAD`
-- Do NOT manually list files from memory or task tracking
-- Do NOT omit files, even if they seem minor
-- Run the git command AFTER committing, BEFORE writing the artifact
-- Use the command output verbatim
-- Large goals (15+ files) will fail validation if files are omitted
-- This rule exists because agent memory frequently misses files in large goals
+**LLM must not generate changed_files. Use the deterministic script.**
+
+Required workflow:
+
+1. Commit goal changes
+2. Write goal-output.md (with any placeholder for changed_files)
+3. Run `pwsh scripts/fix-goal-output.ps1` (Windows) or `./scripts/fix-goal-output.sh` (Unix)
+4. Script overwrites `## Changed Files` section with git-derived list
+5. Verify script output before proceeding
+
+**Why prompt-level enforcement failed:**
+
+The LLM rewrites or omits files even when instructed to use git output verbatim.
+Prompt reminders ("remember to use git", "use output verbatim") are insufficient.
+Only programmatic extraction guarantees correctness.
+
+**What the script does:**
+
+- Runs `git diff-tree --no-commit-id --name-only -r HEAD`
+- Parses goal-output.md
+- Replaces `## Changed Files` section with authoritative list
+- Writes file back
+
+**Prohibited:**
+
+- Manual file lists from memory
+- LLM formatting or paraphrasing of file lists
+- Prompt-level enforcement without script execution
+- Skipping the script "because the list looks correct"
+
+**Script location:**
+
+- `scripts/fix-goal-output.ps1` (PowerShell)
+- `scripts/fix-goal-output.sh` (bash)
+
+Both scripts are committed and portable across projects.
 
 ## Important Patterns
 

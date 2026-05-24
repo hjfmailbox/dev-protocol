@@ -15,6 +15,10 @@ v1 protocol reliability hardened: goal-output changed_files now mandated from gi
 - Updated goal-prompt-template.md with explicit changed_files generation instructions
 - Documented changed_files rule in project-rules.md as CRITICAL protocol rule
 - Root cause: agent memory frequently omits files in large goals (15+ files); only git state is authoritative
+- **NEW: Created deterministic fix scripts** (scripts/fix-goal-output.ps1, scripts/fix-goal-output.sh)
+- **NEW: Updated protocol docs to mandate script execution** (eliminates LLM involvement in file list generation)
+- **NEW: Tested script on current goal** — successfully extracted 5 files from git state
+- Prompt-level enforcement proved insufficient; script-based approach guarantees correctness
 
 ## In Progress
 
