@@ -82,8 +82,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "47e3d7e8b6e77c9ca14ad81d099da1060081591a"
-  summary: "phase p3: v1 usability pass complete (goal-template, doctor, help, incidents, onboarding)"
+  last_commit: "fda2865"
+  summary: "phase p3: runtime decoupling complete — protocol is now runtime-agnostic, .claude/ is optional adapter"
 
 confidence:
   state_confidence: high

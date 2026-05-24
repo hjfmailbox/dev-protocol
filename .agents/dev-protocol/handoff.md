@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-v1 protocol reliability hardened: goal-output changed_files now mandated from git state.
+Runtime decoupling complete: dev-protocol is now architecturally independent of Claude Code.
 
 ## Current Status
 
@@ -10,15 +10,19 @@ v1 protocol reliability hardened: goal-output changed_files now mandated from gi
 
 ## Completed Since Last Checkpoint
 
-- Fixed goal-output changed_files reliability issue discovered during real-project validation
-- Added mandatory generation procedure to goal-output-contract.md (git-derived file lists)
-- Updated goal-prompt-template.md with explicit changed_files generation instructions
-- Documented changed_files rule in project-rules.md as CRITICAL protocol rule
-- Root cause: agent memory frequently omits files in large goals (15+ files); only git state is authoritative
-- **NEW: Created deterministic fix scripts** (scripts/fix-goal-output.ps1, scripts/fix-goal-output.sh)
-- **NEW: Updated protocol docs to mandate script execution** (eliminates LLM involvement in file list generation)
-- **NEW: Tested script on current goal** — successfully extracted 5 files from git state
-- Prompt-level enforcement proved insufficient; script-based approach guarantees correctness
+- Decoupled Claude runtime integration from dev-protocol core
+- Refactored architecture so `.claude/` is an optional runtime adapter, not a protocol dependency
+- Updated README.md: reframed as "AI-assisted development protocol", added Runtime Support section
+- Created docs/runtime-integrations.md: architecture diagram, Claude integration details, manual fallback workflow
+- Updated docs/onboarding.md: added manual fallback workflow, runtime-agnostic prerequisites
+- Updated references/workflow-rules.md: mapped slash commands to semantic operations
+- Updated references/commit-rules.md: generalized checkpoint rule
+- Updated goal-output-contract.md: described Goal semantic operation, not `/goal` command
+- Updated goal-prompt-template.md: clarified for any runtime
+- Updated goal-workflow.md: mapped to semantic Goal operation
+- Retained `.claude/` structure with documented rationale (Claude Code auto-discovery convention)
+- Verified protocol core contains no runtime-specific logic
+- case-06 PASS on goal commit
 
 ## In Progress
 
@@ -40,18 +44,21 @@ v1 protocol reliability hardened: goal-output changed_files now mandated from gi
 - Incident logging is detect+record only, no auto-fix, no daemon, no telemetry
 - /dev-bootstrap remains detect+recommend, not detect+mutate
 - case-06 test script has a path resolution bug when run from tests/ subdirectory (requires running from repo root)
+- **NEW: Protocol is runtime-agnostic** — works with Claude Code, Cursor, Copilot, or manual workflows
+- **NEW: .claude/ is optional** — protocol correctness guaranteed without hooks
 
 ## Next Recommended Actions
 
 1. Review deferred improvements backlog
-2. Consider case-01 full lifecycle test when ready
-3. Validate new skills (goal-template, doctor, help) in real project usage
+2. Consider Cursor or VS Code integration prototype
+3. Validate protocol in a non-Claude environment (e.g., manual workflow)
 
 ## Notes For Next Session
 
 - State confidence is HIGH
 - Strict validation rules enforced in dev-checkpoint skill
 - Global spec prohibits the words "继承", "同上", "略" in design docs (word-level match)
-- Phase is p3 — usability pass complete
+- Phase is p3 — runtime decoupling complete
 - v1 retrospective frozen, no further protocol changes within v1 scope
 - New commands are additive only; core protocol contracts unchanged
+- Protocol core is portable; runtime adapters are optional convenience layers
