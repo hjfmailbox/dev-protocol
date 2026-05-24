@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "v1-usability-pass-complete"
+  focus: "runtime-structure-cleanup-complete"
   status: active
 
 progress:
@@ -54,6 +54,12 @@ progress:
     - "create deterministic fix scripts (fix-goal-output.ps1, fix-goal-output.sh)"
     - "update protocol docs to mandate script execution (eliminates LLM involvement)"
     - "tested script on current goal: 5 files correctly extracted from git"
+    - "verify .claude/skills/* are symlinks"
+    - "remove duplicated runtime skill copies (dev-doctor, dev-goal-template, dev-help)"
+    - "recreate .claude/skills entries as symlinks to canonical skills/*"
+    - "add canonical source note to docs/runtime-integrations.md"
+    - "remove obsolete tests/case-01.txt"
+    - "case-06 PASS on goal commit"
   in_progress: []
   blocked: []
 
@@ -82,8 +88,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "fda2865"
-  summary: "phase p3: runtime decoupling complete — protocol is now runtime-agnostic, .claude/ is optional adapter"
+  last_commit: "d1d2290"
+  summary: "phase p3: runtime structure cleanup — removed duplicated .claude/skills copies, cleaned obsolete tests/case-01.txt"
 
 confidence:
   state_confidence: high

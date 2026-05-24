@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Runtime decoupling complete: dev-protocol is now architecturally independent of Claude Code.
+Runtime structure cleanup complete: duplicated skill copies removed, obsolete test artifact cleaned.
 
 ## Current Status
 
@@ -10,18 +10,11 @@ Runtime decoupling complete: dev-protocol is now architecturally independent of 
 
 ## Completed Since Last Checkpoint
 
-- Decoupled Claude runtime integration from dev-protocol core
-- Refactored architecture so `.claude/` is an optional runtime adapter, not a protocol dependency
-- Updated README.md: reframed as "AI-assisted development protocol", added Runtime Support section
-- Created docs/runtime-integrations.md: architecture diagram, Claude integration details, manual fallback workflow
-- Updated docs/onboarding.md: added manual fallback workflow, runtime-agnostic prerequisites
-- Updated references/workflow-rules.md: mapped slash commands to semantic operations
-- Updated references/commit-rules.md: generalized checkpoint rule
-- Updated goal-output-contract.md: described Goal semantic operation, not `/goal` command
-- Updated goal-prompt-template.md: clarified for any runtime
-- Updated goal-workflow.md: mapped to semantic Goal operation
-- Retained `.claude/` structure with documented rationale (Claude Code auto-discovery convention)
-- Verified protocol core contains no runtime-specific logic
+- Removed duplicated skill copies in `.claude/skills/` (dev-doctor, dev-goal-template, dev-help)
+- Replaced copied directories with symlinks pointing to canonical `skills/*`
+- Verified all `.claude/skills/*` entries are symlinks
+- Added canonical source note to `docs/runtime-integrations.md` (`skills/` is canonical, `.claude/skills/` is optional runtime wiring only)
+- Removed obsolete `tests/case-01.txt` (unreferenced, unused)
 - case-06 PASS on goal commit
 
 ## In Progress
@@ -46,6 +39,7 @@ Runtime decoupling complete: dev-protocol is now architecturally independent of 
 - case-06 test script has a path resolution bug when run from tests/ subdirectory (requires running from repo root)
 - **NEW: Protocol is runtime-agnostic** — works with Claude Code, Cursor, Copilot, or manual workflows
 - **NEW: .claude/ is optional** — protocol correctness guaranteed without hooks
+- **NEW: `.claude/skills/` is symlink-only** — canonical source is `skills/`
 
 ## Next Recommended Actions
 
@@ -58,7 +52,8 @@ Runtime decoupling complete: dev-protocol is now architecturally independent of 
 - State confidence is HIGH
 - Strict validation rules enforced in dev-checkpoint skill
 - Global spec prohibits the words "继承", "同上", "略" in design docs (word-level match)
-- Phase is p3 — runtime decoupling complete
+- Phase is p3 — runtime decoupling complete, structure cleanup complete
 - v1 retrospective frozen, no further protocol changes within v1 scope
 - New commands are additive only; core protocol contracts unchanged
 - Protocol core is portable; runtime adapters are optional convenience layers
+- `.claude/skills/` must only contain symlinks; `skills/` is the canonical source
