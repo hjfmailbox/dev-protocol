@@ -4,6 +4,22 @@ Your goal is to inspect the repository, reconstruct basic project reality, and i
 
 **Boundary**: /dev-init is onboarding, not project analysis. Stop at "knowing the project reality," not "understanding how the project works." Do NOT perform deep architecture reasoning, implementation planning, business/domain analysis, or design conclusion generation.
 
+## STEP 0: Reality Priority
+
+Before any discovery, establish the source-of-truth hierarchy. When sources conflict, the higher-priority source wins.
+
+```
+Repository reality (files on disk) > Git state (git status, git log) > Explicit docs (README, CLAUDE.md) > Existing protocol state > Assumptions
+```
+
+Implications:
+
+- If `git status` contradicts what docs claim, `git status` wins
+- If README describes features not in code, the code wins
+- If existing workflow-state.yml claims phase `p2` but repository is empty, repository wins
+- NEVER trust assumptions over observable reality
+- NEVER infer beyond what is explicitly present
+
 You MUST follow these steps strictly.
 
 ---
@@ -102,7 +118,7 @@ STOP. Do NOT create or modify state files. Do NOT overwrite existing state.
 
 ---
 
-## STEP 4: Project Context Discovery (High-Level Only)
+## STEP 4: Project Context Discovery (Surface Facts Only)
 
 If proceeding (Scenarios B or C), gather surface facts only. Do NOT perform deep analysis.
 
@@ -110,8 +126,8 @@ Allowed:
 
 | Source | What to gather |
 |---|---|
-| README.md | Project purpose, setup instructions (surface only, no architecture conclusions) |
-| docs/ | Existence and top-level structure only |
+| README.md | Project name, one-line purpose, setup instructions (surface only). NEVER infer architecture from README wording. |
+| docs/ | Existence and top-level structure only. Do NOT read contents beyond file names. |
 | CLAUDE.md / AGENTS.md | Runtime conventions, agent instructions |
 | CI/CD configs | Presence only |
 | Build scripts | Presence only |
@@ -122,6 +138,7 @@ Forbidden:
 
 - Deep source code reading
 - Architecture inference beyond explicit docs
+- Architecture conclusions from README wording
 - Implementation recommendations
 - Generating project conclusions
 - Business/domain analysis
@@ -134,16 +151,16 @@ Note what is absent. Do NOT assume missing information.
 
 Identify ongoing work from:
 
-- `git status --short` — modified/untracked files
+- `git status --short` — modified/untracked files only
 - `git branch` — non-main branches
-- Outstanding tasks, fix markers in code (search common work-in-progress indicators sparingly)
+- Modified/untracked files for outstanding tasks or fix markers (do NOT scan the full repository)
 
 If dirty workspace (Scenario C):
 
 - Document dirty state
 - Do NOT stash, reset, or modify any files
-- Do NOT automatically generate state files
-- Proceed to Step 6 for confirmation requirement
+- Do NOT generate state files in this step
+- Proceed to Step 6 for confirmation logic (Scenario C is always gated)
 
 ---
 
@@ -153,21 +170,26 @@ At this point you have classified into exactly one scenario. Confirm and proceed
 
 | Scenario | Condition | Next Action |
 |---|---|---|
-| B | Git repo + clean + no protocol state | Assess confidence → Step 7 if High/Medium, confirm if Low |
-| C | Git repo + dirty + no protocol state | Explain dirty state, STOP and ask for confirmation before Step 7 |
+| B | Git repo + clean + no protocol state | Assess confidence → Step 7 if High/Medium, STOP and confirm if Low |
+| C | Git repo + dirty + no protocol state | STOP. Explain dirty state, request explicit confirmation. Only proceed to Step 7 if user confirms. |
 | A or D | Already handled in Step 1 or 3 | Should have STOPped |
 
 ### Confidence Calibration
 
-Assess confidence based on signals gathered:
+Assess confidence based on signals gathered in Steps 1–5. This is the ONLY step that gates state generation.
 
 | Level | Signals | Action |
 |---|---|---|
-| **High** | README present, clear structure, clean workspace, explicit docs | Auto-generate state in Step 7 |
-| **Medium** | README present but minimal, some ambiguity, clean workspace | Auto-generate, note uncertainties in handoff |
-| **Low** | No README, no docs, ambiguous structure, dirty workspace, low discoverability | STOP. Ask user: "Confidence is low. Generate state files anyway?" |
+| **High** | README present, clear structure, clean workspace, explicit docs | Proceed to Step 7 |
+| **Medium** | README present but minimal, some ambiguity, clean workspace | Proceed to Step 7, note uncertainties in handoff |
+| **Low** | No README, no docs, ambiguous structure, dirty workspace, low discoverability | STOP. Output: "Confidence is low. Generate state files anyway? (yes/no)" |
 
-For Scenario C (dirty workspace), confidence is capped at Medium. If other low-confidence signals are present, require explicit confirmation.
+Rules:
+
+- Scenario C (dirty workspace) caps confidence at Medium
+- If Low confidence signals are present in any scenario, STOP and require explicit user confirmation
+- Do NOT proceed to Step 7 without passing confidence gating
+- Confidence gating happens ONLY in this step
 
 ---
 
@@ -216,7 +238,9 @@ confidence:
   state_confidence: <high | medium | low>
 ```
 
-**Phase rule**: `phase` MUST be `unknown` until validated by user. Do NOT infer phase from maturity. Maturity classification (Step 2) is for confidence calibration only, never for phase assignment.
+**Phase rule**: `phase` MUST be `unknown` until validated by user or `/dev-status`. Do NOT infer phase from maturity. Maturity classification (Step 2) is for confidence calibration only, never for phase assignment.
+
+**Phase ownership**: The user or `/dev-status` owns setting the correct phase. `/dev-init` only records that onboarding occurred; it does NOT claim to know the project's development phase.
 
 **Confidence rule**: Set `state_confidence` to match the confidence assessed in Step 6. Include note in handoff if Medium or Low.
 
@@ -264,24 +288,32 @@ Use template:
 
 ## Notes For Next Session
 
-- State generated by /dev-init — confidence is medium until validated by user
+- State generated by /dev-init
+- Phase is `unknown` — must be validated by user or `/dev-status` before relying on it for planning
+- Confidence level: <high/medium/low>
 ```
 
 ### project-rules.md
 
 Generate a minimal, non-speculative version. NEVER invent missing facts.
 
+**Separation principle**: Project runtime facts and protocol operating rules are distinct. Protocol rules describe how dev-protocol operates; they are NOT project-specific conventions.
+
 ```markdown
 # Project Rules
 
-## Known Runtime Facts
+## Project Runtime Facts
+
+Facts observed during /dev-init. Never inferred, never speculated.
 
 - Language/Framework: <from dependency manifests, or "Unknown">
 - Project purpose: <from README, or "Unknown">
 - CI/CD: <present/absent, or "Unknown">
 - Test tooling: <present/absent, or "Unknown">
 
-## Protocol Rules
+## dev-protocol Operating Rules
+
+These are protocol-level constraints. They do NOT belong to the project; they govern how the protocol interacts with this repository.
 
 - Never auto-commit from /dev-init
 - /dev-save must fail if validation fails (no partial success)
@@ -302,17 +334,19 @@ Generate a minimal, non-speculative version. NEVER invent missing facts.
 
 ## Unknown / Requires Validation
 
-- Architecture constraints: <not inferred during init — validate later>
-- Testing expectations: <not inferred during init — validate later>
-- Documentation conventions: <not inferred during init — validate later>
+Fields NOT inferred during /dev-init. Must be validated by user or /dev-status before use.
+
+- Architecture constraints: <unknown — validate before relying on>
+- Testing expectations: <unknown — validate before relying on>
+- Documentation conventions: <unknown — validate before relying on>
 
 ## Notes
 
 - Initialized by /dev-init on <date>
-- Phase unknown until validated by user
+- Phase is `unknown` until user or /dev-status validates and updates it
 ```
 
-**Critical rule**: If a field is uncertain, use "Unknown" or "Not inferred during init — validate later." Do NOT fabricate constraints, expectations, or conventions.
+**Critical rule**: If a field is uncertain, use "Unknown" or "not inferred during init — validate before relying on." Do NOT fabricate constraints, expectations, or conventions.
 
 State generation rules:
 
@@ -335,10 +369,13 @@ Check:
 - Recoverability from scratch chat
 - No missing critical fields
 - No root-level duplicates created
+- `phase` is `unknown`
+- `checkpoint.last_commit` is empty
+- No invented facts in project-rules.md
 
-If confidence is low:
+If validation fails:
 
-STOP and report failure with specific gaps.
+STOP and report specific gaps. Do NOT proceed with invalid state.
 
 ---
 

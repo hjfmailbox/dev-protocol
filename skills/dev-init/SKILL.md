@@ -52,6 +52,16 @@ Does NOT auto-commit. Does NOT modify existing code. Does NOT stage files.
 
 ---
 
+## Reality Priority
+
+/dev-init follows a strict source-of-truth hierarchy. When sources conflict, the higher-priority source wins:
+
+```
+Repository reality (files on disk) > Git state (git status, git log) > Explicit docs (README, CLAUDE.md) > Existing protocol state > Assumptions
+```
+
+Never infer beyond what is explicitly present. Never trust assumptions over observable reality.
+
 ## Typical Workflow
 
 ```
@@ -137,7 +147,7 @@ Four scenarios with explicit behavior:
 |---|---|
 | A. No git repo | Explain required setup. No destructive actions. |
 | B. Git repo + clean + no protocol state | First-time initialization path. Auto-generate state files allowed. |
-| C. Git repo + dirty + no protocol state | Safe onboarding path. Explain dirty state, recommend action, ask for confirmation before generating state. |
+| C. Git repo + dirty + no protocol state | STOP. Explain dirty state, request explicit confirmation. Only generate state if user confirms. |
 | D. Existing `.agents/dev-protocol` | Recommend `/dev-status`. Explain why re-init is unnecessary. STOP without overwriting. |
 
 ### 7. Generate State Files (Conditional)
@@ -156,7 +166,9 @@ Rules:
 - Never overwrite existing state without explicit reason
 - Prefer reality over history
 - `checkpoint.last_commit` MUST be left empty/absent — no checkpoint baseline exists until first `/dev-save`
-- `phase` MUST be `unknown` until validated by user
+- `phase` MUST be `unknown` until validated by user or `/dev-status`
+- Phase ownership: user or `/dev-status` sets phase; `/dev-init` only records onboarding occurred
+- `project-rules.md` MUST clearly separate project runtime facts from protocol operating rules
 - `project-rules.md` MUST NOT contain invented facts — use "Unknown / Requires Validation" for uncertain items
 
 Confidence gating:
