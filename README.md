@@ -19,7 +19,7 @@ Init → Scope → Work → Save → New Session → Status → Scope → ...
 1. **Init** — Inspect repository and reconstruct basic project reality. Creates `.agents/dev-protocol/` state files reflecting actual project state. Defaults to `phase: unknown` until user validation. No auto-commit.
 2. **Scope** — Declare a focused, multi-step objective with validation criteria.
 3. **Work** — Implement changes within the scoped objective. Make normal git commits during work.
-4. **Save** — Persist protocol state files only (`.agents/dev-protocol/*`), validate consistency, and commit. Does not commit source code. After save, it is safe to start a new session.
+4. **Save** — Persist protocol state files only (`.agents/dev-protocol/*`), validate consistency. Does not modify source code. User stages and commits state files separately.
 5. **New Session** — Reset conversation context. State survives in repository files.
 6. **Status** — Inspect current protocol state and reconstruct development context. Read-only; never modifies files.
 
@@ -36,7 +36,7 @@ Protocol commands are semantic operations. The Claude Code representations use s
 |----------|:-----------:|:------------:|-------------|
 | Init | `/dev-init` | Yes | Inspect repository, reconstruct project reality, initialize protocol state |
 | Scope | `/dev-scope` | No | Declare a focused goal with validation criteria |
-| Save | `/dev-save` | Yes | Persist protocol state files only, validate, commit (fails on inconsistency) |
+| Save | `/dev-save` | Yes | Persist protocol state files only, validate (fails on inconsistency) |
 | Status | `/dev-status` | No | Inspect current protocol state and reconstruct context |
 
 Key guarantees:
@@ -91,7 +91,6 @@ Test cases are under `tests/`:
 - Single-agent only (no multi-agent support)
 - No auto-repair or complex document inference
 - No advanced hooks or long-term memory
-- /dev-save skill not yet created
 - Confidence downgrade mechanism untested in real projects
 
 ## Runtime Support

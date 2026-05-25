@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Runtime structure cleanup complete: duplicated skill copies removed, obsolete test artifact cleaned.
+Implementing /dev-save v2 runtime skill (R2.4) to complete the v2 command surface.
 
 ## Current Status
 
@@ -16,10 +16,12 @@ Runtime structure cleanup complete: duplicated skill copies removed, obsolete te
 - Added canonical source note to `docs/runtime-integrations.md` (`skills/` is canonical, `.claude/skills/` is optional runtime wiring only)
 - Removed obsolete `tests/case-01.txt` (unreferenced, unused)
 - case-06 PASS on goal commit
+- Implemented /dev-scope v2 runtime skill (R2.3) with ambiguity detection and validation-first rule
+- case-06 PASS on /dev-scope implementation commit
 
 ## In Progress
 
-- none
+- Implementing /dev-save v2 runtime skill (R2.4)
 
 ## Blockers
 
@@ -43,9 +45,9 @@ Runtime structure cleanup complete: duplicated skill copies removed, obsolete te
 
 ## Next Recommended Actions
 
-1. Review deferred improvements backlog
-2. Consider Cursor or VS Code integration prototype
-3. Validate protocol in a non-Claude environment (e.g., manual workflow)
+1. Complete /dev-save implementation and validate
+2. Run case-05 and case-06 tests
+3. Push to GitHub
 
 ## Notes For Next Session
 
