@@ -91,7 +91,7 @@ Test cases are under `tests/`:
 - Single-agent only (no multi-agent support)
 - No auto-repair or complex document inference
 - No advanced hooks or long-term memory
-- /dev-scope, /dev-save, /dev-status skills not yet created
+- /dev-scope, /dev-save skills not yet created
 - Confidence downgrade mechanism untested in real projects
 
 ## Runtime Support
