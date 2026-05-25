@@ -10,14 +10,18 @@ It replaces "figure out what to do next" with "follow a fixed sequence."
 
 ## Development Lifecycle
 
-1. **Bootstrap** — recover or reconstruct project state on a fresh session (Claude Code: `/dev-bootstrap`)
-2. **Develop** — write code, test, iterate within a scoped goal
-3. **Goal** — declare a focused objective with explicit scope boundaries (Claude Code: `/goal`)
-4. **Checkpoint** — persist state, validate consistency, commit (Claude Code: `/dev-checkpoint`)
-5. **Resume** — restore context in the next session without chat history (Claude Code: `/dev-resume`)
+```
+Init → Scope → Work → Save → New Session → Status → Scope → ...
+```
 
-This sequence ensures every session can start, work, save, and resume
-predictably, regardless of time gaps or session boundaries.
+1. **Init** — Initialize protocol on a fresh project or after cloning (Claude Code: `/dev-init`)
+2. **Scope** — Declare a focused objective with explicit scope boundaries (Claude Code: `/dev-scope`)
+3. **Work** — Write code, test, iterate within the scoped objective
+4. **Save** — Persist state, validate consistency, commit (Claude Code: `/dev-save`)
+5. **New Session** — Reset conversation context. State survives in repository files.
+6. **Status** — Restore context in the next session without chat history (Claude Code: `/dev-status`)
+
+This sequence ensures every session can start, work, save, and resume predictably, regardless of time gaps or session boundaries.
 
 ---
 
@@ -25,54 +29,56 @@ predictably, regardless of time gaps or session boundaries.
 
 | Category | Definition | When to Do |
 |---|---|---|
-| **Goal work** | Implementing a scoped feature, fix, or document change | After declaring a goal with clear scope (Claude Code: `/goal`) |
-| **Checkpoint work** | Updating state files, validating, committing current progress | After goal work completes or at natural breakpoints (Claude Code: `/dev-checkpoint`) |
-| **Maintenance edits** | Fixing typos, updating docs, adjusting rules without changing behavior | Between goals, when state is stable |
+| **Scope work** | Implementing a scoped feature, fix, or document change | After declaring a scope with clear boundaries (Claude Code: `/dev-scope`) |
+| **Save work** | Updating state files, validating, committing current progress | After scope work completes or at natural breakpoints (Claude Code: `/dev-save`) |
+| **Maintenance edits** | Fixing typos, updating docs, adjusting rules without changing behavior | Between scopes, when state is stable |
 
-**Example:** Filling `references/workflow-rules.md` with content is goal work.
-Updating `workflow-state.yml` to mark it completed is checkpoint work.
-Fixing a typo in `project-rules.md` is a maintenance edit.
+**Example:** Filling `references/workflow-rules.md` with content is scope work. Updating `workflow-state.yml` to mark it completed is save work. Fixing a typo in `project-rules.md` is a maintenance edit.
 
 ---
 
 ## Validation Order
 
-1. **After goal work**: run case-06 (document consistency check) to verify
-   the changed document aligns with existing conventions and references.
-2. **After checkpoint**: run case-05 (checkpoint idempotency) to verify
-   the committed state is self-consistent and reproducible.
+The validation sequence is strict. Running tests out of order produces false failures.
 
-Do not run case-05 before case-06 — checkpoint validation assumes
-documents are already consistent.
+```
+Scope → Work → case-06 → Save → case-05
+```
+
+1. **After scope work**: run `pwsh tests/run-tests.ps1 -Case 06` to verify the goal commit and artifact are valid.
+2. **After save**: run `pwsh tests/run-tests.ps1 -Case 05` to verify the checkpoint commit and state consistency.
+
+**Why this order matters:**
+
+- `case-06` checks the goal commit (HEAD at the time). It validates changed_files, commit message format, and artifact presence.
+- `/dev-save` creates a new checkpoint commit, changing HEAD.
+- `case-05` checks the checkpoint commit. It validates that HEAD is a checkpoint-style commit and that state files are consistent.
+- If you run `case-06` after `/dev-save`, HEAD is now a checkpoint commit, not a goal commit, so `case-06` fails on changed_files mismatch and commit format checks.
+
+**Rule**: Always run `case-06` before `/dev-save`. Always run `case-05` after `/dev-save`.
 
 ---
 
 ## Rules for Safe Iteration
 
-1. **One scoped goal at a time.** Do not combine unrelated changes in a
-   single goal. Smaller goals = easier review = faster checkpoints.
+1. **One scoped objective at a time.** Do not combine unrelated changes in a single scope. Smaller scopes = easier review = faster saves.
 
-2. **Avoid unrelated refactors.** If the goal is "fill placeholder," do not
-   restructure the document format or rename sections. Refactors are their
-   own goals.
+2. **Avoid unrelated refactors.** If the scope is "fill placeholder," do not restructure the document format or rename sections. Refactors are their own scopes.
 
-3. **Checkpoint frequently.** A checkpoint after every completed goal is
-   the minimum. Longer gaps between checkpoints increase drift risk.
+3. **Save frequently.** A save after every completed scope is the minimum. Longer gaps between saves increase drift risk.
 
-4. **Resume after session reset.** When returning to work, always resume
-   (Claude Code: `/dev-resume`) before writing code. Never assume you remember the exact state correctly.
+4. **Status after session reset.** When returning to work, always run `/dev-status` before writing code. Never assume you remember the exact state correctly.
 
 ---
 
 ## Example Workflow
 
 ```
-Session 1: Bootstrap → Goal "fill workflow-rules.md" → write content → Checkpoint
-Session 2: Resume → Goal "run case-01 test" → execute tests → Checkpoint
-Session 3: Resume → Goal "fix case-01 failure" → patch → Checkpoint
-
-In Claude Code: Bootstrap = `/dev-bootstrap`, Goal = `/goal`, Checkpoint = `/dev-checkpoint`, Resume = `/dev-resume`.
+Session 1: Init → Scope "fill workflow-rules.md" → write content → case-06 → Save → case-05
+Session 2: Status → Scope "run case-01 test" → execute tests → case-06 → Save → case-05
+Session 3: Status → Scope "fix case-01 failure" → patch → case-06 → Save → case-05
 ```
 
-Each session starts with state recovery, declares a focused goal, works
-within that scope, and checkpoints before ending. No chat history needed.
+In Claude Code: Init = `/dev-init`, Scope = `/dev-scope`, Save = `/dev-save`, Status = `/dev-status`.
+
+Each session starts with state recovery, declares a focused scope, works within that scope, validates, saves, and validates again. No chat history needed.

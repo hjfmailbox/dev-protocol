@@ -1,229 +1,142 @@
-# Real-Project Onboarding Guide
+# Onboarding Guide
 
-How to adopt dev-protocol in existing repositories.
+How to start using dev-protocol in any project.
 
-**Runtime-agnostic**: This guide uses Claude Code as the reference runtime. If you use Cursor, GitHub Copilot, or manual workflows, the same steps apply using your runtime's interaction model. See [`runtime-integrations.md`](runtime-integrations.md) for non-Claude environments.
-
----
-
-## Prerequisites
-
-- AI assistant or manual workflow capable of reading/writing files and running shell commands
-- Repository accessible locally
-- Basic familiarity with dev-protocol operations (`/dev-help` in Claude Code, or read `references/workflow-rules.md`)
+**Runtime-agnostic**: This guide uses Claude Code slash commands as examples. If you use Cursor, Copilot, or manual workflows, the same operations apply through your runtime's interaction model. See [`runtime-integrations.md`](runtime-integrations.md) for non-Claude environments.
 
 ---
 
-## Scenario 1: Fresh Repository (No Commits)
+## First-Contact Answer
 
-```bash
-mkdir my-project && cd my-project
-git init
-# Add initial files...
-git add . && git commit -m "initial commit"
-```
-
-Then bootstrap the protocol. In Claude Code:
-
-```
-/dev-bootstrap
-```
-
-Or manually: create `.agents/dev-protocol/workflow-state.yml`, `handoff.md`, and `project-rules.md` reflecting your project state.
-
-Bootstrap will:
-
-- Detect project structure
-- Create `.agents/dev-protocol/` with state files
-- NOT auto-commit (you review and commit manually)
-
-After reviewing:
-
-```bash
-git add .agents/
-git commit -m "chore(protocol): initialize dev-protocol"
-```
-
-Then checkpoint. In Claude Code: `/dev-checkpoint`. Or manually: update state files to reflect current progress and commit.
+> **我第一次接入真实项目时，第一步应该做什么？**
+>
+> 运行 `/dev-init`。它会检查你的项目，生成状态文件，然后你审阅、提交，就完成了初始化。
 
 ---
 
-## Scenario 2: Existing Git Repository
+## Happy Path
 
-```bash
-cd existing-project
-```
-
-Then bootstrap. In Claude Code:
+The ideal first-contact flow. Use this when your project is already a git repository with a clean working tree.
 
 ```
-/dev-bootstrap
+Step 1: /dev-init          → Protocol inspects project, creates .agents/dev-protocol/
+Step 2: Review state files → Check workflow-state.yml, handoff.md, project-rules.md
+Step 3: git add .agents/   → Track state files in git
+Step 4: git commit         → chore(protocol): initialize dev-protocol
+Step 5: /dev-scope         → Declare your first goal
+Step 6: Work               → Implement changes
+Step 7: /dev-save          → Persist state and commit
 ```
 
-Or manually: inspect the project and create state files in `.agents/dev-protocol/`.
-
-Bootstrap will:
-
-- Scan git history, docs, code structure
-- Reconstruct current development phase
-- Create state files reflecting actual progress
-- NOT auto-commit
-
-Review the generated state, then:
-
-```bash
-git add .agents/
-git commit -m "chore(protocol): initialize dev-protocol"
-```
-
-Then checkpoint. In Claude Code: `/dev-checkpoint`. Or manually: update state files and commit.
+After Step 7, you can safely end the session. Next session: run `/dev-status` to resume.
 
 ---
 
-## Scenario 3: Dirty Workspace (Uncommitted Changes)
+## Recovery Path
 
-**Before bootstrap:**
+If the happy path does not match your situation, find your state below and follow the corresponding branch.
 
-dev-protocol does NOT auto-commit or auto-stash. If your workspace is dirty:
-
-Option A — Commit first:
-```bash
-git add .
-git commit -m "chore: save current progress"
-/dev-bootstrap
-```
-
-Option B — Stash first:
-```bash
-git stash
-/dev-bootstrap
-git stash pop
-```
-
-Option C — Bootstrap with dirty workspace:
-```
-/dev-bootstrap
-```
-
-Bootstrap will report the dirty state and include it in the reconstructed context. The state files will reflect the dirty workspace as "in progress" work.
-
-**Important**: `/dev-checkpoint` may fail or produce unexpected results on a dirty workspace. Commit or stash before checkpoint.
-
----
-
-## Scenario 4: Untracked Files
-
-Untracked files are visible to bootstrap and will be included in project inspection.
-
-If untracked files are intentional (new feature, experiment):
-
-```
-/dev-bootstrap
-```
-
-Bootstrap will note untracked files in the reconstructed state.
-
-If untracked files are artifacts (build output, temp files):
-
-```bash
-# Add to .gitignore first
-echo "build/" >> .gitignore
-echo "*.tmp" >> .gitignore
-git add .gitignore
-git commit -m "chore: update gitignore"
-/dev-bootstrap
-```
-
----
-
-## Scenario 5: Existing Branches
-
-dev-protocol works on the current branch. State files are branch-specific.
-
-**On your working branch:**
-
-```bash
-git checkout feature-branch
-```
-
-```
-/dev-bootstrap
-```
-
-State files will be created on `feature-branch`. When you switch branches:
-
-```bash
-git checkout main
-# State files from feature-branch won't be here (unless merged)
-```
-
-**Recommendation**: Bootstrap on the branch you plan to work on. State files should be committed to that branch.
-
----
-
-## Scenario 6: Missing Git Initialization
-
-If the project directory is not a git repository:
-
-```
-/dev-bootstrap
-```
-
-Bootstrap will detect this and report:
-
-```
-ERROR: Not a git repository
-Recommendation: Run `git init` and make an initial commit first
-```
-
-Fix:
+### No Git Repository
 
 ```bash
 git init
 git add .
 git commit -m "initial commit"
-/dev-bootstrap
+/dev-init
 ```
 
-dev-protocol requires git. No git = no checkpoint = no recovery.
+dev-protocol requires git. Without git, there is no history to inspect and no way to checkpoint.
+
+### Git Repository but Dirty Workspace
+
+**Option A — Commit first (recommended):**
+```bash
+git add .
+git commit -m "chore: save current progress"
+/dev-init
+```
+
+**Option B — Stash first:**
+```bash
+git stash
+/dev-init
+git stash pop
+```
+
+**Option C — Init with dirty workspace:**
+```
+/dev-init
+```
+
+`/dev-init` will detect the dirty state and include it in reconstructed context. State files will reflect the dirty workspace as "in progress" work. You must clean the workspace before `/dev-save`.
+
+### Existing `.agents/dev-protocol`
+
+If the project already has dev-protocol state files:
+
+```
+/dev-status
+```
+
+Do not run `/dev-init`. `/dev-status` inspects existing state and reports whether it is current, stale, or broken. If stale, `/dev-status` recommends re-syncing. If missing, `/dev-status` recommends `/dev-init`.
+
+### Existing Design Documents
+
+If the project has `README.md`, `docs/`, `CLAUDE.md`, or architecture documents:
+
+```
+/dev-init
+```
+
+`/dev-init` inspects existing documents to estimate project maturity and phase. Review the generated `workflow-state.yml` to verify the estimated phase is accurate.
+
+### No Design Documents
+
+If the project has no documentation:
+
+```
+/dev-init
+```
+
+`/dev-init` estimates phase from git history depth and directory structure alone. The estimate may be conservative (p1). Update `workflow-state.yml` manually if you know the project is more mature.
 
 ---
 
-## Post-Onboarding Checklist
+## Command Reference
 
-After bootstrap and first checkpoint:
+| Command | Purpose | When to Use |
+|---|---|---|
+| `/dev-init` | Initialize protocol on a project | First contact, or after cloning a repo without `.agents/` |
+| `/dev-scope` | Declare a focused goal with validation criteria | Before starting any implementation work |
+| `/dev-save` | Persist state, validate consistency, commit | After completing a goal or at natural stopping points |
+| `/dev-status` | Inspect current state, diagnose issues, resume context | Every new session, or when unsure of current state |
 
-- [ ] `.agents/dev-protocol/workflow-state.yml` exists and reflects project state
-- [ ] `.agents/dev-protocol/handoff.md` exists with current focus
-- [ ] `.agents/dev-protocol/project-rules.md` exists with project constraints
-- [ ] Checkpoint succeeded (one commit created) — in Claude Code: `/dev-checkpoint`; manual: commit state files
-- [ ] Resume restores correct context in a new session — in Claude Code: `/dev-resume`; manual: read `handoff.md`
-- [ ] `.agents/` is tracked in git (not in `.gitignore`)
+**Deprecated v1 commands** (still work but print a deprecation warning):
+
+| Deprecated | Replacement |
+|---|---|
+| `/dev-bootstrap` | `/dev-init` |
+| `/dev-checkpoint` | `/dev-save` |
+| `/dev-resume` | `/dev-status` |
+| `/dev-doctor` | `/dev-status --diagnose` |
+| `/dev-help` | `/dev-status --help` |
+| `/dev-goal-template` | `/dev-scope` (template built-in) |
+| `/goal` | `/dev-scope` |
 
 ---
 
-## Manual Fallback Workflow (No Hooks)
+## Validation Order
 
-If your runtime does not support hooks or slash commands, use this manual workflow:
+After goal work, validate in this exact order:
 
-1. **Bootstrap**: Create `.agents/dev-protocol/` state files manually or with a script.
-2. **Goal work**: Implement changes within a written scope.
-3. **Normalize**: Before completing a goal, always run:
-   ```powershell
-   pwsh scripts/fix-goal-output.ps1
-   ```
-4. **Validate**: Run case-06:
-   ```powershell
-   pwsh tests/run-tests.ps1 -Case 06
-   ```
-5. **Checkpoint**: Commit state files and changes:
-   ```bash
-   git add .
-   git commit -m "chore(checkpoint): describe change"
-   ```
-6. **Resume**: In a new session, read `.agents/dev-protocol/handoff.md` to recover context.
+```
+/dev-scope → work → case-06 → /dev-save → case-05
+```
 
-The only difference from hook mode is that normalization and validation are triggered manually instead of automatically. The protocol behavior is identical.
+1. **After `/dev-scope` and work**: Run `pwsh tests/run-tests.ps1 -Case 06` to verify the goal commit and artifact are valid.
+2. **After `/dev-save`**: Run `pwsh tests/run-tests.ps1 -Case 05` to verify the checkpoint commit and state consistency.
+
+Running `case-05` before `case-06` will fail because `/dev-save` changes HEAD to a checkpoint commit, invalidating the goal artifact checks in `case-06`.
 
 ---
 
@@ -232,15 +145,15 @@ The only difference from hook mode is that normalization and validation are trig
 | Pitfall | Solution |
 |---------|----------|
 | `.agents/` accidentally gitignored | Remove from `.gitignore`, commit |
-| Bootstrap on wrong branch | State files are branch-specific; re-bootstrap on correct branch |
-| Skipping first checkpoint after bootstrap | Bootstrap creates state but no commit — always checkpoint after bootstrap |
+| Running `/dev-init` on a project that already has `.agents/` | Run `/dev-status` instead |
+| Skipping first `/dev-save` after `/dev-init` | `/dev-init` creates state but no commit — always `/dev-save` after init |
+| Running `case-06` after `/dev-save` | `case-06` must run before `/dev-save`; `case-05` runs after |
+| Forgetting to run `fix-goal-output.ps1` before goal completion | Run `pwsh scripts/fix-goal-output.ps1` after writing goal-output, before `case-06` |
 | State files in wrong location | Must be in `.agents/dev-protocol/`, not root or `.agent/` |
-| Running checkpoint before any commits | Make at least one commit before checkpoint |
-| Forgetting to run `fix-goal-output.ps1` before goal completion | Add it to your checklist, or use a runtime with hook support |
 
 ---
 
-## What Bootstrap Does NOT Do
+## What `/dev-init` Does NOT Do
 
 - Does NOT auto-commit
 - Does NOT modify existing code or docs
@@ -250,4 +163,29 @@ The only difference from hook mode is that normalization and validation are trig
 - Does NOT install dependencies
 - Does NOT require any specific AI runtime
 
-Bootstrap is **detect + recommend**, not detect + mutate.
+`/dev-init` is **detect + recommend**, not detect + mutate.
+
+---
+
+## `.agents` Directory Convention
+
+`.agents/dev-protocol/` is the runtime directory for dev-protocol state.
+
+**Why `.agents` (plural)?**
+
+- Aligns with multi-agent ecosystem conventions
+- Enables shared skill discovery across different AI runtimes
+- Distinguishes from single-runtime `.agent/` or `.claude/`
+
+**Relationship to `.claude/`**
+
+| Directory | Purpose | Content |
+|---|---|---|
+| `.agents/dev-protocol/` | Protocol state | `workflow-state.yml`, `handoff.md`, `project-rules.md` |
+| `.claude/` | Claude Code runtime adapter | `settings.json`, hooks, skill symlinks |
+| `.claude/skills/` | Claude auto-discovery | Symlinks to `skills/` only |
+| `skills/` | Canonical skill definitions | `PROMPT.md`, `SKILL.md` per command |
+
+**Rule**: `skills/` is the canonical source. `.claude/skills/` contains only symlinks. `.agents/dev-protocol/` contains only state files. No duplicated copies anywhere.
+
+**Cross-agent compatibility**: `.agents/` is runtime-agnostic. Claude Code, Cursor, Copilot, or manual workflows all read and write the same `.agents/dev-protocol/` files. Runtime-specific configuration lives in `.claude/`, `.cursor/`, etc.

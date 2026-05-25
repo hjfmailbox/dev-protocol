@@ -16,30 +16,28 @@ dev-protocol solves this by persisting development state to durable files in the
 Bootstrap → Checkpoint → New Session → Resume → Goal → Checkpoint
 ```
 
-1. **Bootstrap** — Initialize protocol on a project. Reconstructs current state from code, docs, and git history into state files. No auto-commit.
-2. **Checkpoint** — Persist changes to state files, validate consistency, and commit. After checkpoint, it is safe to start a new session.
-3. **New Session** — Reset conversation context. State survives in repository files.
-4. **Resume** — Recover full development context from state files. Read-only; never modifies files.
-5. **Goal** — Set a scoped, multi-step objective with validation criteria.
-6. **Checkpoint** — Save progress toward the goal.
+1. **Init** — Initialize protocol on a project. Inspects git history, docs, and directory structure. Creates `.agents/dev-protocol/` state files. No auto-commit.
+2. **Scope** — Declare a focused, multi-step objective with validation criteria.
+3. **Work** — Implement changes within the scoped objective.
+4. **Save** — Persist progress to state files, validate consistency, and commit. After save, it is safe to start a new session.
+5. **New Session** — Reset conversation context. State survives in repository files.
+6. **Status** — Recover full development context from state files. Diagnose issues. Read-only; never modifies files.
 
-Repeat the checkpoint → new session → resume cycle as needed.
+Repeat the scope → work → save → new session → status cycle as needed.
 
 In Claude Code, these semantic operations map to slash commands:
-`Bootstrap` = `/dev-bootstrap`, `Checkpoint` = `/dev-checkpoint`, `Resume` = `/dev-resume`, `Goal` = `/goal`.
+`Init` = `/dev-init`, `Scope` = `/dev-scope`, `Save` = `/dev-save`, `Status` = `/dev-status`.
 
 ## Commands
 
 Protocol commands are semantic operations. The Claude Code representations use slash commands; other runtimes may use function calls, CLI tools, or chat prompts.
 
-| Semantic | Claude Code | Writes Files? | Description |
+| Command | Claude Code | Writes Files? | Description |
 |----------|:-----------:|:------------:|-------------|
-| Bootstrap | `/dev-bootstrap` | Yes | Initialize protocol, reconstruct state, no auto-commit |
-| Checkpoint | `/dev-checkpoint` | Yes | Persist state, validate, commit (fails on inconsistency) |
-| Resume | `/dev-resume` | No | Recover context from state files (read-only) |
-| Goal Template | `/dev-goal-template` | No | Generate a standardized goal template for `Goal` |
-| Doctor | `/dev-doctor` | No | Diagnose protocol health issues (read-only) |
-| Help | `/dev-help` | No | Quick usage reference |
+| Init | `/dev-init` | Yes | Initialize protocol on a project, reconstruct state |
+| Scope | `/dev-scope` | No | Declare a focused goal with validation criteria |
+| Save | `/dev-save` | Yes | Persist state, validate, commit (fails on inconsistency) |
+| Status | `/dev-status` | No | Inspect state, diagnose issues, resume context, show help |
 
 Key guarantees:
 
@@ -67,29 +65,33 @@ Test cases are under `tests/`:
 
 | Case | Description |
 |------|-------------|
-| `case-01-basic` | Full lifecycle: bootstrap → change → checkpoint → resume → idempotent checkpoint |
-| `case-05-first-checkpoint` | First checkpoint from a bootstrapped (no prior commit) state |
-| `case-06-goal-workflow` | Goal setting and completion cycle |
+| `case-01-basic` | Full lifecycle: init → scope → work → save → status → idempotent save |
+| `case-05-first-checkpoint` | First save from an initialized (no prior checkpoint) state |
+| `case-06-goal-workflow` | Scope declaration and completion cycle |
 
 ## Current Status
 
 **Phase**: p3 (v1-frozen-deferred-backlog-review) — **active**
 
 **Completed**:
-- Three core commands defined and implemented
+- v2 command surface defined (init, scope, save, status)
+- v1 commands deprecated with migration path
 - State file templates and validation rules
 - Runtime directory at `.agents/dev-protocol/`
 - Commit convention and failure policy
 - case-05 and case-06 test validation passed (17/17 checks)
 - v1 retrospective completed and frozen
-- Usability commands added (goal-template, doctor, help)
+- Unified onboarding guide with happy path and recovery path
+- Validation order explicitly documented
+- `.agents` directory convention documented
 - Incident logging mechanism
 - Real-project onboarding guide
 
-**Known limitations (v1 scope)**:
+**Known limitations (v2 scope)**:
 - Single-agent only (no multi-agent support)
 - No auto-repair or complex document inference
 - No advanced hooks or long-term memory
+- New skill files for v2 commands not yet created (documentation-first redesign)
 
 ## Runtime Support
 

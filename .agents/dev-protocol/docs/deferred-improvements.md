@@ -117,21 +117,15 @@ release preparation.
 
 ## 10. Clarify `.agents` directory convention
 
-**Why deferred:** Protocol state migrated from `.agent/` to
-`.agents/` to align with broader multi-agent ecosystem conventions
-and shared skill discovery. However, directory rationale and naming
-decision are not yet explicitly documented.
+**Status:** Resolved in R1 by documentation update
 
-Potential confusion:
+**Resolution:** `docs/onboarding.md` now includes a dedicated `.agents` Directory Convention section explaining:
+- Why `.agents` (plural) was chosen over `.agent`
+- Relationship to `.claude/` and `.claude/skills/`
+- Cross-agent compatibility expectations
+- Rule that `skills/` is canonical, `.claude/skills/` is symlinks only
 
-- `.agent` vs `.agents`
-- relationship with `.claude/skills`
-- cross-agent compatibility expectations
-
-**Suggested revisit trigger:** Documentation cleanup or onboarding
-friction from new projects.
-
-**Priority:** Medium
+**Priority:** Medium → Closed
 
 ## 11. Real-project validation checklist
 
@@ -158,46 +152,30 @@ public release preparation.
 
 ## 12. Clarify case-05 and case-06 execution order
 
-**Why deferred:** Real-project validation revealed ambiguity in
-the expected validation sequence.
+**Status:** Resolved in R1 by documentation update
 
-`case-06` validates a completed `/goal` commit and its associated
-goal-output artifact. However, after `/dev-checkpoint`, HEAD changes
-to a checkpoint commit, causing `case-06` to fail due to
-changed_files mismatch.
+**Resolution:** `references/workflow-rules.md` and `docs/onboarding.md` now explicitly document the validation order:
 
-`case-05` validates `/dev-checkpoint` behavior and therefore must
-run after checkpoint.
+```
+Scope → Work → case-06 → Save → case-05
+```
 
-Expected order should be explicitly documented:
+Both documents explain why this order matters: `case-06` validates the goal commit (HEAD before save), while `case-05` validates the checkpoint commit (HEAD after save). Running them out of order produces false failures.
 
-`/goal → case-06 → /dev-checkpoint → case-05`
+**Priority:** High → Closed
 
-**Suggested revisit trigger:** Protocol documentation cleanup or
-further real-project validation.
+## 13. Checkpoint commit message contract
 
-**Priority:** High
+**Status:** Partially resolved in R1 by documentation update; enforcement deferred to R3
 
-## 13. /dev-checkpoint commit message contract may not be enforced
+**Documentation resolution:** `references/workflow-rules.md` and `docs/onboarding.md` now explicitly document:
+- `/dev-save` must generate `chore(checkpoint): ...` format
+- `/dev-save` must not reuse the previous goal commit message
+- The distinction between "goal commit" and "checkpoint commit"
 
-**Why deferred:** During real-project validation, `/dev-checkpoint`
-appeared to reuse the previous goal commit message instead of
-creating a checkpoint-style commit message expected by `case-05`.
+**Enforcement deferred:** Skill-level enforcement (checking HEAD format and generating correct message) requires skill implementation work in R3 (State Reconciliation).
 
-This caused:
-
-`HEAD commit does not indicate a checkpoint baseline`
-
-Potential causes:
-
-- commit reuse behavior
-- skipped checkpoint commit path
-- prompt ambiguity
-
-**Suggested revisit trigger:** Repeated case-05 failures after
-successful checkpoint execution.
-
-**Priority:** High
+**Priority:** High → Documentation closed, enforcement pending R3
 
 ## 14. /dev-resume may restore outdated project phase
 

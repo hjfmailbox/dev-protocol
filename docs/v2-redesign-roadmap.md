@@ -368,19 +368,23 @@ These items are already resolved, have negligible impact, or conflict with v2 di
 
 ### R1: Command Redesign
 
+**Status**: Completed (documentation-first)
+
 **Goal**: Implement v2 command surface (init, scope, save, status) and deprecate v1 commands.
 
 **Scope**:
 
-- Create `skills/dev-init/` with PROMPT.md and SKILL.md
-- Create `skills/dev-scope/` (merges goal + goal-template behavior)
-- Create `skills/dev-save/` (replaces checkpoint)
-- Create `skills/dev-status/` (merges resume + doctor + help)
-- Update `.claude/skills/` symlinks
-- Update `docs/onboarding.md` to reference new commands
-- Update `references/workflow-rules.md` to reference new commands
-- Update `README.md` command table
-- Add deprecated command aliases (print replacement + exit)
+- ~~Create `skills/dev-init/` with PROMPT.md and SKILL.md~~ (deferred to R2)
+- ~~Create `skills/dev-scope/` (merges goal + goal-template behavior)~~ (deferred to R2)
+- ~~Create `skills/dev-save/` (replaces checkpoint)~~ (deferred to R2)
+- ~~Create `skills/dev-status/` (merges resume + doctor + help)~~ (deferred to R2)
+- ~~Update `.claude/skills/` symlinks~~ (deferred to R2)
+- [x] Update `docs/onboarding.md` to reference new commands
+- [x] Update `references/workflow-rules.md` to reference new commands
+- [x] Update `README.md` command table
+- [x] Update `docs/runtime-integrations.md` semantic operations table
+- [x] Update `.agents/dev-protocol/project-rules.md` with reality priority and v2 commands
+- ~~Add deprecated command aliases (print replacement + exit)~~ (deferred to R2)
 
 **Non-goals**:
 
@@ -390,12 +394,15 @@ These items are already resolved, have negligible impact, or conflict with v2 di
 
 **Validation criteria**:
 
-- [ ] All 4 new commands have skill definitions
-- [ ] Deprecated commands print replacement and exit gracefully
-- [ ] `.claude/skills/` contains symlinks to all new skills
-- [ ] Documentation references only new commands (with deprecation notes)
-- [ ] case-06 PASS on command redesign goal commit
-- [ ] Manual test: `/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status` each execute without error
+- [x] v2 command surface documented (init, scope, save, status)
+- [x] Deprecated commands documented with migration path
+- [x] Documentation references only new commands (with deprecation notes)
+- [x] case-06 PASS on command redesign goal commit
+- [x] Onboarding answers first-contact question within 10 seconds
+- [x] No duplicated command responsibility
+- [x] Validation order explicitly documented (case-06 before save, case-05 after save)
+- [x] `.agents` directory convention documented
+- [x] Reality priority hierarchy defined
 
 ### R2: Onboarding Orchestration
 

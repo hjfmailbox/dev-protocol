@@ -83,36 +83,43 @@ Any environment that can execute PowerShell or Bash can use dev-protocol without
 
 ### Minimal Manual Fallback Workflow
 
-1. **Bootstrap** — Create state files manually or run a script:
+1. **Init** — Create state files manually or run a script:
    ```powershell
    # Inspect project structure, create .agents/dev-protocol/*
-   # Or use the dev-bootstrap skill logic directly
+   # Or use the dev-init skill logic directly
    ```
 
-2. **Goal work** — Implement changes within a scoped objective.
+2. **Scope** — Declare a focused objective with validation criteria.
 
-3. **Normalize artifact** — Before declaring completion, always run:
+3. **Work** — Implement changes within the scoped objective.
+
+4. **Normalize artifact** — Before declaring completion, always run:
    ```powershell
    pwsh scripts/fix-goal-output.ps1
    ```
    This repairs `changed_files` and schema automatically.
 
-4. **Validate** — Run case-06:
+5. **Validate goal** — Run case-06:
    ```powershell
    pwsh tests/run-tests.ps1 -Case 06
    ```
 
-5. **Checkpoint** — Commit state files and goal artifact:
+6. **Save** — Commit state files and goal artifact:
    ```bash
    git add .
    git commit -m "chore(checkpoint): describe change"
    ```
 
-6. **Resume** — In a new session, read state files to recover context.
+7. **Validate checkpoint** — Run case-05:
+   ```powershell
+   pwsh tests/run-tests.ps1 -Case 05
+   ```
+
+8. **Status** — In a new session, read state files and run `git status` to recover context.
 
 ### Key Difference from Hook Mode
 
-In hook mode, normalization happens automatically on session stop. In manual mode, the operator must run `fix-goal-output.ps1` explicitly before completing a goal. The protocol behavior is identical; only the trigger mechanism changes.
+In hook mode, normalization happens automatically on session stop. In manual mode, the operator must run `fix-goal-output.ps1` explicitly before completing a scope. The protocol behavior is identical; only the trigger mechanism changes.
 
 ---
 
@@ -122,12 +129,10 @@ dev-protocol defines semantic operations. Each runtime maps them to its own inte
 
 | Protocol Semantic | Claude Code | Cursor | Manual / Other |
 |---|---|---|---|
-| Bootstrap | `/dev-bootstrap` | Custom command or plugin | Run bootstrap logic manually |
-| Checkpoint | `/dev-checkpoint` | Custom command or plugin | `git add . && git commit` + state update |
-| Resume | `/dev-resume` | Custom command or plugin | Read `.agents/dev-protocol/handoff.md` |
-| Goal | `/goal` | AI chat with structured output | Write scope document, execute, write goal-output |
-| Doctor | `/dev-doctor` | Custom command or plugin | Run validation scripts manually |
-| Help | `/dev-help` | Documentation panel | Read `docs/` and `references/` |
+| Init | `/dev-init` | Custom command or plugin | Create `.agents/dev-protocol/` state files manually |
+| Scope | `/dev-scope` | AI chat with structured output | Write scope document, execute, write goal-output |
+| Save | `/dev-save` | Custom command or plugin | `git add . && git commit` + state update |
+| Status | `/dev-status` | Custom command or plugin | Read `.agents/dev-protocol/handoff.md`, run `git status` |
 
 The slash commands are **Claude Code's representation** of the protocol semantics. They are not the protocol itself.
 

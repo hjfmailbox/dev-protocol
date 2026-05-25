@@ -7,13 +7,37 @@
 - Three state files required: workflow-state.yml, handoff.md, project-rules.md
 - No multi-agent support in v1
 
+## Reality Priority
+
+The protocol follows a strict source-of-truth hierarchy. When any two sources conflict, the higher-priority source wins.
+
+```
+Running code > Repository reality > Protocol state > Documentation > History > Memory > Assumptions
+```
+
+| Priority | Source | Meaning |
+|---|---|---|
+| 1 | **Running code** | The actual executable behavior is the ultimate truth |
+| 2 | **Repository reality** | `git status`, `git log`, file contents on disk |
+| 3 | **Protocol state** | `.agents/dev-protocol/workflow-state.yml`, `handoff.md` |
+| 4 | **Documentation** | `docs/`, `references/`, `README.md` |
+| 5 | **History** | Previous commits, past session logs |
+| 6 | **Memory** | Agent's recollection of prior conversation |
+| 7 | **Assumptions** | Unverified beliefs about project state |
+
+**Implications**:
+
+- If `workflow-state.yml` claims the workspace is dirty but `git status --short` is empty, `git status` wins. The state file is stale and must be updated.
+- If `handoff.md` says the phase is `p1` but the repository has 50 commits and 10 docs, the repository wins. The phase is underestimated and must be corrected.
+- If documentation describes a feature that does not exist in code, the code wins. Documentation must be marked as describing a future phase.
+- If an agent remembers the project being in a different state than the files show, the files win. The agent must re-read state files on every session.
+
 ## Development Rules
 
-- Never auto-commit from /dev-bootstrap
-- /dev-checkpoint must fail if validation fails (no partial success)
-- /dev-resume must never modify files
-- Code reality > documentation > workflow state > memory > assumptions
-- Source of truth order: running code > repo reality > workflow state > docs > history
+- Never auto-commit from /dev-init
+- /dev-save must fail if validation fails (no partial success)
+- /dev-status must never modify files
+- Reality priority is enforced on every command: recompute from git and files before trusting persisted state
 
 ## Code Style Rules
 
@@ -74,14 +98,15 @@ Both scripts are committed and portable across projects.
 
 ## Important Commands
 
-- /dev-bootstrap: initialize protocol, reconstruct state, NO auto-commit
-- /dev-checkpoint: persist state, validate, commit
-- /dev-resume: recover context from state files, read-only
+- /dev-init: initialize protocol, reconstruct state, NO auto-commit
+- /dev-scope: declare focused goal with validation criteria
+- /dev-save: persist state, validate, commit
+- /dev-status: inspect state, diagnose, resume context, read-only
 - rtk gain: show token savings analytics (RTK tool)
 
 ## Testing Expectations
 
-- Case-01 test plan validates full lifecycle: bootstrap → checkpoint → resume
+- Case-01 test plan validates full lifecycle: init → scope → work → save → status
 - Success = no manual correction, state reconstructible, consistency maintained
 - Failure = missing state, incorrect recovery, commit blocked incorrectly
 
@@ -94,10 +119,11 @@ Both scripts are committed and portable across projects.
 
 ## Workflow Rules
 
-- Always use /dev-checkpoint before ending a session
+- Always use /dev-save before ending a session
 - State files must reflect current reality
 - Prefer updating state over appending history
+- Always run /dev-status after session reset before writing code
 
 ## Notes
 
-- v1 scope excludes: multi-agent, auto-repair, complex document inference, advanced hooks, long-term memory
+- v2 scope excludes: multi-agent, auto-repair, complex document inference, advanced hooks, long-term memory, new skill implementation (documentation-only redesign)
