@@ -104,13 +104,15 @@ Any environment that can execute PowerShell or Bash can use dev-protocol without
    pwsh tests/run-tests.ps1 -Case 06
    ```
 
-6. **Save** — Commit state files and goal artifact:
+6. **Save** — Update state files to reflect current reality.
+
+7. **Commit state files** — Persist state files through your normal git workflow:
    ```bash
-   git add .
-   git commit -m "chore(checkpoint): describe change"
+   git add .agents/dev-protocol/
+   git commit -m "chore(state): describe change"
    ```
 
-7. **Validate checkpoint** — Run case-05:
+8. **Validate state consistency** — Run case-05:
    ```powershell
    pwsh tests/run-tests.ps1 -Case 05
    ```
@@ -131,7 +133,7 @@ dev-protocol defines semantic operations. Each runtime maps them to its own inte
 |---|---|---|---|
 | Init | `/dev-init` | Custom command or plugin | Create `.agents/dev-protocol/` state files manually |
 | Scope | `/dev-scope` | AI chat with structured output | Write scope document, execute, write goal-output |
-| Save | `/dev-save` | Custom command or plugin | `git add . && git commit` + state update |
+| Save | `/dev-save` | Custom command or plugin | Update state files, user handles git separately |
 | Status | `/dev-status` | Custom command or plugin | Read `.agents/dev-protocol/handoff.md`, run `git status` |
 
 The slash commands are **Claude Code's representation** of the protocol semantics. They are not the protocol itself.

@@ -17,7 +17,7 @@ Init → Scope → Work → Save → New Session → Status → Scope → ...
 1. **Init** — Initialize protocol on a fresh project or after cloning (Claude Code: `/dev-init`)
 2. **Scope** — Declare a focused objective with explicit scope boundaries (Claude Code: `/dev-scope`)
 3. **Work** — Write code, test, iterate within the scoped objective
-4. **Save** — Persist state, validate consistency, commit (Claude Code: `/dev-save`)
+4. **Save** — Persist state, validate consistency (Claude Code: `/dev-save`)
 5. **New Session** — Reset conversation context. State survives in repository files.
 6. **Status** — Restore context in the next session without chat history (Claude Code: `/dev-status`)
 
@@ -30,7 +30,7 @@ This sequence ensures every session can start, work, save, and resume predictabl
 | Category | Definition | When to Do |
 |---|---|---|
 | **Scope work** | Implementing a scoped feature, fix, or document change | After declaring a scope with clear boundaries (Claude Code: `/dev-scope`) |
-| **Save work** | Updating state files, validating, committing current progress | After scope work completes or at natural breakpoints (Claude Code: `/dev-save`) |
+| **Save work** | Updating state files, validating current progress | After scope work completes or at natural breakpoints (Claude Code: `/dev-save`) |
 | **Maintenance edits** | Fixing typos, updating docs, adjusting rules without changing behavior | Between scopes, when state is stable |
 
 **Example:** Filling `references/workflow-rules.md` with content is scope work. Updating `workflow-state.yml` to mark it completed is save work. Fixing a typo in `project-rules.md` is a maintenance edit.
@@ -42,20 +42,20 @@ This sequence ensures every session can start, work, save, and resume predictabl
 The validation sequence is strict. Running tests out of order produces false failures.
 
 ```
-Scope → Work → case-06 → Save → case-05
+Scope → Work → case-06 → Save → commit state files → case-05
 ```
 
 1. **After scope work**: run `pwsh tests/run-tests.ps1 -Case 06` to verify the goal commit and artifact are valid.
-2. **After save**: run `pwsh tests/run-tests.ps1 -Case 05` to verify the checkpoint commit and state consistency.
+2. **After save and committing state files**: run `pwsh tests/run-tests.ps1 -Case 05` to verify state consistency and baseline correctness.
 
 **Why this order matters:**
 
 - `case-06` checks the goal commit (HEAD at the time). It validates changed_files, commit message format, and artifact presence.
-- `/dev-save` creates a new checkpoint commit, changing HEAD.
-- `case-05` checks the checkpoint commit. It validates that HEAD is a checkpoint-style commit and that state files are consistent.
-- If you run `case-06` after `/dev-save`, HEAD is now a checkpoint commit, not a goal commit, so `case-06` fails on changed_files mismatch and commit format checks.
+- `/dev-save` updates state files only. Committing those state files changes HEAD.
+- `case-05` checks state consistency. It validates that state files are consistent and that `last_commit` matches HEAD~1.
+- If you run `case-06` after committing state files, HEAD is now a state-sync commit, not a goal commit, so `case-06` fails on changed_files mismatch and commit format checks.
 
-**Rule**: Always run `case-06` before `/dev-save`. Always run `case-05` after `/dev-save`.
+**Rule**: Always run `case-06` before committing state files. Always run `case-05` after committing state files.
 
 ---
 

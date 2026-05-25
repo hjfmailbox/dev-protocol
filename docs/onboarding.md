@@ -25,12 +25,12 @@ Step 3: git add .agents/   → Track state files in git
 Step 4: git commit         → chore(protocol): initialize dev-protocol
 Step 5: /dev-scope         → Declare your first goal
 Step 6: Work               → Implement changes (normal git commits during work)
-Step 7: /dev-save          → Persist protocol state and commit state files
+Step 7: /dev-save          → Persist protocol state files
 ```
 
 After Step 7, you can safely end the session. Next session: run `/dev-status` to resume.
 
-**Important**: `/dev-save` does **not** replace normal development commits. During Step 6, you commit your code changes as usual (`git commit -m "feat: add feature"`). `/dev-save` only commits the protocol state files (`.agents/dev-protocol/*`) to record progress and context.
+**Important**: `/dev-save` does **not** replace normal development commits. During Step 6, you commit your code changes as usual (`git commit -m "feat: add feature"`). `/dev-save` only updates the protocol state files (`.agents/dev-protocol/*`) to record progress and context. You persist those state files through your normal version control workflow.
 
 ---
 
@@ -47,7 +47,7 @@ git commit -m "initial commit"
 /dev-init
 ```
 
-dev-protocol requires git. Without git, there is no history to inspect and no way to checkpoint.
+dev-protocol requires git. Without git, there is no history to inspect and no way to persist state.
 
 ### Git Repository but Dirty Workspace
 
@@ -109,9 +109,9 @@ If the project has no documentation:
 | Operation | What it commits | When to do it | Example message |
 |---|---|---|---|
 | Normal commit | Your code changes, docs, tests | During work, when a change is complete | `feat(api): add user authentication` |
-| Protocol save | `.agents/dev-protocol/*` state files only | After completing a goal or at session end | `chore(checkpoint): sync state after auth goal` |
+| Protocol save | `.agents/dev-protocol/*` state files only | After completing a goal or at session end | `chore(state): sync state after auth goal` |
 
-**Rule**: You make normal commits throughout your work. You make protocol saves only at boundaries (goal complete, session end, natural breakpoint). `/dev-save` never commits your source code — it only commits state files that record where you are and what is next.
+**Rule**: You make normal commits throughout your work. You make protocol saves only at boundaries (goal complete, session end, natural breakpoint). `/dev-save` never modifies your source code — it only writes state files that record where you are and what is next.
 
 ---
 
@@ -121,7 +121,7 @@ If the project has no documentation:
 |---|---|---|
 | `/dev-init` | Inspect repository, reconstruct project reality, initialize protocol state | First contact, or after cloning a repo without `.agents/` |
 | `/dev-scope` | Declare a focused goal with validation criteria | Before starting any implementation work |
-| `/dev-save` | Persist protocol state files, validate consistency, commit state only | After completing a goal or at natural stopping points |
+| `/dev-save` | Persist protocol state files, validate consistency | After completing a goal or at natural stopping points |
 | `/dev-status` | Inspect current protocol state and reconstruct context | Every new session, or when unsure of current state |
 
 **Deprecated v1 commands** (still work but print a deprecation warning):
@@ -143,13 +143,13 @@ If the project has no documentation:
 After goal work, validate in this exact order:
 
 ```
-/dev-scope → work → case-06 → /dev-save → case-05
+/dev-scope → work → case-06 → /dev-save → commit state files → case-05
 ```
 
 1. **After `/dev-scope` and work**: Run `pwsh tests/run-tests.ps1 -Case 06` to verify the goal commit and artifact are valid.
-2. **After `/dev-save`**: Run `pwsh tests/run-tests.ps1 -Case 05` to verify the checkpoint commit and state consistency.
+2. **After `/dev-save` and committing state files**: Run `pwsh tests/run-tests.ps1 -Case 05` to verify state consistency and baseline correctness.
 
-Running `case-05` before `case-06` will fail because `/dev-save` changes HEAD to a checkpoint commit, invalidating the goal artifact checks in `case-06`.
+Running `case-05` before `case-06` will fail because committing state files changes HEAD, invalidating the goal artifact checks in `case-06`.
 
 ---
 
@@ -159,7 +159,7 @@ Running `case-05` before `case-06` will fail because `/dev-save` changes HEAD to
 |---------|----------|
 | `.agents/` accidentally gitignored | Remove from `.gitignore`, commit |
 | Running `/dev-init` on a project that already has `.agents/` | Run `/dev-status` instead |
-| Skipping first `/dev-save` after `/dev-init` | `/dev-init` creates state but no commit — always `/dev-save` after init |
+| Skipping first state persistence after `/dev-init` | `/dev-init` creates state but does not persist it — always run `/dev-save` after init |
 | Running `case-06` after `/dev-save` | `case-06` must run before `/dev-save`; `case-05` runs after |
 | Forgetting to run `fix-goal-output.ps1` before goal completion | Run `pwsh scripts/fix-goal-output.ps1` after writing goal-output, before `case-06` |
 | State files in wrong location | Must be in `.agents/dev-protocol/`, not root or `.agent/` |

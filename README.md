@@ -43,8 +43,8 @@ Key guarantees:
 
 - **State over history**: current file truth > appended logs
 - **Fail-fast**: hard failure on corruption, soft failure on ambiguity
-- **State files only**: /dev-save commits only `.agents/dev-protocol/*`, never source code
-- **Self-drift detection**: repeated checkpoint with no real changes produces no commit
+- **State files only**: /dev-save writes only `.agents/dev-protocol/*`, never source code
+- **Self-drift detection**: repeated save with no real changes requires no action
 - **Runtime-agnostic**: protocol correctness does not depend on any specific AI runtime
 
 ## State Files
@@ -53,7 +53,7 @@ All state files live in `.agents/dev-protocol/`:
 
 | File | Purpose |
 |------|---------|
-| `workflow-state.yml` | Machine-readable progress, phase, and checkpoint metadata |
+| `workflow-state.yml` | Machine-readable progress, phase, and persistence metadata |
 | `handoff.md` | Human-readable session handoff with current focus and next actions |
 | `project-rules.md` | Project-specific constraints, coding standards, and known pitfalls |
 

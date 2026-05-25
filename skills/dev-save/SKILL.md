@@ -36,10 +36,10 @@ After /dev-save, a fresh session can reconstruct context by reading state files.
 
 1. Validates preconditions (state files exist, workspace is saveable)
 2. Inspects current repository reality (git status, current commit)
-3. Updates `workflow-state.yml` with current checkpoint metadata
+3. Updates `workflow-state.yml` save-tracking fields
 4. Updates `handoff.md` with current focus, progress, blockers, next actions
 5. Validates state consistency and recoverability
-6. Reports what was updated and what remains for the user to do
+6. Reports what was updated
 
 ---
 
@@ -48,7 +48,6 @@ After /dev-save, a fresh session can reconstruct context by reading state files.
 ```
 /dev-save
 -> state files updated and validated
--> user stages and commits state files
 -> safe to start new session
 ```
 
@@ -79,11 +78,11 @@ Use git-derived values. Never assume branch names.
 
 ### 3. Update workflow-state.yml
 
-Must update:
+Must update save-tracking fields:
 
-- `checkpoint.last_commit` — current HEAD hash
-- `checkpoint.last_updated` — current date
-- `checkpoint.summary` — brief description of current state
+- `checkpoint.last_commit` — current HEAD hash (persistence tracking)
+- `checkpoint.last_updated` — current date (persistence tracking)
+- `checkpoint.summary` — brief description of current state (persistence tracking)
 - `current_state.phase` — if changed
 - `current_state.focus` — current focus
 - `progress.completed` — if new items completed

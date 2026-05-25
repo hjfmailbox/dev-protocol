@@ -59,9 +59,9 @@ Update these fields to reflect current reality:
 
 | Field | Value |
 |---|---|
-| `checkpoint.last_commit` | Current HEAD hash |
-| `checkpoint.last_updated` | Current date (YYYY-MM-DD) |
-| `checkpoint.summary` | Brief description of current state |
+| `checkpoint.last_commit` | Current HEAD hash (save tracking) |
+| `checkpoint.last_updated` | Current date (YYYY-MM-DD) (save tracking) |
+| `checkpoint.summary` | Brief description of current state (save tracking) |
 | `current_state.focus` | Current work focus |
 | `progress.in_progress` | Currently active tasks (array) |
 | `progress.blocked` | Blocked tasks (array) |
@@ -83,7 +83,7 @@ Update sections to reflect current reality:
 
 - **Current Focus** — what is actively being worked on
 - **Current Status** — active, blocked, waiting
-- **Completed Since Last Save** — recent accomplishments since last checkpoint
+- **Completed Since Last Save** — recent accomplishments since last state update
 - **In Progress** — ongoing tasks
 - **Blockers** — anything preventing progress
 - **Next Recommended Actions** — 1-3 concrete next steps
@@ -122,7 +122,7 @@ Simulate: "Can /dev-status reconstruct meaningful context from these files?"
 Required for recoverability:
 
 - `handoff.md` contains Current Focus
-- `workflow-state.yml` contains checkpoint metadata
+- `workflow-state.yml` contains save-tracking metadata
 - State is internally consistent (no contradictions between files)
 
 If any validation fails:
@@ -150,15 +150,14 @@ If validation passes, output:
 - `.agents/dev-protocol/workflow-state.yml`
 - `.agents/dev-protocol/handoff.md`
 
-**Checkpoint**:
+**Git Context**:
 - Last commit: <hash>
 - Branch: <branch>
 - Workspace: <clean/dirty>
 
 **Next Steps**:
 1. Review updated state files
-2. Stage state files: `git add .agents/dev-protocol/`
-3. Commit with conventional commit format: `chore(checkpoint): <summary>`
+2. Persist state files through your normal version control workflow
 ```
 
 ---

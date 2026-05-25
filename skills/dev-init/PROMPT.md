@@ -329,7 +329,7 @@ These are protocol-level constraints. They do NOT belong to the project; they go
 
 - /dev-init: initialize protocol, reconstruct state, NO auto-commit
 - /dev-scope: declare focused goal with validation criteria
-- /dev-save: persist state, validate, commit
+- /dev-save: persist state, validate, no git operations
 - /dev-status: inspect state, resume context, read-only
 
 ## Unknown / Requires Validation

@@ -100,7 +100,7 @@ Both scripts are committed and portable across projects.
 
 - /dev-init: initialize protocol, reconstruct state, NO auto-commit
 - /dev-scope: declare focused goal with validation criteria
-- /dev-save: persist state, validate, commit
+- /dev-save: persist state, validate, no git operations
 - /dev-status: inspect state, diagnose, resume context, read-only
 - rtk gain: show token savings analytics (RTK tool)
 
