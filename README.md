@@ -32,12 +32,26 @@ In Claude Code, these semantic operations map to slash commands:
 
 Protocol commands are semantic operations. The Claude Code representations use slash commands; other runtimes may use function calls, CLI tools, or chat prompts.
 
+### Canonical v2 Commands
+
 | Command | Claude Code | Writes Files? | Description |
 |----------|:-----------:|:------------:|-------------|
 | Init | `/dev-init` | Yes | Inspect repository, reconstruct project reality, initialize protocol state |
 | Scope | `/dev-scope` | No | Declare a focused goal with validation criteria |
 | Save | `/dev-save` | Yes | Persist protocol state files only, validate (fails on inconsistency) |
 | Status | `/dev-status` | No | Inspect current protocol state and reconstruct context |
+
+### Legacy Aliases (Backward Compatibility Only)
+
+| Legacy Command | Replacement | Status |
+|---|---|---|
+| `/dev-bootstrap` | `/dev-init` | Deprecated, redirects to v2 |
+| `/dev-checkpoint` | `/dev-save` | Deprecated, redirects to v2 |
+| `/dev-resume` | `/dev-status` | Deprecated, redirects to v2 |
+| `/dev-doctor` | `/dev-status --diagnose` | Deprecated, redirects to v2 |
+| `/dev-help` | `/dev-status --help` | Deprecated, redirects to v2 |
+| `/dev-goal-template` | `/dev-scope` | Deprecated, redirects to v2 |
+| `/goal` | `/dev-scope` | Deprecated, redirects to v2 |
 
 Key guarantees:
 
@@ -71,7 +85,7 @@ Test cases are under `tests/`:
 
 ## Current Status
 
-**Phase**: p3 (v1-frozen-deferred-backlog-review) — **active**
+**Phase**: p3 (v2-frozen-ready-for-real-project-validation) — **active**
 
 **Completed**:
 - v2 command surface defined (init, scope, save, status)
@@ -86,6 +100,8 @@ Test cases are under `tests/`:
 - `.agents` directory convention documented
 - Incident logging mechanism
 - Real-project onboarding guide
+- External benchmark of 7 workflow systems (ECC, Superpowers, Spec Kit, LangGraph, wshobson/commands, barkain, Microsoft Agent Framework)
+- v2 freeze readiness assessment: READY_TO_FREEZE_V2
 
 **Known limitations (v2 scope)**:
 - Single-agent only (no multi-agent support)
@@ -107,13 +123,14 @@ The protocol core (`scripts/`, `tests/`, `.agents/`, `docs/`, `references/`) con
 ## Project Structure
 
 ```
-.agents/dev-protocol/    State files (workflow-state.yml, handoff.md, project-rules.md, incidents.md)
-.claude/                 Optional Claude Code runtime adapter (hooks, settings, skill symlinks)
+.agents/dev-protocol/    Project-local protocol state (workflow-state.yml, handoff.md, project-rules.md)
+.claude/                 Claude Code adapter layer only (hooks, settings, skill symlinks)
 docs/                    Design documents, retrospective, onboarding guide, runtime integrations
 references/              Protocol reference rules (commit, failure, sync, memory, workflow, incidents)
-skills/                  Skill definitions (PROMPT.md, SKILL.md per command)
+skills/                  Protocol runtime — canonical skill definitions (PROMPT.md, SKILL.md per command)
 templates/               State file templates for new projects
-tests/                   Test cases and plans
+tests/                   Protocol validation suite (case-05, case-06)
+scripts/                 Deterministic tooling (fix-goal-output, debug diagnostics)
 ```
 
 For detailed design documents, see `docs/`. For protocol rules, see `references/`.

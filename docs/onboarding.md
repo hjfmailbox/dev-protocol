@@ -124,17 +124,17 @@ If the project has no documentation:
 | `/dev-save` | Persist protocol state files, validate consistency | After completing a goal or at natural stopping points |
 | `/dev-status` | Inspect current protocol state and reconstruct context | Every new session, or when unsure of current state |
 
-**Deprecated v1 commands** (deprecated but supported — no breaking changes):
+**Legacy aliases (backward compatibility only)** — These commands still work but redirect to their v2 replacements:
 
-| Deprecated | Replacement |
-|---|---|
-| `/dev-bootstrap` | `/dev-init` |
-| `/dev-checkpoint` | `/dev-save` |
-| `/dev-resume` | `/dev-status` |
-| `/dev-doctor` | `/dev-status --diagnose` |
-| `/dev-help` | `/dev-status --help` |
-| `/dev-goal-template` | `/dev-scope` (template built-in) |
-| `/goal` | `/dev-scope` |
+| Legacy Alias | v2 Replacement | Notes |
+|---|---|---|
+| `/dev-bootstrap` | `/dev-init` | Prints redirect notice |
+| `/dev-checkpoint` | `/dev-save` | Prints redirect notice |
+| `/dev-resume` | `/dev-status` | Prints redirect notice |
+| `/dev-doctor` | `/dev-status --diagnose` | Prints redirect notice |
+| `/dev-help` | `/dev-status --help` | Prints redirect notice |
+| `/dev-goal-template` | `/dev-scope` | Prints redirect notice |
+| `/goal` | `/dev-scope` | Prints redirect notice |
 
 ---
 
