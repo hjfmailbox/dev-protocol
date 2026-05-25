@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Hardening /dev-save semantics: removed checkpoint/commit/staging ambiguity from skill definitions and documentation.
+v1→v2 compatibility aliases implemented. v1 commands deprecated but supported: /dev-bootstrap→/dev-init, /dev-resume→/dev-status, /dev-goal-template→/dev-scope, /dev-checkpoint→/dev-save.
 
 ## Current Status
 
@@ -22,10 +22,12 @@ Hardening /dev-save semantics: removed checkpoint/commit/staging ambiguity from 
 - case-05 and case-06 PASS on /dev-save implementation commit
 - v2 command surface complete: /dev-init, /dev-status, /dev-scope, /dev-save
 - Hardened /dev-save semantics: removed checkpoint/commit/staging ambiguity from skill definitions and documentation
+- Implemented v1→v2 compatibility aliases: /dev-bootstrap→/dev-init, /dev-resume→/dev-status, /dev-goal-template→/dev-scope, /dev-checkpoint→/dev-save
+- case-05 and case-06 PASS on alias implementation commit
 
 ## In Progress
 
-- Hardening /dev-save semantics and eliminating v1 checkpoint ambiguity
+- none
 
 ## Blockers
 
@@ -46,12 +48,13 @@ Hardening /dev-save semantics: removed checkpoint/commit/staging ambiguity from 
 - **NEW: Protocol is runtime-agnostic** — works with Claude Code, Cursor, Copilot, or manual workflows
 - **NEW: .claude/ is optional** — protocol correctness guaranteed without hooks
 - **NEW: `.claude/skills/` is symlink-only** — canonical source is `skills/`
+- **NEW: v1→v2 aliases implemented** — v1 commands deprecated but supported, redirecting to v2 semantics
 
 ## Next Recommended Actions
 
-1. Validate hardening changes with case-05 and case-06
-2. Review v2 command surface for gaps or inconsistencies
-3. Consider real-project validation of full v2 workflow
+1. Review v2 command surface for gaps or inconsistencies
+2. Consider real-project validation of full v2 workflow
+3. Evaluate deferred backlog for next phase
 
 ## Notes For Next Session
 

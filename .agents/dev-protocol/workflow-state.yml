@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "v2-command-surface-complete"
+  focus: "v1-v2-alias-deprecated"
   status: active
 
 progress:
@@ -66,6 +66,8 @@ progress:
     - "implement /dev-scope v2 runtime skill (R2.3) with ambiguity detection and validation-first rule"
     - "implement /dev-save v2 runtime skill (R2.4) for state persistence"
     - "v2 command surface complete: /dev-init, /dev-status, /dev-scope, /dev-save"
+    - "harden /dev-save semantics: remove checkpoint/commit/staging ambiguity"
+    - "implement v1→v2 compatibility aliases: /dev-bootstrap→/dev-init, /dev-resume→/dev-status, /dev-goal-template→/dev-scope, /dev-checkpoint→/dev-save"
   in_progress: []
   blocked: []
 
@@ -94,7 +96,7 @@ next:
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "6bf6250"
+  last_commit: "31c6cd8"
   summary: "phase p3: runtime structure cleanup — removed duplicated .claude/skills copies, cleaned obsolete tests/case-01.txt"
 
 confidence:
