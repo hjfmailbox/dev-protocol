@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "external-benchmark-v2-freeze-readiness"
+  focus: "pre-real-project-cleanup"
   status: active
 
 progress:
@@ -81,6 +81,12 @@ progress:
     - "list 7 things explicitly NOT worth copying from external systems"
     - "final benchmark recommendation: READY_TO_FREEZE_V2"
     - "case-06 PASS on benchmark commit"
+    - "clarify v2 canonical commands vs legacy aliases in README.md and onboarding.md"
+    - "clean temporary diagnostic artifacts (.claude/hooks/*.txt)"
+    - "retain reusable diagnostic tooling (scripts/debug/diagnose-stop-hook.ps1)"
+    - "update Phase description to v2-frozen-ready-for-real-project-validation"
+    - "clarify architecture boundary: skills/ = runtime, .claude/ = adapter, .agents/ = state"
+    - "case-06 PASS on cleanup commit"
   in_progress: []
   blocked: []
 
@@ -109,8 +115,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-26"
-  last_commit: "b091c24"
-  summary: "phase p3: external benchmark complete — 7 systems evaluated, READY_TO_FREEZE_V2 recommendation, risks documented"
+  last_commit: "8e96252"
+  summary: "phase p3: pre-real-project cleanup complete — v2 surface clarified, legacy aliases documented, diagnostic artifacts cleaned, architecture boundary unambiguous"
 
 confidence:
   state_confidence: high

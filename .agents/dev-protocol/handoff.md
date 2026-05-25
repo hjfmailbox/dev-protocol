@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-External benchmark research complete. Evaluated 7 systems (ECC, Superpowers, Spec Kit, LangGraph, wshobson/commands, barkain, Microsoft Agent Framework) across 7 dimensions. Created docs/external-benchmark.md with cross-dimension comparison matrix, 5 architecture risks, 7 explicitly-not-worth-copying items, and final recommendation: READY_TO_FREEZE_V2. No evaluated system solves the same problem (simplest session-resilient dev workflow with explicit validation) better than dev-protocol. Remaining risks (#14, #15) are implementation bugs scoped to R3, not design flaws requiring v2 surface changes.
+Pre-real-project cleanup complete. v2 canonical commands (/dev-init, /dev-status, /dev-scope, /dev-save) are now explicitly identifiable in README.md and onboarding.md. Legacy aliases classified as backward-compatibility only. Temporary diagnostic artifacts removed; reusable diagnostic tooling retained. Architecture boundary unambiguous: skills/ = protocol runtime, .claude/ = Claude adapter, .agents/ = project-local state. Protocol is clean for first real-project validation (DesignDocMCP onboarding).
 
 ## Current Status
 
@@ -34,6 +34,11 @@ External benchmark research complete. Evaluated 7 systems (ECC, Superpowers, Spe
 - Identified 5 architecture risks: portability untested, manual save gap, phase detection weak, no subagent support, hooks underutilized
 - Listed 7 things explicitly NOT worth copying from external systems
 - Final benchmark recommendation: READY_TO_FREEZE_V2
+- Clarified v2 canonical commands vs legacy aliases in README.md and onboarding.md
+- Cleaned temporary diagnostic artifacts (.claude/hooks/diagnosis-log.txt, stop-hook-log.txt)
+- Retained reusable diagnostic tooling (scripts/debug/diagnose-stop-hook.ps1)
+- Updated Phase description to v2-frozen-ready-for-real-project-validation
+- Clarified architecture boundary: skills/ = protocol runtime, .claude/ = adapter, .agents/ = state
 
 ## In Progress
 
