@@ -70,7 +70,7 @@ git stash pop
 /dev-init
 ```
 
-`/dev-init` will detect the dirty state and include it in reconstructed context. State files will reflect the dirty workspace as "in progress" work. You must clean the workspace before `/dev-save`.
+/dev-init will detect the dirty state and ask for confirmation before generating state files. If confirmed, state files will reflect the dirty workspace as "in progress" work. You must clean the workspace before `/dev-save`.
 
 ### Existing `.agents/dev-protocol`
 
@@ -90,7 +90,7 @@ If the project has `README.md`, `docs/`, `CLAUDE.md`, or architecture documents:
 /dev-init
 ```
 
-`/dev-init` inspects existing documents to estimate project maturity and phase. Review the generated `workflow-state.yml` to verify the estimated phase is accurate.
+`/dev-init` inspects existing documents for high-level context only. It does not perform deep project analysis. The generated `workflow-state.yml` defaults to `phase: unknown` until you validate and update it.
 
 ### No Design Documents
 
@@ -100,7 +100,7 @@ If the project has no documentation:
 /dev-init
 ```
 
-`/dev-init` estimates phase from git history depth and directory structure alone. The estimate may be conservative (p1). Update `workflow-state.yml` manually if you know the project is more mature.
+`/dev-init` does not guess project phase. The generated `workflow-state.yml` always uses `phase: unknown` with `focus: onboarding`. Update `workflow-state.yml` manually after you validate the actual project state.
 
 ---
 

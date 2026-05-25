@@ -1,6 +1,8 @@
 You are executing /dev-init for a software project.
 
-Your goal is to inspect the repository, reconstruct project reality, and initialize protocol state if appropriate.
+Your goal is to inspect the repository, reconstruct basic project reality, and initialize protocol state if appropriate.
+
+**Boundary**: /dev-init is onboarding, not project analysis. Stop at "knowing the project reality," not "understanding how the project works." Do NOT perform deep architecture reasoning, implementation planning, business/domain analysis, or design conclusion generation.
 
 You MUST follow these steps strictly.
 
@@ -89,32 +91,42 @@ Output:
 ```
 Existing protocol state detected at .agents/dev-protocol/
 
-Action: Redirect to /dev-status
-Reason: /dev-init is for first-time initialization only.
-       Running init on existing state risks overwriting current progress.
+Recommended: /dev-status
+Reason: Existing protocol state already exists.
+        Re-running init is unnecessary and may overwrite onboarding assumptions.
 
 Next step: Run /dev-status to inspect and reconstruct context from existing state.
 ```
 
-STOP. Do NOT create or modify state files.
+STOP. Do NOT create or modify state files. Do NOT overwrite existing state.
 
 ---
 
-## STEP 4: Project Context Discovery
+## STEP 4: Project Context Discovery (High-Level Only)
 
-If proceeding (Scenarios B or C), inspect:
+If proceeding (Scenarios B or C), gather surface facts only. Do NOT perform deep analysis.
+
+Allowed:
 
 | Source | What to gather |
 |---|---|
-| README.md | Project purpose, setup instructions, architecture overview |
-| docs/ | Design documents, API docs, architecture diagrams |
+| README.md | Project purpose, setup instructions (surface only, no architecture conclusions) |
+| docs/ | Existence and top-level structure only |
 | CLAUDE.md / AGENTS.md | Runtime conventions, agent instructions |
-| CI/CD configs | GitHub Actions, Travis, etc. — workflow maturity |
-| Build scripts | Makefile, package.json scripts, build.rs, etc. |
-| Dependency manifests | Language, framework, external dependencies |
+| CI/CD configs | Presence only |
+| Build scripts | Presence only |
+| Dependency manifests | Language, framework indicators |
 | .gitignore | Project type indicators |
 
-Do NOT assume missing information. Note what is absent.
+Forbidden:
+
+- Deep source code reading
+- Architecture inference beyond explicit docs
+- Implementation recommendations
+- Generating project conclusions
+- Business/domain analysis
+
+Note what is absent. Do NOT assume missing information.
 
 ---
 
@@ -128,21 +140,34 @@ Identify ongoing work from:
 
 If dirty workspace (Scenario C):
 
-- Document dirty state in generated handoff.md
-- Set `current_state.status` to `active` with note about uncommitted work
+- Document dirty state
 - Do NOT stash, reset, or modify any files
+- Do NOT automatically generate state files
+- Proceed to Step 6 for confirmation requirement
 
 ---
 
-## STEP 6: Behavior Matrix Resolution
+## STEP 6: Behavior Matrix Resolution + Confidence Gating
 
 At this point you have classified into exactly one scenario. Confirm and proceed:
 
 | Scenario | Condition | Next Action |
 |---|---|---|
-| B | Git repo + clean + no protocol state | Proceed to Step 7 (state generation) |
-| C | Git repo + dirty + no protocol state | Proceed to Step 7 (state generation with dirty note) |
+| B | Git repo + clean + no protocol state | Assess confidence → Step 7 if High/Medium, confirm if Low |
+| C | Git repo + dirty + no protocol state | Explain dirty state, STOP and ask for confirmation before Step 7 |
 | A or D | Already handled in Step 1 or 3 | Should have STOPped |
+
+### Confidence Calibration
+
+Assess confidence based on signals gathered:
+
+| Level | Signals | Action |
+|---|---|---|
+| **High** | README present, clear structure, clean workspace, explicit docs | Auto-generate state in Step 7 |
+| **Medium** | README present but minimal, some ambiguity, clean workspace | Auto-generate, note uncertainties in handoff |
+| **Low** | No README, no docs, ambiguous structure, dirty workspace, low discoverability | STOP. Ask user: "Confidence is low. Generate state files anyway?" |
+
+For Scenario C (dirty workspace), confidence is capped at Medium. If other low-confidence signals are present, require explicit confirmation.
 
 ---
 
@@ -164,8 +189,8 @@ project:
   initialized: true
 
 current_state:
-  phase: "<inferred phase: p1 | p2 | p3 | p4 | p5>"
-  focus: "<active focus or 'initializing'>"
+  phase: unknown
+  focus: onboarding
   status: active
 
 progress:
@@ -188,17 +213,12 @@ checkpoint:
   summary: ""
 
 confidence:
-  state_confidence: medium
+  state_confidence: <high | medium | low>
 ```
 
-Phase inference rules:
+**Phase rule**: `phase` MUST be `unknown` until validated by user. Do NOT infer phase from maturity. Maturity classification (Step 2) is for confidence calibration only, never for phase assignment.
 
-| Maturity | Suggested Phase | Rationale |
-|---|---|---|
-| empty repo | p1 | protocol-definition-and-bootstrap |
-| early repo | p1 or p2 | depending on whether bootstrap is complete |
-| active repo | p2 or p3 | architecture-and-core or implementation |
-| mature repo | p3 or p4 | implementation or hardening |
+**Confidence rule**: Set `state_confidence` to match the confidence assessed in Step 6. Include note in handoff if Medium or Low.
 
 ### handoff.md
 
@@ -249,69 +269,61 @@ Use template:
 
 ### project-rules.md
 
-Use template from `templates/project-rules.md` or generate minimal version:
+Generate a minimal, non-speculative version. NEVER invent missing facts.
 
 ```markdown
 # Project Rules
 
-## Architecture Constraints
+## Known Runtime Facts
 
-- <from project context discovery>
+- Language/Framework: <from dependency manifests, or "Unknown">
+- Project purpose: <from README, or "Unknown">
+- CI/CD: <present/absent, or "Unknown">
+- Test tooling: <present/absent, or "Unknown">
 
-## Development Rules
+## Protocol Rules
 
 - Never auto-commit from /dev-init
 - /dev-save must fail if validation fails (no partial success)
 - /dev-status must never modify files
+- State files are the single source of truth
 
 ## Code Style Rules
 
 - Commit format: `<type>(<scope>): <summary>`
 - Allowed types: feat, fix, refactor, docs, test, chore
 
-## Important Patterns
-
-- State-over-history: prefer updating current truth over appending logs
-- Fail-fast: hard failure on corruption, soft failure on ambiguity
-
-## Known Pitfalls
-
-- <from active work detection or project context>
-
 ## Important Commands
 
 - /dev-init: initialize protocol, reconstruct state, NO auto-commit
 - /dev-scope: declare focused goal with validation criteria
 - /dev-save: persist state, validate, commit
-- /dev-status: inspect state, diagnose, resume context, read-only
+- /dev-status: inspect state, resume context, read-only
 
-## Testing Expectations
+## Unknown / Requires Validation
 
-- <from project context>
-
-## Documentation Rules
-
-- <from project context or global conventions>
-
-## Workflow Rules
-
-- Always use /dev-save before ending a session
-- State files must reflect current reality
-- Prefer updating state over appending history
-- Always run /dev-status after session reset before writing code
+- Architecture constraints: <not inferred during init — validate later>
+- Testing expectations: <not inferred during init — validate later>
+- Documentation conventions: <not inferred during init — validate later>
 
 ## Notes
 
 - Initialized by /dev-init on <date>
+- Phase unknown until validated by user
 ```
+
+**Critical rule**: If a field is uncertain, use "Unknown" or "Not inferred during init — validate later." Do NOT fabricate constraints, expectations, or conventions.
 
 State generation rules:
 
 - Write ONLY to `.agents/dev-protocol/`
 - Do NOT create root-level copies
 - `checkpoint.last_commit` MUST remain empty
+- `phase` MUST be `unknown`
 - Reflect CURRENT reality, not aspirations
-- If confidence is low on any field, use empty string or `[]` and note in handoff
+- NEVER invent missing facts
+- If confidence is low on any field, use "Unknown" and note in handoff
+- For Scenario C (dirty workspace), only generate after explicit user confirmation
 
 ---
 
@@ -359,5 +371,7 @@ Next: Review → git add .agents/ → git commit → /dev-scope
 - NEVER overwrite existing `.agents/dev-protocol/` state without explicit user instruction
 - NEVER invent missing facts
 - NEVER proceed with low confidence silently
+- NEVER perform deep project analysis (architecture, implementation, domain)
 - ALWAYS prefer correctness over completeness
 - ALWAYS prefer reality over history
+- ALWAYS stop at onboarding boundary — /dev-init is onboarding, not project analysis

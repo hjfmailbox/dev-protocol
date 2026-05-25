@@ -72,9 +72,9 @@ The following problems were observed during the first real-project adoption. Eac
 
 **Failure risks**:
 
-- **State files describe wrong phase**: If bootstrap scans repo incompletely, phase may be underestimated (e.g., `p1` for a mature project). Mitigation: bootstrap must inspect `git log --oneline` depth, existing documentation, and file maturity heuristics.
+- **State files describe wrong phase**: Mitigation: `/dev-init` does NOT infer phase. `workflow-state.yml` always uses `phase: unknown` until validated by user. This eliminates phase estimation errors entirely.
 - **`.agents/` accidentally gitignored**: Onboarding guide must include a verification step. Mitigation: `/dev-init` should warn if `.agents/` matches `.gitignore` patterns.
-- **Bootstrap on dirty workspace**: Uncommitted changes confuse phase detection. Mitigation: `/dev-init` must warn and recommend committing or stashing first.
+- **Bootstrap on dirty workspace**: Uncommitted changes create uncertainty. Mitigation: `/dev-init` detects dirty state, explains it, and asks for confirmation before generating state files.
 - **Windows file creation silent failure**: Goal-output artifacts may not be written. Mitigation: protocol scripts must use PowerShell-native file creation on Windows, Bash on Unix.
 
 ### 2.2 Resume Interrupted Work
@@ -415,10 +415,10 @@ These items are already resolved, have negligible impact, or conflict with v2 di
 **Scope**:
 
 - Create `skills/dev-init/` with PROMPT.md and SKILL.md:
-  - Implement repository discovery: inspect git history, architecture docs, CLAUDE.md, active work, repo maturity, outstanding tasks, existing workflows
-  - Implement project reality reconstruction: estimate phase from commit depth, directory structure, documentation
+  - Implement repository discovery: inspect git history, top-level docs, CLAUDE.md, active work, repo maturity, existing workflows
+  - Implement safe onboarding: reconstruct basic project reality without deep analysis, default `phase: unknown`
   - Add `.agents/` gitignore detection (warn if `.agents/` is ignored)
-  - Add dirty workspace warning
+  - Add dirty workspace confirmation (do not auto-generate state on dirty repo)
 - Create `skills/dev-scope/` with PROMPT.md and SKILL.md:
   - Merge goal declaration and template generation into single command
   - Generate standardized scope document with validation criteria
@@ -454,8 +454,8 @@ These items are already resolved, have negligible impact, or conflict with v2 di
 - [ ] `skills/dev-status/` exists with PROMPT.md and SKILL.md
 - [ ] `.claude/skills/` contains symlinks to all new v2 skills
 - [ ] Deprecated commands print replacement and exit gracefully
-- [ ] `/dev-init` on a mature project estimates phase >= p2 (not p1)
-- [ ] `/dev-init` on a dirty workspace warns before proceeding
+- [x] `/dev-init` defaults to `phase: unknown` (no estimation drift)
+- [x] `/dev-init` on a dirty workspace requires confirmation before state generation
 - [ ] `/dev-init` warns if `.agents/` matches `.gitignore`
 - [ ] `docs/real-project-validation-checklist.md` exists and covers init → scope → work → save → status cycle
 - [ ] case-06 PASS
@@ -554,7 +554,7 @@ These items are already resolved, have negligible impact, or conflict with v2 di
 **Validation criteria**:
 
 - [ ] Onboarding checklist completed without deviation
-- [ ] First `/dev-init` produces accurate phase estimation
+- [ ] First `/dev-init` produces safe onboarding with `phase: unknown`
 - [ ] First `/dev-save` succeeds with checkpoint-style message
 - [ ] `/dev-status` in new session restores correct phase and focus
 - [ ] All validation tests (case-05, case-06) pass during real-project usage
@@ -571,7 +571,7 @@ dev-protocol v2 is considered "Ready for real project onboarding" when all of th
 ### 7.1 Protocol Correctness
 
 1. **State reconciliation accuracy**: `/dev-status` reports `git status` that matches `git status --short` in 100% of trials (n >= 10).
-2. **Phase estimation accuracy**: `/dev-init` on a mature project (>= 10 commits, >= 3 docs) estimates phase >= p2 in 100% of trials (n >= 5 projects).
+2. **Safe onboarding default**: `/dev-init` on any project defaults to `phase: unknown` with `focus: onboarding`, requiring explicit user validation before phase assignment. Never auto-infers phase in 100% of trials (n >= 5 projects).
 3. **Checkpoint commit contract**: `/dev-save` generates `chore(checkpoint): ...` format in 100% of trials (n >= 10).
 4. **Self-drift detection**: `/dev-save` with no meaningful changes since last baseline early-exits without creating a commit in 100% of trials (n >= 5).
 5. **Recoverability**: After `/dev-save`, a fresh session `/dev-status` restores the same phase, focus, and next actions as the previous session in 100% of trials (n >= 5).
