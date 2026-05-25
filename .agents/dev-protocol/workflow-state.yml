@@ -89,7 +89,7 @@ next:
 
 checkpoint:
   last_updated: "2026-05-24"
-  last_commit: "d1d2290"
+  last_commit: "b212784"
   summary: "phase p3: runtime structure cleanup — removed duplicated .claude/skills copies, cleaned obsolete tests/case-01.txt"
 
 confidence:
