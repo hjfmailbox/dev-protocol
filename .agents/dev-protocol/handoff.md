@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-R3.1 dry-run validation complete. Full v2 workflow validated mentally and via checklist against dev-protocol itself. Explicit go/no-go decision: BLOCKED_WITH_REQUIRED_FIXES. Two core state reconciliation bugs (#14 phase drift, #15 status freshness drift) plus three medium-severity usability blockers (#6 continuation handoff, #7 NO_OP goals, #8 Windows heredoc) must be resolved in R3 (State Reconciliation) and R4 (Onboarding Hardening) before external real-project validation (R5).
+External benchmark research complete. Evaluated 7 systems (ECC, Superpowers, Spec Kit, LangGraph, wshobson/commands, barkain, Microsoft Agent Framework) across 7 dimensions. Created docs/external-benchmark.md with cross-dimension comparison matrix, 5 architecture risks, 7 explicitly-not-worth-copying items, and final recommendation: READY_TO_FREEZE_V2. No evaluated system solves the same problem (simplest session-resilient dev workflow with explicit validation) better than dev-protocol. Remaining risks (#14, #15) are implementation bugs scoped to R3, not design flaws requiring v2 surface changes.
 
 ## Current Status
 
@@ -28,6 +28,12 @@ R3.1 dry-run validation complete. Full v2 workflow validated mentally and via ch
 - Documented friction points: command naming ambiguity, validation order complexity, manual fix-goal-output step, phase drift, status freshness drift
 - Reclassified deferred backlog: 6 must-fix, 4 safe-to-validate, 6 obsolete/resolved
 - Explicit go/no-go decision: BLOCKED_WITH_REQUIRED_FIXES (R3 State Reconciliation and R4 Onboarding Hardening required before R5)
+- Performed external benchmark research against 7 workflow systems (ECC, Superpowers, Spec Kit, LangGraph, wshobson/commands, barkain, Microsoft Agent Framework)
+- Created `docs/external-benchmark.md` with cross-dimension comparison matrix
+- Documented what dev-protocol does better: validation suite, human-readable state, explicit phase, protocol/runtime separation, simplicity
+- Identified 5 architecture risks: portability untested, manual save gap, phase detection weak, no subagent support, hooks underutilized
+- Listed 7 things explicitly NOT worth copying from external systems
+- Final benchmark recommendation: READY_TO_FREEZE_V2
 
 ## In Progress
 
@@ -56,10 +62,12 @@ R3.1 dry-run validation complete. Full v2 workflow validated mentally and via ch
 
 ## Next Recommended Actions
 
-1. Implement R3: State Reconciliation — fix phase drift (#14) and status freshness drift (#15)
-2. Implement R4: Onboarding Hardening — fix Windows artifact emission (#8), NO_OP goal handling (#7), continuation handoff hardening (#6)
-3. Re-run real-project validation checklist after R3/R4 completion
-4. Only then proceed to R5: external real-project validation
+1. **Freeze v2 command surface** — lock `/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status` and state file schema
+2. Implement R3: State Reconciliation — fix phase drift (#14) and status freshness drift (#15)
+3. Implement R4: Onboarding Hardening — fix Windows artifact emission (#8), NO_OP goal handling (#7), continuation handoff hardening (#6)
+4. Re-run real-project validation checklist after R3/R4 completion
+5. Proceed to R5: external real-project validation
+6. Consider adding mandatory-skill wording to dev-protocol skill prompts (zero-cost improvement from Superpowers benchmark)
 
 ## Notes For Next Session
 
@@ -76,3 +84,7 @@ R3.1 dry-run validation complete. Full v2 workflow validated mentally and via ch
 - **NEW: 6 must-fix deferred items identified** (#6, #7, #8, #14, #15, #13 enforcement)
 - **NEW: 4 safe-to-validate deferred items** (#1, #3, #4, #9) — need real-project data
 - **NEW: 6 obsolete/resolved deferred items** (#2, #5, #9-runtime, #10, #11, #12)
+- **NEW: External benchmark complete** — 7 systems evaluated (ECC, Superpowers, Spec Kit, LangGraph, wshobson/commands, barkain, Microsoft Agent Framework)
+- **NEW: Benchmark recommendation = READY_TO_FREEZE_V2** — no evaluated system solves the same problem better; remaining risks are implementation bugs, not design flaws
+- **NEW: 5 architecture risks documented** — portability untested, manual save gap, phase detection weak, no subagent support, hooks underutilized
+- **NEW: 7 things explicitly NOT worth copying** — ECC installer complexity, LangGraph graph API, barkain parallelism, Microsoft Azure coupling, Spec Kit 7-stage rigidity, etc.
