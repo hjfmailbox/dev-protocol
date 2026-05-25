@@ -102,7 +102,7 @@ next:
 
 checkpoint:
   last_updated: "2026-05-26"
-  last_commit: "5852f6a"
+  last_commit: "60478f9"
   summary: "phase p3: r3.1 dry-run validation complete — checklist created, friction documented, deferred reclassified, decision: BLOCKED pending R3/R4"
 
 confidence:
