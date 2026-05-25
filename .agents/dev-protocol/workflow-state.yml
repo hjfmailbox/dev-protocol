@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "v1-v2-alias-deprecated"
+  focus: "r3.1-dry-run-validation"
   status: active
 
 progress:
@@ -68,6 +68,12 @@ progress:
     - "v2 command surface complete: /dev-init, /dev-status, /dev-scope, /dev-save"
     - "harden /dev-save semantics: remove checkpoint/commit/staging ambiguity"
     - "implement v1→v2 compatibility aliases: /dev-bootstrap→/dev-init, /dev-resume→/dev-status, /dev-goal-template→/dev-scope, /dev-checkpoint→/dev-save"
+    - "create real-project validation checklist (12 scenarios, full workflow sequence validation)"
+    - "document friction points: command naming ambiguity, validation order, manual steps, phase drift, status freshness"
+    - "reclassify deferred backlog into must-fix / safe-to-validate / obsolete"
+    - "explicit go/no-go decision: BLOCKED_WITH_REQUIRED_FIXES (R3 and R4 required before R5)"
+    - "case-05 PASS on r3.1 dry-run validation commit"
+    - "case-06 PASS on r3.1 dry-run validation commit"
   in_progress: []
   blocked: []
 
@@ -95,9 +101,9 @@ next:
     - "validate new skills (goal-template, doctor, help) in real project usage"
 
 checkpoint:
-  last_updated: "2026-05-24"
-  last_commit: "31c6cd8"
-  summary: "phase p3: runtime structure cleanup — removed duplicated .claude/skills copies, cleaned obsolete tests/case-01.txt"
+  last_updated: "2026-05-26"
+  last_commit: "5852f6a"
+  summary: "phase p3: r3.1 dry-run validation complete — checklist created, friction documented, deferred reclassified, decision: BLOCKED pending R3/R4"
 
 confidence:
   state_confidence: high

@@ -234,3 +234,44 @@ freshness reporting was inaccurate.
 contradict `git status`.
 
 **Priority:** Medium
+
+---
+
+## R3.1 Reclassification (2026-05-26)
+
+After end-to-end dry-run validation inside the dev-protocol repository.
+
+### Must Fix Before Real Project
+
+These block reliable external adoption. Fixing them is the scope of R3 (State Reconciliation) and R4 (Onboarding Hardening).
+
+| Item | Title | Rationale |
+|------|-------|-----------|
+| #14 | Phase drift on resume | Core state reconciliation bug. `/dev-status` reports persisted phase without cross-checking git history. In real-project validation it reported `p1` for a `p3` project. |
+| #15 | Repository status freshness drift | Core state reconciliation bug. `/dev-status` may use cached `handoff.md` workspace status instead of live `git status`. Undermines trust. |
+| #6 | Continuation handoff prompt hardening | Cold-start scope expansion wastes tokens and introduces risk. Prompt seed must constrain any model to documented boundaries. |
+| #7 | NO_OP goal false FAILs | False failures erode confidence. Legitimate zero-change goals should pass `case-06`. |
+| #8 | Windows bash heredoc failure | Core usability on Windows. Silent artifact emission makes protocol unreliable for ~50% of developers. |
+| #13 | Checkpoint commit message contract (enforcement) | `/dev-save` no longer commits, so enforcement shifted to user workflow. Skill-level message format guidance exists but is not mandatory. Low risk if user follows onboarding. |
+
+### Safe to Validate on Real Project
+
+These require empirical data from real usage; cannot be resolved by theory alone.
+
+| Item | Title | Rationale |
+|------|-------|-----------|
+| #3 | 10-file / 50-file scope threshold | Arbitrary threshold needs calibration from goal commit sizes across multiple real projects. |
+| #1 | Session output capture for output contract automation | Depends on runtime logging capabilities. Strategy varies by runtime. |
+| #4 | Continuation handoff validation | Blocked on item #1. Requires session output capture infrastructure. |
+| #9 | Test numbering standardization | Renumbering is a breaking change to documentation and muscle memory. Wait until test suite stabilizes. |
+
+### Obsolete / Resolved
+
+| Item | Title | Resolution |
+|------|-------|------------|
+| #2 | Duplicate state files | **Completed** in v1. Root-level copies removed. |
+| #5 | Redundant git diff checks | **Intentional**. Removing 4 lines of PowerShell reduces readability. Cost exceeds benefit. |
+| #10 | `.agents` directory convention | **Resolved** in R1. Documented in `docs/onboarding.md`. |
+| #11 | Real-project validation checklist | **Resolved** in R3.1. `docs/real-project-validation-checklist.md` created with 12 scenarios and full workflow validation. |
+| #12 | case-05 / case-06 execution order | **Resolved** in R1. Documented in `references/workflow-rules.md` and `docs/onboarding.md`. |
+| #9-runtime | Runtime directory migration | **Completed** in v1. `.agent/` → `.agents/` migration finished. |

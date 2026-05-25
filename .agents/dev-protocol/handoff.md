@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-v1→v2 compatibility aliases implemented. v1 commands deprecated but supported: /dev-bootstrap→/dev-init, /dev-resume→/dev-status, /dev-goal-template→/dev-scope, /dev-checkpoint→/dev-save.
+R3.1 dry-run validation complete. Full v2 workflow validated mentally and via checklist against dev-protocol itself. Explicit go/no-go decision: BLOCKED_WITH_REQUIRED_FIXES. Two core state reconciliation bugs (#14 phase drift, #15 status freshness drift) plus three medium-severity usability blockers (#6 continuation handoff, #7 NO_OP goals, #8 Windows heredoc) must be resolved in R3 (State Reconciliation) and R4 (Onboarding Hardening) before external real-project validation (R5).
 
 ## Current Status
 
@@ -24,6 +24,10 @@ v1→v2 compatibility aliases implemented. v1 commands deprecated but supported:
 - Hardened /dev-save semantics: removed checkpoint/commit/staging ambiguity from skill definitions and documentation
 - Implemented v1→v2 compatibility aliases: /dev-bootstrap→/dev-init, /dev-resume→/dev-status, /dev-goal-template→/dev-scope, /dev-checkpoint→/dev-save
 - case-05 and case-06 PASS on alias implementation commit
+- Created `docs/real-project-validation-checklist.md` with 12 scenarios and full workflow sequence validation
+- Documented friction points: command naming ambiguity, validation order complexity, manual fix-goal-output step, phase drift, status freshness drift
+- Reclassified deferred backlog: 6 must-fix, 4 safe-to-validate, 6 obsolete/resolved
+- Explicit go/no-go decision: BLOCKED_WITH_REQUIRED_FIXES (R3 State Reconciliation and R4 Onboarding Hardening required before R5)
 
 ## In Progress
 
@@ -52,17 +56,23 @@ v1→v2 compatibility aliases implemented. v1 commands deprecated but supported:
 
 ## Next Recommended Actions
 
-1. Review v2 command surface for gaps or inconsistencies
-2. Consider real-project validation of full v2 workflow
-3. Evaluate deferred backlog for next phase
+1. Implement R3: State Reconciliation — fix phase drift (#14) and status freshness drift (#15)
+2. Implement R4: Onboarding Hardening — fix Windows artifact emission (#8), NO_OP goal handling (#7), continuation handoff hardening (#6)
+3. Re-run real-project validation checklist after R3/R4 completion
+4. Only then proceed to R5: external real-project validation
 
 ## Notes For Next Session
 
 - State confidence is HIGH
 - Strict validation rules enforced in dev-checkpoint skill
 - Global spec prohibits the words "继承", "同上", "略" in design docs (word-level match)
-- Phase is p3 — runtime decoupling complete, structure cleanup complete
+- Phase is p3 — runtime decoupling complete, structure cleanup complete, r3.1 dry-run complete
 - v1 retrospective frozen, no further protocol changes within v1 scope
 - New commands are additive only; core protocol contracts unchanged
 - Protocol core is portable; runtime adapters are optional convenience layers
 - `.claude/skills/` must only contain symlinks; `skills/` is the canonical source
+- **NEW: R3.1 dry-run validation complete** — checklist exists, friction documented, deferred reclassified
+- **NEW: go/no-go = BLOCKED_WITH_REQUIRED_FIXES** — R3 (State Reconciliation) and R4 (Onboarding Hardening) required before R5
+- **NEW: 6 must-fix deferred items identified** (#6, #7, #8, #14, #15, #13 enforcement)
+- **NEW: 4 safe-to-validate deferred items** (#1, #3, #4, #9) — need real-project data
+- **NEW: 6 obsolete/resolved deferred items** (#2, #5, #9-runtime, #10, #11, #12)
