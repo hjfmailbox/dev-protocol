@@ -19,16 +19,18 @@ How to start using dev-protocol in any project.
 The ideal first-contact flow. Use this when your project is already a git repository with a clean working tree.
 
 ```
-Step 1: /dev-init          → Protocol inspects project, creates .agents/dev-protocol/
+Step 1: /dev-init          → Protocol inspects repository, reconstructs reality, creates .agents/dev-protocol/
 Step 2: Review state files → Check workflow-state.yml, handoff.md, project-rules.md
 Step 3: git add .agents/   → Track state files in git
 Step 4: git commit         → chore(protocol): initialize dev-protocol
 Step 5: /dev-scope         → Declare your first goal
-Step 6: Work               → Implement changes
-Step 7: /dev-save          → Persist state and commit
+Step 6: Work               → Implement changes (normal git commits during work)
+Step 7: /dev-save          → Persist protocol state and commit state files
 ```
 
 After Step 7, you can safely end the session. Next session: run `/dev-status` to resume.
+
+**Important**: `/dev-save` does **not** replace normal development commits. During Step 6, you commit your code changes as usual (`git commit -m "feat: add feature"`). `/dev-save` only commits the protocol state files (`.agents/dev-protocol/*`) to record progress and context.
 
 ---
 
@@ -102,14 +104,25 @@ If the project has no documentation:
 
 ---
 
+## Normal Commits vs Protocol Saves
+
+| Operation | What it commits | When to do it | Example message |
+|---|---|---|---|
+| Normal commit | Your code changes, docs, tests | During work, when a change is complete | `feat(api): add user authentication` |
+| Protocol save | `.agents/dev-protocol/*` state files only | After completing a goal or at session end | `chore(checkpoint): sync state after auth goal` |
+
+**Rule**: You make normal commits throughout your work. You make protocol saves only at boundaries (goal complete, session end, natural breakpoint). `/dev-save` never commits your source code — it only commits state files that record where you are and what is next.
+
+---
+
 ## Command Reference
 
 | Command | Purpose | When to Use |
 |---|---|---|
-| `/dev-init` | Initialize protocol on a project | First contact, or after cloning a repo without `.agents/` |
+| `/dev-init` | Inspect repository, reconstruct project reality, initialize protocol state | First contact, or after cloning a repo without `.agents/` |
 | `/dev-scope` | Declare a focused goal with validation criteria | Before starting any implementation work |
-| `/dev-save` | Persist state, validate consistency, commit | After completing a goal or at natural stopping points |
-| `/dev-status` | Inspect current state, diagnose issues, resume context | Every new session, or when unsure of current state |
+| `/dev-save` | Persist protocol state files, validate consistency, commit state only | After completing a goal or at natural stopping points |
+| `/dev-status` | Inspect current protocol state and reconstruct context | Every new session, or when unsure of current state |
 
 **Deprecated v1 commands** (still work but print a deprecation warning):
 
@@ -162,6 +175,15 @@ Running `case-05` before `case-06` will fail because `/dev-save` changes HEAD to
 - Does NOT configure CI/CD
 - Does NOT install dependencies
 - Does NOT require any specific AI runtime
+
+``/dev-init` performs full repository discovery and project reality reconstruction. It does not simply create files. It inspects:
+
+- **Git history** — commit depth, branching patterns, recent activity
+- **Architecture/design documents** — `README.md`, `docs/`, `CLAUDE.md`, `AGENTS.md`, architecture diagrams
+- **Active work** — uncommitted changes, open branches, outstanding tasks, fix markers in code
+- **Repository maturity** — directory structure (`src/`, `tests/`, `lib/`), file count, dependency manifests
+- **Existing workflows** — CI/CD configs, build scripts, lint rules
+- **Project type** — language indicators, framework signatures
 
 `/dev-init` is **detect + recommend**, not detect + mutate.
 

@@ -403,35 +403,61 @@ These items are already resolved, have negligible impact, or conflict with v2 di
 - [x] Validation order explicitly documented (case-06 before save, case-05 after save)
 - [x] `.agents` directory convention documented
 - [x] Reality priority hierarchy defined
+- [x] R1/R2 boundary is unambiguous: R1 = docs/UX only, R2 = runtime implementation
+- [x] Normal commits vs protocol saves are clearly distinguished
+- [x] /dev-init responsibility covers repository discovery + reality reconstruction
+- [x] /dev-status primary responsibility is state inspection + context reconstruction
 
-### R2: Onboarding Orchestration
+### R2: Runtime Implementation + Onboarding Orchestration
 
-**Goal**: Harden the first-time project onboarding experience.
+**Goal**: Implement the v2 command surface as runtime skills and harden the first-time project onboarding experience.
 
 **Scope**:
 
-- Implement `/dev-init` skill with project maturity heuristics:
-  - Inspect `git log --oneline` depth to estimate phase
-  - Inspect existing documentation files to estimate project maturity
-  - Inspect directory structure (src/, tests/, docs/, etc.) to estimate project type
-- Add `.agents/` gitignore detection to `/dev-init` (warn if `.agents/` is ignored)
-- Add dirty workspace warning to `/dev-init`
+- Create `skills/dev-init/` with PROMPT.md and SKILL.md:
+  - Implement repository discovery: inspect git history, architecture docs, CLAUDE.md, active work, repo maturity, outstanding tasks, existing workflows
+  - Implement project reality reconstruction: estimate phase from commit depth, directory structure, documentation
+  - Add `.agents/` gitignore detection (warn if `.agents/` is ignored)
+  - Add dirty workspace warning
+- Create `skills/dev-scope/` with PROMPT.md and SKILL.md:
+  - Merge goal declaration and template generation into single command
+  - Generate standardized scope document with validation criteria
+- Create `skills/dev-save/` with PROMPT.md and SKILL.md:
+  - Replace checkpoint behavior
+  - Persist only protocol state files (`.agents/dev-protocol/*`)
+  - Validate consistency before committing
+  - Generate `chore(checkpoint): ...` commit message
+  - Never commit source code
+- Create `skills/dev-status/` with PROMPT.md and SKILL.md:
+  - Primary: inspect current protocol state and reconstruct context
+  - Secondary: diagnose issues, show usage help
+  - Run `git status` at invocation time; never rely on cached metadata
+  - Cross-check phase against git history depth
+- Update `.claude/skills/` symlinks to point to new v2 skills
+- Add deprecated command aliases (print replacement + exit)
 - Write `docs/real-project-validation-checklist.md` with step-by-step validation for new projects
-- Write `docs/agents-convention.md` explaining `.agents/` rationale and naming
 
 **Non-goals**:
 
 - Do not auto-commit from `/dev-init`
 - Do not modify existing project code or docs
 - Do not create branches
+- Do not change state file schema
+- Do not change validation tests (case-05, case-06)
+- Do not fix state reconciliation bugs (deferred to R3)
 
 **Validation criteria**:
 
+- [ ] `skills/dev-init/` exists with PROMPT.md and SKILL.md
+- [ ] `skills/dev-scope/` exists with PROMPT.md and SKILL.md
+- [ ] `skills/dev-save/` exists with PROMPT.md and SKILL.md
+- [ ] `skills/dev-status/` exists with PROMPT.md and SKILL.md
+- [ ] `.claude/skills/` contains symlinks to all new v2 skills
+- [ ] Deprecated commands print replacement and exit gracefully
 - [ ] `/dev-init` on a mature project estimates phase >= p2 (not p1)
 - [ ] `/dev-init` on a dirty workspace warns before proceeding
 - [ ] `/dev-init` warns if `.agents/` matches `.gitignore`
-- [ ] `docs/real-project-validation-checklist.md` exists and covers bootstrap → scope → save → status cycle
-- [ ] `docs/agents-convention.md` explains `.agents/` vs `.agent/` vs `.claude/`
+- [ ] `docs/real-project-validation-checklist.md` exists and covers init → scope → work → save → status cycle
 - [ ] case-06 PASS
 
 ### R3: State Reconciliation

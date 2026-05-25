@@ -16,12 +16,12 @@ dev-protocol solves this by persisting development state to durable files in the
 Bootstrap → Checkpoint → New Session → Resume → Goal → Checkpoint
 ```
 
-1. **Init** — Initialize protocol on a project. Inspects git history, docs, and directory structure. Creates `.agents/dev-protocol/` state files. No auto-commit.
+1. **Init** — Inspect repository and reconstruct project reality. Analyzes git history, architecture docs, active work, and repository maturity. Creates `.agents/dev-protocol/` state files reflecting actual project state. No auto-commit.
 2. **Scope** — Declare a focused, multi-step objective with validation criteria.
-3. **Work** — Implement changes within the scoped objective.
-4. **Save** — Persist progress to state files, validate consistency, and commit. After save, it is safe to start a new session.
+3. **Work** — Implement changes within the scoped objective. Make normal git commits during work.
+4. **Save** — Persist protocol state files only (`.agents/dev-protocol/*`), validate consistency, and commit. Does not commit source code. After save, it is safe to start a new session.
 5. **New Session** — Reset conversation context. State survives in repository files.
-6. **Status** — Recover full development context from state files. Diagnose issues. Read-only; never modifies files.
+6. **Status** — Inspect current protocol state and reconstruct development context. Read-only; never modifies files.
 
 Repeat the scope → work → save → new session → status cycle as needed.
 
@@ -34,16 +34,16 @@ Protocol commands are semantic operations. The Claude Code representations use s
 
 | Command | Claude Code | Writes Files? | Description |
 |----------|:-----------:|:------------:|-------------|
-| Init | `/dev-init` | Yes | Initialize protocol on a project, reconstruct state |
+| Init | `/dev-init` | Yes | Inspect repository, reconstruct project reality, initialize protocol state |
 | Scope | `/dev-scope` | No | Declare a focused goal with validation criteria |
-| Save | `/dev-save` | Yes | Persist state, validate, commit (fails on inconsistency) |
-| Status | `/dev-status` | No | Inspect state, diagnose issues, resume context, show help |
+| Save | `/dev-save` | Yes | Persist protocol state files only, validate, commit (fails on inconsistency) |
+| Status | `/dev-status` | No | Inspect current protocol state and reconstruct context |
 
 Key guarantees:
 
 - **State over history**: current file truth > appended logs
 - **Fail-fast**: hard failure on corruption, soft failure on ambiguity
-- **No partial commits**: checkpoint either fully succeeds or produces no commit
+- **State files only**: /dev-save commits only `.agents/dev-protocol/*`, never source code
 - **Self-drift detection**: repeated checkpoint with no real changes produces no commit
 - **Runtime-agnostic**: protocol correctness does not depend on any specific AI runtime
 
