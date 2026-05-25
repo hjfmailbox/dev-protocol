@@ -1,4 +1,7 @@
-You are executing /dev-bootstrap for a software project.
+You are executing /dev-bootstrap.
+
+> **DEPRECATED**: `/dev-bootstrap` is deprecated but supported. Use `/dev-init` instead.
+> This command continues to function for backward compatibility, but its behavior is now aligned with `/dev-init`.
 
 Your goal is to reconstruct a recoverable development state.
 
@@ -65,7 +68,7 @@ Ensure:
 - state reflects CURRENT reality
 - no historical logging
 - no duplication of past events
-- `checkpoint.last_commit` MUST be left empty/absent — no checkpoint baseline exists yet
+- `checkpoint.last_commit` MUST be left empty/absent — no save baseline exists yet
 
 ---
 

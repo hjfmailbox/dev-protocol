@@ -1,7 +1,11 @@
-You are executing /dev-goal-template for a software project.
+You are executing /dev-goal-template.
 
-Your goal is to generate a standardized goal template that the user
-can refine and pass to /goal.
+> **DEPRECATED**: `/dev-goal-template` is deprecated but supported. Use `/dev-scope` instead.
+> This command continues to function for backward compatibility, but its behavior is now aligned with `/dev-scope`.
+
+Your goal is to convert user intent into a focused, bounded, execution-ready goal structure.
+
+Proceed using `/dev-scope` semantics. Do NOT implement, modify, commit, or expand scope silently.
 
 ---
 
@@ -49,9 +53,9 @@ Rules:
 
 ---
 
-## STEP 4: Generate Template
+## STEP 4: Generate Scope
 
-Output the following template structure:
+Output the following scope structure (aligned with `/dev-scope`):
 
 ```
 ## Goal
@@ -60,42 +64,43 @@ Output the following template structure:
 
 ## Scope
 
-### Allowed Files
+### In-scope
 
-- <file or directory patterns relevant to the goal>
+- <specific file, directory, or behavior>
+- ...
 
-### Forbidden
+### Out-of-scope
 
-- <constraints that protect existing contracts>
+- <specific exclusion>
+- ...
 
 ## Requirements
 
-1. <first requirement — concrete, actionable>
-2. <second requirement>
+1. <concrete requirement>
+2. <concrete requirement>
 ...
+
+## Non-goals
+
+- <what this goal does NOT cover>
+- ...
 
 ## Validation
 
-1. <criterion that can be checked by git, filesystem, or test>
-2. <criterion>
+1. <machine-checkable criterion>
+2. <machine-checkable criterion>
 ...
-
-## Expected Commit Style
-
-<type>(<scope>): <summary>
-
-<guidance on commit granularity for this goal>
 ```
 
 ---
 
 ## STEP 5: Output
 
-Display the complete template.
+Display the complete scope.
 
 Then output:
 
-"Review the template above. Edit as needed, then pass to `/goal`."
+"Review the scope above. Confirm or refine before proceeding to implementation."
 
 ---
 

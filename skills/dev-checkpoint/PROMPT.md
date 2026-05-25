@@ -1,9 +1,13 @@
-You are executing /dev-checkpoint for a software project.
+You are executing /dev-checkpoint.
 
-Your goal is to safely persist the current development state
-so that the project can be fully recovered later via /dev-resume.
+> **DEPRECATED**: `/dev-checkpoint` is deprecated but supported. Use `/dev-save` instead.
+> This command continues to function for backward compatibility, but its behavior is now aligned with `/dev-save`.
 
-This is a STRICT operation. Partial success is failure.
+Your goal is to persist the current protocol state to durable files.
+
+**Boundary**: /dev-checkpoint updates state files only. It does NOT implement, modify source code, stage files, or commit.
+
+Proceed using `/dev-save` semantics. This is a STRICT operation. Partial success is failure.
 
 ---
 
@@ -66,7 +70,6 @@ And NO other files changed (no code, no docs, no config, no tests):
   ```
 - **IMMEDIATELY STOP. Do NOT execute any subsequent STEP.**
 - Do NOT update any state files.
-- Do NOT create any commit.
 - Do NOT proceed to STEP 2.
 
 This is a HARD STOP. The checkpoint flow terminates here.
@@ -120,7 +123,7 @@ FAIL checkpoint.
 
 Simulate:
 
-"Can a fresh session using /dev-resume reconstruct state?"
+"Can a fresh session using /dev-status reconstruct state?"
 
 If NOT:
 
@@ -128,62 +131,53 @@ FAIL checkpoint.
 
 ---
 
-## STEP 5: Generate Commit
+## STEP 5: Update State Files Only
 
-Create commit message following commit-rules:
+`/dev-checkpoint` no longer creates commits. Write state files only.
 
-Format:
-<type>(<scope>): <summary>
+Update `.agents/dev-protocol/workflow-state.yml`:
 
-Must reflect:
+- `checkpoint.last_commit` = current HEAD hash
+- `checkpoint.last_updated` = current date
+- `checkpoint.summary` = brief description of current state
 
-- dominant change
-- correct scope
-- concise reasoning
+Rules:
+
+- MUST reflect current reality
+- MUST NOT append history
+- MUST overwrite outdated state
+- MUST remove contradictions
 
 ---
 
-## STEP 6: Commit
+## STEP 6: Validate and Output
 
-Execute exactly ONE checkpoint commit.
-
-Record current HEAD before committing:
-
-```
-PRE_HEAD = git rev-parse HEAD
-```
-
-Write into `workflow-state.yml.checkpoint`:
-
-- `last_commit` = `PRE_HEAD` (the parent of the checkpoint commit)
-- `summary` = the commit summary
-
-Then:
-
-- git add .
-- git commit (using message from STEP 5)
-
-CRITICAL:
-
-- Do NOT create a separate drift correction commit.
-- Do NOT amend after the initial commit.
-- If commit fails, FAIL checkpoint.
-
-Note: `last_commit` is the PARENT of the checkpoint commit.
-This is by design — a commit cannot contain its own hash.
-Early exit (STEP 1.5) must compare diff since `last_commit`, not HEAD.
+Validate state consistency and output summary.
 
 ---
 
 ## STEP 7: Output Summary
 
-Return:
+If validation passes, output:
 
-- changes detected
-- files updated
-- sync performed
-- commit message
-- recovery confidence
+```
+## /dev-checkpoint Complete
+
+**Deprecated**: /dev-checkpoint is deprecated. Use /dev-save instead.
+
+**Files Updated**:
+- `.agents/dev-protocol/workflow-state.yml`
+- `.agents/dev-protocol/handoff.md`
+
+**Git Context**:
+- Last commit: <hash>
+- Branch: <branch>
+- Workspace: <clean/dirty>
+
+**Next Steps**:
+1. Review updated state files
+2. Persist state files through your normal version control workflow
+```
 
 ---
 
@@ -195,7 +189,6 @@ Checkpoint MUST FAIL if:
 - sync rules violated
 - recoverability is low
 - any critical file missing
-- commit is not possible
 
 NO partial success allowed.
 
@@ -207,11 +200,13 @@ NO partial success allowed.
 - NEVER skip validation
 - NEVER commit unsafe state
 - NEVER continue after failure
+- NEVER stage files
+- NEVER auto-commit
 ---
 
 ## RULE ENFORCEMENT (ADDED)
 
-Always re-parse project-rules.md and validate workflow-state.yml against it before committing.
+Always re-parse project-rules.md and validate workflow-state.yml against it before writing state files.
 
 ---
 
@@ -265,7 +260,6 @@ Then:
 - output self-drift summary with "No meaningful changes detected"
 - **IMMEDIATELY STOP the checkpoint flow**
 - do NOT update any state files
-- do NOT create a commit
 - do NOT proceed to any subsequent validation or sync step
 
 This is a HARD STOP, not a classification note.

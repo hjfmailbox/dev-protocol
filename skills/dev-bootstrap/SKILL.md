@@ -1,5 +1,9 @@
 # /dev-bootstrap
 
+> **DEPRECATED**: `/dev-bootstrap` is deprecated but supported. Use `/dev-init` instead.
+>
+> Behavior is now aligned with `/dev-init`. This skill remains callable for backward compatibility.
+
 ## Purpose
 
 Initialize dev protocol on an existing or new project.
@@ -27,9 +31,9 @@ After bootstrap, the project must support:
 
 ## When NOT to Use
 
-- State files already exist and are current (use `/dev-resume` instead)
-- You just want to save progress (use `/dev-checkpoint` instead)
-- You want to recover context after `/clear` (use `/dev-resume` instead)
+- State files already exist and are current (use `/dev-status` instead)
+- You just want to save progress (use `/dev-save` instead)
+- You want to recover context after `/clear` (use `/dev-status` instead)
 
 ---
 
@@ -55,7 +59,7 @@ Does NOT auto-commit. Does NOT modify existing code.
 → review generated state files
 → git add .agents/
 → git commit -m "chore(protocol): initialize dev-protocol"
-→ /dev-checkpoint
+→ /dev-save
 ```
 
 ---
@@ -115,8 +119,8 @@ Create or update in `.agents/dev-protocol/`:
 
 Must preserve useful existing information.
 
-Must set `checkpoint.last_commit` to empty/absent — no checkpoint baseline
-exists until the user explicitly runs /dev-checkpoint.
+Must set `checkpoint.last_commit` to empty/absent — no save baseline
+exists until the user explicitly runs /dev-save.
 
 ---
 

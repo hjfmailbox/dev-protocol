@@ -24,8 +24,8 @@ conversation. State files are durable across sessions, machines, and time gaps.
 
 | File | Purpose | Update Frequency |
 |---|---|---|
-| `workflow-state.yml` | Machine-readable progress, phase, checkpoint metadata | Every `/dev-checkpoint` |
-| `handoff.md` | Human-readable current focus, blockers, context | Every `/dev-checkpoint` |
+| `workflow-state.yml` | Machine-readable progress, phase, persistence metadata | Every `/dev-save` |
+| `handoff.md` | Human-readable current focus, blockers, context | Every `/dev-save` |
 | `project-rules.md` | Stable project conventions, constraints, decisions | Only when rules change |
 
 **Example:** `workflow-state.yml` says `phase: "p2"` and `progress.completed` lists
@@ -35,7 +35,7 @@ rule that doesn't change between checkpoints.
 
 ---
 
-## How `/dev-resume` Uses Memory
+## How `/dev-status` Uses Memory
 
 1. Reads `workflow-state.yml` for phase, completed items, in-progress items
 2. Reads `handoff.md` for human-readable context and blockers
@@ -44,19 +44,19 @@ rule that doesn't change between checkpoints.
 5. Generates recovery summary: current phase, active focus, completed progress,
    blockers, recommended next actions
 
-If state files are missing, `/dev-resume` fails and recommends `/dev-bootstrap`.
+If state files are missing, `/dev-status` reports the issue and recommends `/dev-init`.
 
 ---
 
 ## Rules for Keeping Memory Reliable
 
-1. **Update at checkpoint, not continuously.** Memory is batched into
-   `/dev-checkpoint` executions. Do not incrementally edit state files during
+1. **Update at save boundaries, not continuously.** Memory is batched into
+   `/dev-save` executions. Do not incrementally edit state files during
    a session — that introduces drift between state and actual work.
 
 2. **Completed items must match reality.** If `workflow-state.yml` marks something
    completed but the file doesn't exist or the code isn't there, it's a bug.
-   Fix it at the next checkpoint.
+   Fix it at the next save.
 
 3. **Phase transitions are explicit.** Moving from p1 to p2 requires all p1
    deliverables to be done. Never advance phase with incomplete items.

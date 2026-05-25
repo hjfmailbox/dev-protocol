@@ -124,7 +124,7 @@ If the project has no documentation:
 | `/dev-save` | Persist protocol state files, validate consistency | After completing a goal or at natural stopping points |
 | `/dev-status` | Inspect current protocol state and reconstruct context | Every new session, or when unsure of current state |
 
-**Deprecated v1 commands** (still work but print a deprecation warning):
+**Deprecated v1 commands** (deprecated but supported — no breaking changes):
 
 | Deprecated | Replacement |
 |---|---|

@@ -1,5 +1,9 @@
 # /dev-checkpoint
 
+> **DEPRECATED**: `/dev-checkpoint` is deprecated but supported. Use `/dev-save` instead.
+>
+> Behavior is now aligned with `/dev-save`. This skill remains callable for backward compatibility.
+
 ## Purpose
 
 Persist development state into durable project memory.
@@ -23,20 +27,20 @@ The next session must NOT depend on prior conversation history.
 
 ## When NOT to Use
 
-- No changes since last checkpoint (self-drift will skip anyway)
+- No changes since last state update (self-drift will skip anyway)
 - Workspace is in an inconsistent state (fix first)
-- You haven't run `/dev-bootstrap` yet (bootstrap first)
+- You haven't run `/dev-init` yet (init first)
 - Mid-implementation with incomplete work (commit or stash first)
 
 ---
 
 ## What It Does
 
-1. Inspects changes since last checkpoint
+1. Inspects changes since last state update
 2. Updates state files to reflect current reality
 3. Validates consistency between state, code, and docs
-4. Creates exactly ONE commit with the checkpoint
-5. Records the checkpoint baseline for future drift detection
+4. Records save metadata for future drift detection
+5. Does NOT create commits or stage files
 
 If no meaningful changes exist, exits early (self-drift exception).
 
@@ -48,7 +52,6 @@ If no meaningful changes exist, exits early (self-drift exception).
 # After implementation
 /dev-checkpoint
 → state reconciled and validated
-→ one commit created
 → safe to /clear
 ```
 
@@ -139,38 +142,18 @@ Must detect high-confidence drift.
 
 Must verify a new agent can recover by using:
 
-/dev-resume
+/dev-status
 
 Checkpoint fails if recovery confidence is low.
 
----
-
-### 5. Prepare Commit
+### 5. Write State Files
 
 Must:
 
-- stage required files
-- generate commit message
-- follow commit convention
-
-### 6. Finalize (Single-Commit Guarantee)
-
-Must produce exactly ONE checkpoint commit:
-
-- Record `PRE_HEAD = git rev-parse HEAD` before committing.
-- Write `checkpoint.last_commit = PRE_HEAD` (parent of the checkpoint commit).
-- git add . + git commit → exactly one commit.
-- Do NOT amend. Do NOT create a drift correction commit.
-
-Note: `last_commit` is the parent hash, not the checkpoint hash itself.
-A commit cannot contain its own hash — this is a fundamental constraint.
-Early exit uses `git diff last_commit..HEAD` to detect self-drift.
-
-Must summarize:
-
-- state changes
-- updated files
-- next recommended actions
+- update state files only
+- never stage files
+- never commit
+- follow commit convention in output recommendations only
 
 ---
 
@@ -187,4 +170,4 @@ Checkpoint MUST fail if:
 
 Never partially succeed.
 
-No commit on failure.
+No state write on failure.

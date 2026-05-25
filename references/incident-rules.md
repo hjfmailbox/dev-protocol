@@ -43,8 +43,8 @@ Runtime protocol anomalies detected during command execution.
 
 | Type | Trigger | Typical Severity |
 |------|---------|-----------------|
-| `resume-drift` | `/dev-resume` detects state-reality mismatch | medium |
-| `checkpoint-mismatch` | `/dev-checkpoint` finds state inconsistency | high |
+| `resume-drift` | `/dev-status` detects state-reality mismatch | medium |
+| `checkpoint-mismatch` | `/dev-save` finds state inconsistency | high |
 | `artifact-emission-failure` | Goal output artifact not written to disk | high |
 | `missing-state-file` | Required state file absent | high |
 | `empty-state-file` | State file exists but is empty | medium |
@@ -60,8 +60,8 @@ Runtime protocol anomalies detected during command execution.
 
 Incidents are logged by commands that detect anomalies:
 
-- `/dev-resume` — logs drift, missing files, phase mismatch
-- `/dev-checkpoint` — logs state inconsistency, validation failures
+- `/dev-status` — logs drift, missing files, phase mismatch
+- `/dev-save` — logs state inconsistency, validation failures
 - `/dev-doctor` — logs all detected issues during diagnosis
 
 Incidents are NOT logged for:
@@ -84,26 +84,26 @@ Incidents are NOT logged for:
 
 ## Integration Points
 
-### /dev-resume
+### /dev-status
 
-When STEP 3 (Validate State Freshness) detects drift:
+When drift detection finds mismatch:
 
 - If drift severity is WARNING or ERROR → log incident
 - Type: `resume-drift` or `phase-drift`
 
-When STEP 1 (Read Recoverable State) finds missing files:
+When loading state finds missing files:
 
 - If state files missing → log incident
 - Type: `missing-state-file`
 
-### /dev-checkpoint
+### /dev-save
 
-When STEP 3 (Validate Consistency) finds mismatch:
+When validation finds mismatch:
 
 - If validation fails → log incident
 - Type: `checkpoint-mismatch`
 
-When STEP 1.5 detects stale `last_commit`:
+When checking `last_commit` detects stale baseline:
 
 - If commit no longer exists → log incident
 - Type: `checkpoint-stale`
@@ -137,7 +137,7 @@ Runtime protocol anomalies detected during command execution.
 
 ---
 
-## 2026-05-24 /dev-resume — resume-drift
+## 2026-05-24 /dev-status — resume-drift
 
 **Context**: Resume detected checkpoint.last_commit pointing to 078f305 but HEAD at 47e3d7e
 **Detection**: git diff between last_commit and HEAD showed 1 intermediate commit
@@ -146,7 +146,7 @@ Runtime protocol anomalies detected during command execution.
 
 ---
 
-## 2026-05-24 /dev-checkpoint — checkpoint-stale
+## 2026-05-24 /dev-save — checkpoint-stale
 
 **Context**: After rebase, last_commit pointed to commit no longer in history
 **Detection**: git cat-file -t <last_commit> returned fatal error

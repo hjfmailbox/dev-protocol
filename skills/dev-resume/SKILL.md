@@ -1,5 +1,9 @@
 # /dev-resume
 
+> **DEPRECATED**: `/dev-resume` is deprecated but supported. Use `/dev-status` instead.
+>
+> Behavior is now aligned with `/dev-status`. This skill remains callable for backward compatibility.
+
 ## Purpose
 
 Recover development context from durable project state.
@@ -21,10 +25,10 @@ Allow development to continue without prior chat history.
 
 ## When NOT to Use
 
-- No state files exist yet (run `/dev-bootstrap` first)
-- You want to save progress (use `/dev-checkpoint`)
+- No state files exist yet (run `/dev-init` first)
+- You want to save progress (use `/dev-save`)
 - You want to diagnose protocol issues (use `/dev-doctor`)
-- State files are known to be corrupted (run `/dev-bootstrap` to reconstruct)
+- State files are known to be corrupted (run `/dev-init` to reconstruct)
 
 ---
 
@@ -141,5 +145,5 @@ Resume fails if:
 
 Must recommend:
 
-/dev-bootstrap
+/dev-init
 if recoverable state does not exist.

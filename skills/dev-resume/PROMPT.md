@@ -1,9 +1,14 @@
-You are executing /dev-resume for a software project.
+You are executing /dev-resume.
+
+> **DEPRECATED**: `/dev-resume` is deprecated but supported. Use `/dev-status` instead.
+> This command continues to function for backward compatibility, but its behavior is now aligned with `/dev-status`.
 
 Your goal is to fully restore the current development context
 from persistent state files and repository state.
 
 You MUST NOT rely on chat history.
+
+Proceed using `/dev-status` semantics: read-only inspection, no modifications, no commits.
 
 ---
 
@@ -29,7 +34,7 @@ Rules:
   - Output the resolved path: "State source: .agents/dev-protocol/" (or `.agent/dev-protocol/` if fallback was used)
 - If files exist only in repository root, use root path (backward compatibility).
 - If neither location has state files, report:
-  "State files not found. Run /dev-bootstrap to initialize."
+  "State files not found. Run /dev-init to initialize."
 
 Read and interpret the resolved state files.
 

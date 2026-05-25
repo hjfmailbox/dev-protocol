@@ -81,7 +81,7 @@ update workflow recovery logic
 
 Checkpoint operations should generate commit messages automatically.
 
-In Claude Code, `/dev-checkpoint` generates the message. In manual mode, the operator
+In Claude Code, `/dev-save` recommends the message. In manual mode, the operator
 or a script must infer:
 
 - dominant change

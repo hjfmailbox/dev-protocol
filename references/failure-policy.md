@@ -58,9 +58,9 @@ No commit allowed.
 
 ---
 
-## Bootstrap Rules
+## Init Rules
 
-/dev-bootstrap
+/dev-init
 
 May continue with warnings.
 
@@ -73,9 +73,9 @@ Never auto commit.
 
 ---
 
-## Resume Rules
+## Status Rules
 
-/dev-resume
+/dev-status
 
 Must stop if:
 
@@ -84,13 +84,13 @@ Must stop if:
 
 Must recommend:
 
-/dev-bootstrap
+/dev-init
 
 ---
 
-## Checkpoint Rules
+## Save Rules
 
-/dev-checkpoint
+/dev-save
 
 Must fail if:
 
@@ -102,7 +102,7 @@ Must fail if:
 
 Never partially succeed.
 
-No commit on failure.
+No state write on failure.
 
 ---
 

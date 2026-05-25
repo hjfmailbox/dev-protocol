@@ -1,5 +1,9 @@
 # /dev-goal-template
 
+> **DEPRECATED**: `/dev-goal-template` is deprecated but supported. Use `/dev-scope` instead.
+>
+> Behavior is now aligned with `/dev-scope`. This skill remains callable for backward compatibility.
+
 ## Purpose
 
 Generate a standardized goal template to reduce manual prompt authoring friction.
@@ -29,15 +33,15 @@ Produce a reusable, well-structured goal definition optimized for `/goal` usage 
 
 ## What It Does
 
-Generates a goal template with the following sections:
+Generates a scoped goal structure with the following sections:
 
 1. **Goal** — one-sentence objective
-2. **Scope** — allowed and forbidden files/areas
-3. **Requirements** — numbered implementation tasks
-4. **Validation** — machine-checkable success criteria
-5. **Expected Commit Style** — commit convention for the goal
+2. **Scope** — in-scope and out-of-scope boundaries
+3. **Requirements** — numbered, concrete, actionable tasks
+4. **Non-goals** — explicit exclusions to prevent scope creep
+5. **Validation** — machine-checkable success criteria
 
-The output is ready to paste into `/goal` with minimal editing.
+The output is execution-ready. Aligns with `/dev-scope` semantics.
 
 ---
 
@@ -45,11 +49,11 @@ The output is ready to paste into `/goal` with minimal editing.
 
 ```
 /dev-goal-template <brief description>
-→ template generated
-→ user reviews and fills in specifics
-→ /goal <filled template>
-→ implement
-→ /dev-checkpoint
+→ scope generated
+→ user reviews and confirms
+→ implement within scoped boundaries
+→ validate against criteria
+→ /dev-save
 ```
 
 ---
