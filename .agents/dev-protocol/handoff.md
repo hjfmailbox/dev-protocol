@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-v2 command surface complete. All four v2 runtime skills implemented: /dev-init, /dev-status, /dev-scope, /dev-save.
+Hardening /dev-save semantics: removed checkpoint/commit/staging ambiguity from skill definitions and documentation.
 
 ## Current Status
 
@@ -21,10 +21,11 @@ v2 command surface complete. All four v2 runtime skills implemented: /dev-init, 
 - Implemented /dev-save v2 runtime skill (R2.4) for state persistence
 - case-05 and case-06 PASS on /dev-save implementation commit
 - v2 command surface complete: /dev-init, /dev-status, /dev-scope, /dev-save
+- Hardened /dev-save semantics: removed checkpoint/commit/staging ambiguity from skill definitions and documentation
 
 ## In Progress
 
-- none
+- Hardening /dev-save semantics and eliminating v1 checkpoint ambiguity
 
 ## Blockers
 
@@ -48,9 +49,9 @@ v2 command surface complete. All four v2 runtime skills implemented: /dev-init, 
 
 ## Next Recommended Actions
 
-1. Review v2 command surface for gaps or inconsistencies
-2. Consider real-project validation of full v2 workflow
-3. Evaluate deferred backlog for next phase
+1. Validate hardening changes with case-05 and case-06
+2. Review v2 command surface for gaps or inconsistencies
+3. Consider real-project validation of full v2 workflow
 
 ## Notes For Next Session
 
