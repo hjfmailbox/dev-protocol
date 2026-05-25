@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "runtime-structure-cleanup-complete"
+  focus: "v2-command-surface-complete"
   status: active
 
 progress:
@@ -60,8 +60,13 @@ progress:
     - "add canonical source note to docs/runtime-integrations.md"
     - "remove obsolete tests/case-01.txt"
     - "case-06 PASS on goal commit"
-  in_progress:
-    - "implement /dev-save v2 runtime skill (R2.4)"
+    - "implement /dev-init v2 runtime skill (R2.1) with 4-scenario behavior matrix"
+    - "harden /dev-init for safe real-project onboarding (dirty workspace confirmation, phase unknown default)"
+    - "implement /dev-status v2 runtime skill (R2.2) with read-only drift detection"
+    - "implement /dev-scope v2 runtime skill (R2.3) with ambiguity detection and validation-first rule"
+    - "implement /dev-save v2 runtime skill (R2.4) for state persistence"
+    - "v2 command surface complete: /dev-init, /dev-status, /dev-scope, /dev-save"
+  in_progress: []
   blocked: []
 
 context:
