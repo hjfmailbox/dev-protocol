@@ -1,8 +1,8 @@
 You are executing /dev-save for a software project.
 
-Your goal is to persist the current protocol state to durable files.
+Your goal is to persist the current protocol state to durable files and commit them automatically.
 
-**Boundary**: /dev-save updates state files only. It does NOT implement, modify source code, stage files, or commit.
+**Boundary**: /dev-save updates state files, stages them, and creates a protocol commit. It does NOT modify source code, stage non-protocol files, or ask for confirmation.
 
 ---
 
@@ -139,9 +139,35 @@ Do NOT report save as successful.
 
 ---
 
-## STEP 6: Output Summary
+## STEP 6: Stage and Commit Protocol State
 
-If validation passes, output:
+After validation passes, automatically persist the state files:
+
+1. **Stage ONLY protocol state files**:
+   ```bash
+   git add .agents/dev-protocol/
+   ```
+
+2. **Create protocol commit** with conventional format:
+   ```bash
+   git commit -m "chore(checkpoint): sync state after <focus summary>"
+   ```
+
+   Rules for commit message:
+   - MUST use `chore(checkpoint):` prefix
+   - MUST describe current focus (e.g., "sync state after auth goal", "sync state after onboarding")
+   - MUST NOT reuse the previous goal commit message
+   - MUST NOT include source code changes
+
+3. **Verify clean workspace**:
+   - `git status --short` should show nothing staged and nothing modified in `.agents/`
+   - If non-protocol files are modified, they were NOT staged (correct behavior)
+
+---
+
+## STEP 7: Output Summary
+
+After successful commit, output:
 
 ```
 ## /dev-save Complete
@@ -150,14 +176,17 @@ If validation passes, output:
 - `.agents/dev-protocol/workflow-state.yml`
 - `.agents/dev-protocol/handoff.md`
 
+**Protocol Commit**:
+- Message: chore(checkpoint): sync state after <focus>
+- Hash: <new-commit-hash>
+
 **Git Context**:
 - Last commit: <hash>
 - Branch: <branch>
 - Workspace: <clean/dirty>
 
 **Next Steps**:
-1. Review updated state files
-2. Persist state files through your normal version control workflow
+1. Continue working or start a new session with /dev-status
 ```
 
 ---
@@ -165,10 +194,11 @@ If validation passes, output:
 ## RULES
 
 - **NEVER modify source code**
-- **NEVER stage files**
-- **NEVER auto-commit**
+- **NEVER stage non-protocol files**
+- **NEVER ask for confirmation** — commit automatically
 - **NEVER partially succeed**
 - **NEVER invent progress**
-- **ALWAYS validate before reporting success**
+- **ALWAYS validate before committing**
 - **ALWAYS prefer git reality over persisted state**
 - **ALWAYS overwrite state, never append history**
+- **ALWAYS create a protocol commit** — do not leave modified state files unstaged

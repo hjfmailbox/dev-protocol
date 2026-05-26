@@ -30,7 +30,7 @@ Step 7: /dev-save          → Persist protocol state files
 
 After Step 7, you can safely end the session. Next session: run `/dev-status` to resume.
 
-**Important**: `/dev-save` does **not** replace normal development commits. During Step 6, you commit your code changes as usual (`git commit -m "feat: add feature"`). `/dev-save` only updates the protocol state files (`.agents/dev-protocol/*`) to record progress and context. You persist those state files through your normal version control workflow.
+**Important**: `/dev-save` does **not** replace normal development commits. During Step 6, you commit your code changes as usual (`git commit -m "feat: add feature"`). `/dev-save` updates the protocol state files (`.agents/dev-protocol/*`) and automatically creates a protocol commit (`chore(checkpoint): ...`). You do not need to manually stage or commit state files.
 
 ---
 
@@ -109,9 +109,9 @@ If the project has no documentation:
 | Operation | What it commits | When to do it | Example message |
 |---|---|---|---|
 | Normal commit | Your code changes, docs, tests | During work, when a change is complete | `feat(api): add user authentication` |
-| Protocol save | `.agents/dev-protocol/*` state files only | After completing a goal or at session end | `chore(state): sync state after auth goal` |
+| Protocol save | `.agents/dev-protocol/*` state files only | After completing a goal or at session end | `chore(checkpoint): sync state after auth goal` |
 
-**Rule**: You make normal commits throughout your work. You make protocol saves only at boundaries (goal complete, session end, natural breakpoint). `/dev-save` never modifies your source code — it only writes state files that record where you are and what is next.
+**Rule**: You make normal commits throughout your work. You make protocol saves only at boundaries (goal complete, session end, natural breakpoint). `/dev-save` never modifies your source code — it updates state files and creates a protocol commit automatically.
 
 ---
 
@@ -143,13 +143,13 @@ If the project has no documentation:
 After goal work, validate in this exact order:
 
 ```
-/dev-scope → work → case-06 → /dev-save → commit state files → case-05
+/dev-scope → work → case-06 → /dev-save → case-05
 ```
 
 1. **After `/dev-scope` and work**: Run `pwsh tests/run-tests.ps1 -Case 06` to verify the goal commit and artifact are valid.
-2. **After `/dev-save` and committing state files**: Run `pwsh tests/run-tests.ps1 -Case 05` to verify state consistency and baseline correctness.
+2. **After `/dev-save`**: Run `pwsh tests/run-tests.ps1 -Case 05` to verify state consistency and baseline correctness. `/dev-save` automatically commits state files, so case-05 validates the resulting checkpoint.
 
-Running `case-05` before `case-06` will fail because committing state files changes HEAD, invalidating the goal artifact checks in `case-06`.
+Running `case-05` before `case-06` will fail because `/dev-save` commits state files, changing HEAD and invalidating the goal artifact checks in `case-06`.
 
 ---
 

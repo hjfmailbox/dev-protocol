@@ -19,7 +19,7 @@ Init → Scope → Work → Save → New Session → Status → Scope → ...
 1. **Init** — Inspect repository and reconstruct basic project reality. Creates `.agents/dev-protocol/` state files reflecting actual project state. Defaults to `phase: unknown` until user validation. No auto-commit.
 2. **Scope** — Declare a focused, multi-step objective with validation criteria.
 3. **Work** — Implement changes within the scoped objective. Make normal git commits during work.
-4. **Save** — Persist protocol state files only (`.agents/dev-protocol/*`), validate consistency. Does not modify source code. User stages and commits state files separately.
+4. **Save** — Persist protocol state files (`.agents/dev-protocol/*`), validate consistency, and create a protocol commit automatically. Does not modify source code or stage non-protocol files.
 5. **New Session** — Reset conversation context. State survives in repository files.
 6. **Status** — Inspect current protocol state and reconstruct development context. Read-only; never modifies files.
 

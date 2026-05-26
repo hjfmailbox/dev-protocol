@@ -42,20 +42,20 @@ This sequence ensures every session can start, work, save, and resume predictabl
 The validation sequence is strict. Running tests out of order produces false failures.
 
 ```
-Scope → Work → case-06 → Save → commit state files → case-05
+Scope → Work → case-06 → Save → case-05
 ```
 
 1. **After scope work**: run `pwsh tests/run-tests.ps1 -Case 06` to verify the goal commit and artifact are valid.
-2. **After save and committing state files**: run `pwsh tests/run-tests.ps1 -Case 05` to verify state consistency and baseline correctness.
+2. **After `/dev-save`**: run `pwsh tests/run-tests.ps1 -Case 05` to verify state consistency and baseline correctness. `/dev-save` automatically commits state files.
 
 **Why this order matters:**
 
 - `case-06` checks the goal commit (HEAD at the time). It validates changed_files, commit message format, and artifact presence.
-- `/dev-save` updates state files only. Committing those state files changes HEAD.
+- `/dev-save` updates state files and creates a protocol commit, which changes HEAD.
 - `case-05` checks state consistency. It validates that state files are consistent and that `last_commit` matches HEAD~1.
-- If you run `case-06` after committing state files, HEAD is now a state-sync commit, not a goal commit, so `case-06` fails on changed_files mismatch and commit format checks.
+- If you run `case-06` after `/dev-save`, HEAD is now a checkpoint commit, not a goal commit, so `case-06` fails on changed_files mismatch and commit format checks.
 
-**Rule**: Always run `case-06` before committing state files. Always run `case-05` after committing state files.
+**Rule**: Always run `case-06` before `/dev-save`. Always run `case-05` after `/dev-save`.
 
 ---
 

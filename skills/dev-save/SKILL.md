@@ -10,7 +10,7 @@ Update `.agents/dev-protocol/` state files so the current development context su
 
 After /dev-save, a fresh session can reconstruct context by reading state files.
 
-**Boundary rule**: /dev-save persists state only. It does NOT implement, modify source code, stage files, or commit.
+**Boundary rule**: /dev-save persists state and commits it automatically. It does NOT implement, modify source code, stage non-protocol files, or ask for confirmation.
 
 ---
 
@@ -132,11 +132,12 @@ FAIL. Report why recovery is insufficient.
 ## Hard Constraints
 
 - **NEVER mutate source code**
-- **NEVER stage files**
-- **NEVER auto-commit**
+- **NEVER stage non-protocol files**
+- **NEVER ask for confirmation** — commit automatically
 - **NEVER partially succeed**
 - **Prefer current truth over historical description**
 - **State files only** — only write to `.agents/dev-protocol/`
+- **ALWAYS create a protocol commit** after updating state files
 
 ---
 
