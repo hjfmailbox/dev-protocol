@@ -237,6 +237,40 @@ contradict `git status`.
 
 ---
 
+## 16. /dev-status drift detection too permissive for protocol commits
+
+**Why Deferred:**
+Current behavior is sufficient for v2 real-world validation and not blocking.
+
+**Problem:**
+Current protocol commit detection trusts `chore(protocol):*` as protocol-only commit.
+
+This may create false negatives in drift detection:
+- `chore(protocol): refactor save pipeline`
+- `chore(protocol): redesign checkpoint logic`
+
+These are real source changes and should trigger drift.
+
+**Proposed Improvement:**
+Switch from message-only detection to dual validation:
+
+Required:
+- commit message matches protocol pattern
+AND
+- changed files restricted to protocol-only areas
+
+Suggested allowed paths:
+- `.agents/**`
+- `docs/**` (optional)
+- protocol metadata only
+
+**Trigger: **
+Implement only if false-positive/false-negative drift appears during real usage.
+
+**Priority:** Low
+
+---
+
 ## R3.1 Reclassification (2026-05-26)
 
 After end-to-end dry-run validation inside the dev-protocol repository.
