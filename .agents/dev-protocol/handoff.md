@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-/dev-save auto-commit fix complete. /dev-save now aligns with v2 contract: updates protocol state files, stages ONLY .agents/dev-protocol/*, creates a chore(checkpoint) protocol commit automatically, and never asks for confirmation. Documentation updated (README, onboarding, workflow-rules) to reflect auto-commit behavior. No source code changes. No other commands modified.
+/dev-status drift fix complete. /dev-status now correctly handles the case where HEAD is a checkpoint commit created by /dev-save. If all commits between checkpoint.last_commit and HEAD are chore(checkpoint) protocol commits, drift = none (informational note only). If any non-checkpoint commit exists, drift = high (unrecorded work). False positive eliminated; legitimate drift still detected.
 
 ## Current Status
 
@@ -42,6 +42,9 @@
 - Fixed /dev-save to auto-stage and auto-commit protocol state (chore(checkpoint) format)
 - Updated docs to reflect auto-commit behavior (README, onboarding, workflow-rules)
 - case-06 PASS on /dev-save fix commit
+- Fixed /dev-status false-positive drift after checkpoint commits
+- Added commit-type drift check: chore(checkpoint) commits are expected, not drift
+- case-06 PASS on dev-status drift fix commit
 
 ## In Progress
 

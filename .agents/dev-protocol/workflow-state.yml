@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "dev-save-auto-commit"
+  focus: "dev-status-drift-fix"
   status: active
 
 progress:
@@ -90,6 +90,9 @@ progress:
     - "fix /dev-save to auto-stage and auto-commit protocol state"
     - "update docs to reflect auto-commit behavior (README, onboarding, workflow-rules)"
     - "case-06 PASS on /dev-save fix commit"
+    - "fix /dev-status false-positive drift after checkpoint commits"
+    - "add commit-type drift check: chore(checkpoint) commits are expected, not drift"
+    - "case-06 PASS on dev-status drift fix commit"
   in_progress: []
   blocked: []
 
@@ -118,8 +121,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-26"
-  last_commit: "1cc6713"
-  summary: "phase p3: /dev-save auto-commit fix complete — aligns with v2 contract, stages .agents/* only, creates chore(checkpoint) commit automatically"
+  last_commit: "6ab1ca9"
+  summary: "phase p3: dev-status drift fix complete — checkpoint commits no longer reported as drift, unrecorded source commits still detected"
 
 confidence:
   state_confidence: high
