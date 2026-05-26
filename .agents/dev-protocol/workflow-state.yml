@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "pre-real-project-cleanup"
+  focus: "dev-save-auto-commit"
   status: active
 
 progress:
@@ -87,6 +87,9 @@ progress:
     - "update Phase description to v2-frozen-ready-for-real-project-validation"
     - "clarify architecture boundary: skills/ = runtime, .claude/ = adapter, .agents/ = state"
     - "case-06 PASS on cleanup commit"
+    - "fix /dev-save to auto-stage and auto-commit protocol state"
+    - "update docs to reflect auto-commit behavior (README, onboarding, workflow-rules)"
+    - "case-06 PASS on /dev-save fix commit"
   in_progress: []
   blocked: []
 
@@ -115,8 +118,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-26"
-  last_commit: "8e96252"
-  summary: "phase p3: pre-real-project cleanup complete — v2 surface clarified, legacy aliases documented, diagnostic artifacts cleaned, architecture boundary unambiguous"
+  last_commit: "1cc6713"
+  summary: "phase p3: /dev-save auto-commit fix complete — aligns with v2 contract, stages .agents/* only, creates chore(checkpoint) commit automatically"
 
 confidence:
   state_confidence: high

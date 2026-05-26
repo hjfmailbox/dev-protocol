@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Pre-real-project cleanup complete. v2 canonical commands (/dev-init, /dev-status, /dev-scope, /dev-save) are now explicitly identifiable in README.md and onboarding.md. Legacy aliases classified as backward-compatibility only. Temporary diagnostic artifacts removed; reusable diagnostic tooling retained. Architecture boundary unambiguous: skills/ = protocol runtime, .claude/ = Claude adapter, .agents/ = project-local state. Protocol is clean for first real-project validation (DesignDocMCP onboarding).
+/dev-save auto-commit fix complete. /dev-save now aligns with v2 contract: updates protocol state files, stages ONLY .agents/dev-protocol/*, creates a chore(checkpoint) protocol commit automatically, and never asks for confirmation. Documentation updated (README, onboarding, workflow-rules) to reflect auto-commit behavior. No source code changes. No other commands modified.
 
 ## Current Status
 
@@ -39,6 +39,9 @@ Pre-real-project cleanup complete. v2 canonical commands (/dev-init, /dev-status
 - Retained reusable diagnostic tooling (scripts/debug/diagnose-stop-hook.ps1)
 - Updated Phase description to v2-frozen-ready-for-real-project-validation
 - Clarified architecture boundary: skills/ = protocol runtime, .claude/ = adapter, .agents/ = state
+- Fixed /dev-save to auto-stage and auto-commit protocol state (chore(checkpoint) format)
+- Updated docs to reflect auto-commit behavior (README, onboarding, workflow-rules)
+- case-06 PASS on /dev-save fix commit
 
 ## In Progress
 
