@@ -104,13 +104,25 @@ If `checkpoint.last_commit` is empty/absent:
 - Output: "No previous checkpoint baseline"
 - Skip diff-based drift comparison
 
-Drift classification:
+### Commit-type drift check
+
+When `checkpoint.last_commit` differs from HEAD:
+
+1. Inspect commits between baseline and HEAD
+2. If ALL intermediate commits match `chore(checkpoint):*`:
+   - These are expected protocol commits from `/dev-save`
+   - **Drift = none** — report informational note only
+3. If ANY intermediate commit does NOT match `chore(checkpoint):*:`
+   - These are unrecorded source commits
+   - **Drift = high** — state has not captured actual work
+
+### General drift classification
 
 | Severity | Meaning |
 |---|---|
-| none | State matches reality |
+| none | State matches reality (including checkpoint-only commits) |
 | low | Minor inconsistency, context still usable |
-| high | Significant mismatch, state may need refresh |
+| high | Significant mismatch or unrecorded non-checkpoint commits |
 
 ### 4. Reconstruct Context
 

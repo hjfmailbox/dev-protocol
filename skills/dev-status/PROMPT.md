@@ -78,13 +78,32 @@ If `checkpoint.last_commit` is empty, absent, or null:
 - Do NOT reference "since last checkpoint" phrasing
 - Skip diff-based drift comparison
 
-Classify drift:
+### Commit-type drift check (critical)
+
+When `checkpoint.last_commit` != HEAD:
+
+1. List commits between `checkpoint.last_commit` and HEAD:
+   ```bash
+   git log --oneline <checkpoint.last_commit>..HEAD
+   ```
+
+2. Inspect each commit message:
+   - If **ALL** commits match `chore(checkpoint):*` → **drift = none**
+     - These are expected protocol commits created by `/dev-save`
+     - Report as informational note only: "N protocol checkpoint(s) since last baseline"
+   - If **ANY** commit does NOT match `chore(checkpoint):*` → **drift = high**
+     - These are unrecorded source commits; state is stale
+     - Report: "Unrecorded commits detected since last checkpoint"
+
+**Why this matters**: `/dev-save` creates `chore(checkpoint)` commits automatically. These are NOT drift. Only non-checkpoint commits represent actual work that the protocol state has not captured.
+
+### General drift classification
 
 | Severity | Condition |
 |---|---|
-| **none** | All checks pass |
+| **none** | All checks pass, including commit-type check |
 | **low** | Minor mismatch (e.g., focus wording outdated, one task status mismatch) |
-| **high** | Major mismatch (e.g., phase wrong, workspace claim contradicts git status, missing commits) |
+| **high** | Major mismatch (phase wrong, workspace claim contradicts git status, unrecorded non-checkpoint commits) |
 
 Drift detection is report-only. Do NOT write incidents, do NOT modify state files, do NOT auto-fix.
 
