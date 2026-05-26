@@ -127,6 +127,9 @@ Forbidden:
 
 - Deep source code reading
 - Architecture inference beyond explicit docs
+  - Explicit docs = README, CLAUDE.md, AGENTS.md, official project docs
+  - pyproject.toml/dependencies list language/framework indicators ONLY
+  - NEVER infer storage backends, design patterns, or runtime architecture from dependency manifests
 - Implementation recommendations
 - Generating project conclusions
 - Business/domain analysis
@@ -171,6 +174,25 @@ Rules:
 - `project-rules.md` MUST clearly separate project runtime facts from protocol operating rules
 - `project-rules.md` MUST NOT contain invented facts — use "Unknown / Requires Validation" for uncertain items
 
+### Output Boundaries
+
+Init output MUST stay high-signal and minimal:
+
+**Allowed in output:**
+- Git state (branch, clean/dirty, untracked files)
+- Top-level file existence (docs/, tests/, README, pyproject.toml, etc.)
+- Language and primary framework (from README or pyproject.toml)
+- Presence of CI/CD, build tools, test runners
+
+**NOT allowed in output:**
+- Storage backend conclusions (SQLite/JSON/Postgres/etc.) unless README explicitly states
+- Architecture pattern labels (event sourcing, microservices, etc.) unless README explicitly states
+- Design inference ("6-phase debate engine", "dual backend", etc.)
+- File size commentary ("specification.md 65K")
+- Subjective maturity assessments beyond observable commit frequency
+
+**handoff.md Discoveries section** should be a short bullet list. NOT a structured report.
+
 Confidence gating:
 
 | Confidence | Auto-generate? | Action |
@@ -186,6 +208,7 @@ Low-confidence signals:
 - Ambiguous repo structure
 - Dirty workspace
 - Low discoverability
+- Architecture inferred from dependency manifests rather than README/docs
 
 ### 8. Review Before Commit
 
