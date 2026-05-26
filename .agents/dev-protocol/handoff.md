@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-/dev-status drift fix complete. /dev-status now correctly handles the case where HEAD is a checkpoint commit created by /dev-save. If all commits between checkpoint.last_commit and HEAD are chore(checkpoint) protocol commits, drift = none (informational note only). If any non-checkpoint commit exists, drift = high (unrecorded work). False positive eliminated; legitimate drift still detected.
+/dev-status protocol commit detection complete. /dev-status now recognizes multiple protocol commit patterns: chore(checkpoint), chore(protocol), chore(state), and semantic indicators ("sync state" or "protocol" with only .agents/ or docs/ changes). All protocol-only commits between checkpoint.last_commit and HEAD are treated as expected behavior — drift = none with informational note only. Non-protocol commits still trigger high drift. Eliminates false positives from /dev-save commits regardless of prefix format.
 
 ## Current Status
 
@@ -45,6 +45,9 @@
 - Fixed /dev-status false-positive drift after checkpoint commits
 - Added commit-type drift check: chore(checkpoint) commits are expected, not drift
 - case-06 PASS on dev-status drift fix commit
+- Fixed /dev-status to recognize chore(protocol) and chore(state) as protocol commits
+- Expanded protocol commit patterns beyond single chore(checkpoint) prefix
+- case-06 PASS on protocol commit detection fix commit
 
 ## In Progress
 

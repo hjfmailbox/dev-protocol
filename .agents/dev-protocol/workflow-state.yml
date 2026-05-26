@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "dev-status-drift-fix"
+  focus: "dev-status-protocol-commit-detection"
   status: active
 
 progress:
@@ -93,6 +93,9 @@ progress:
     - "fix /dev-status false-positive drift after checkpoint commits"
     - "add commit-type drift check: chore(checkpoint) commits are expected, not drift"
     - "case-06 PASS on dev-status drift fix commit"
+    - "fix /dev-status to recognize chore(protocol) and chore(state) as protocol commits"
+    - "expand protocol commit patterns beyond single chore(checkpoint) prefix"
+    - "case-06 PASS on protocol commit detection fix commit"
   in_progress: []
   blocked: []
 
@@ -121,8 +124,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-26"
-  last_commit: "6ab1ca9"
-  summary: "phase p3: dev-status drift fix complete — checkpoint commits no longer reported as drift, unrecorded source commits still detected"
+  last_commit: "25642a5"
+  summary: "phase p3: dev-status protocol commit detection complete — recognizes chore(checkpoint), chore(protocol), chore(state), and semantic indicators as protocol commits"
 
 confidence:
   state_confidence: high
