@@ -109,20 +109,23 @@ If `checkpoint.last_commit` is empty/absent:
 When `checkpoint.last_commit` differs from HEAD:
 
 1. Inspect commits between baseline and HEAD
-2. If ALL intermediate commits match `chore(checkpoint):*`:
-   - These are expected protocol commits from `/dev-save`
+2. A commit is a **protocol commit** if it matches any of:
+   - `chore(checkpoint):*` — state sync by `/dev-save`
+   - `chore(protocol):*` — protocol initialization or maintenance
+   - `chore(state):*` — state update
+   - Semantic indicators: contains "sync state" or "protocol" with only `.agents/` or `docs/` changes
+3. If ALL intermediate commits are protocol commits:
    - **Drift = none** — report informational note only
-3. If ANY intermediate commit does NOT match `chore(checkpoint):*:`
-   - These are unrecorded source commits
+4. If ANY intermediate commit is NOT a protocol commit:
    - **Drift = high** — state has not captured actual work
 
 ### General drift classification
 
 | Severity | Meaning |
 |---|---|
-| none | State matches reality (including checkpoint-only commits) |
+| none | State matches reality (including protocol-only commits) |
 | low | Minor inconsistency, context still usable |
-| high | Significant mismatch or unrecorded non-checkpoint commits |
+| high | Significant mismatch or unrecorded non-protocol commits |
 
 ### 4. Reconstruct Context
 

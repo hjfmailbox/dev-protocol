@@ -87,15 +87,28 @@ When `checkpoint.last_commit` != HEAD:
    git log --oneline <checkpoint.last_commit>..HEAD
    ```
 
-2. Inspect each commit message:
-   - If **ALL** commits match `chore(checkpoint):*` → **drift = none**
-     - These are expected protocol commits created by `/dev-save`
-     - Report as informational note only: "N protocol checkpoint(s) since last baseline"
-   - If **ANY** commit does NOT match `chore(checkpoint):*` → **drift = high**
+2. For each commit, determine if it is a **protocol commit** (state persistence only, no source code changes).
+
+   A commit is a protocol commit if **any** of the following hold:
+
+   | Pattern | Example |
+   |---|---|
+   | `chore(checkpoint):*` | `chore(checkpoint): sync state after auth goal` |
+   | `chore(protocol):*` | `chore(protocol): initialize dev-protocol` |
+   | `chore(state):*` | `chore(state): update focus and progress` |
+   | Contains "sync state" AND only `.agents/` files changed | Semantic protocol persistence |
+   | Contains "protocol" AND only `.agents/` or `docs/` files changed | Semantic protocol maintenance |
+
+3. Classify drift based on intermediate commits:
+
+   - If **ALL** intermediate commits are protocol commits → **drift = none**
+     - These are expected commits created by `/dev-save` or protocol maintenance
+     - Report informational note only: "N protocol commit(s) since last baseline"
+   - If **ANY** intermediate commit is NOT a protocol commit → **drift = high**
      - These are unrecorded source commits; state is stale
      - Report: "Unrecorded commits detected since last checkpoint"
 
-**Why this matters**: `/dev-save` creates `chore(checkpoint)` commits automatically. These are NOT drift. Only non-checkpoint commits represent actual work that the protocol state has not captured.
+**Why this matters**: `/dev-save` may create commits with various `chore(checkpoint)`, `chore(protocol)`, or `chore(state)` prefixes. All of these are protocol-only commits that persist `.agents/` state. They are NOT drift. Only commits that modify source code, tests, or build artifacts represent actual work that the protocol state has not captured.
 
 ### General drift classification
 
@@ -103,7 +116,7 @@ When `checkpoint.last_commit` != HEAD:
 |---|---|
 | **none** | All checks pass, including commit-type check |
 | **low** | Minor mismatch (e.g., focus wording outdated, one task status mismatch) |
-| **high** | Major mismatch (phase wrong, workspace claim contradicts git status, unrecorded non-checkpoint commits) |
+| **high** | Major mismatch (phase wrong, workspace claim contradicts git status, unrecorded non-protocol commits) |
 
 Drift detection is report-only. Do NOT write incidents, do NOT modify state files, do NOT auto-fix.
 
