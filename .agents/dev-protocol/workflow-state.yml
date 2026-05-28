@@ -96,6 +96,11 @@ progress:
     - "fix /dev-status to recognize chore(protocol) and chore(state) as protocol commits"
     - "expand protocol commit patterns beyond single chore(checkpoint) prefix"
     - "case-06 PASS on protocol commit detection fix commit"
+    - "Implemented phase inference in /dev-status PROMPT.md"
+    - "Implemented no-op save support in /dev-save PROMPT.md"
+    - "Added current-focus.md prevention rule to references/workflow-rules.md"
+    - "Created case-a/b/c test plans for new protocol behavior"
+    - "case-06 PASS on Phase A completion commit"
   in_progress: []
   blocked: []
 
@@ -123,9 +128,9 @@ next:
     - "validate new skills (goal-template, doctor, help) in real project usage"
 
 checkpoint:
-  last_updated: "2026-05-26"
-  last_commit: "25642a5"
-  summary: "phase p3: dev-status protocol commit detection complete — recognizes chore(checkpoint), chore(protocol), chore(state), and semantic indicators as protocol commits"
+  last_updated: "2026-05-28"
+  last_commit: "db13b6b"
+  summary: "phase p3: phase inference and no-op save support implemented — /dev-status infers phase from 5 sources, /dev-save supports clean-workspace checkpoints, current-focus.md prevention rule added"
 
 confidence:
   state_confidence: high

@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-/dev-status protocol commit detection complete. /dev-status now recognizes multiple protocol commit patterns: chore(checkpoint), chore(protocol), chore(state), and semantic indicators ("sync state" or "protocol" with only .agents/ or docs/ changes). All protocol-only commits between checkpoint.last_commit and HEAD are treated as expected behavior — drift = none with informational note only. Non-protocol commits still trigger high drift. Eliminates false positives from /dev-save commits regardless of prefix format.
+Phase A completion — command contract hardening. Implemented phase inference in /dev-status (5-step priority: next-phase-plan → roadmap → handoff → workflow-state → unknown). Implemented no-op save support in /dev-save (clean workspace allowed, records validated target/summary/reasoning). Added current-focus.md prevention rule. Created test plans for case-a (phase inference), case-b (no-op save), case-c (focus migration).
 
 ## Current Status
 
@@ -48,6 +48,11 @@
 - Fixed /dev-status to recognize chore(protocol) and chore(state) as protocol commits
 - Expanded protocol commit patterns beyond single chore(checkpoint) prefix
 - case-06 PASS on protocol commit detection fix commit
+- Implemented phase inference in /dev-status PROMPT.md (5-step priority)
+- Implemented no-op save support in /dev-save PROMPT.md (clean workspace allowed)
+- Added current-focus.md prevention rule to references/workflow-rules.md
+- Created case-a/b/c test plans for new protocol behavior
+- case-06 PASS on Phase A completion commit
 
 ## In Progress
 
