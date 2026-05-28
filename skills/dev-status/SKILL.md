@@ -202,6 +202,7 @@ Must provide:
 - detected drift (severity + specifics)
 - confidence level
 - recommended next action
+- protocol task status (workflow completed or pending tasks)
 
 ---
 

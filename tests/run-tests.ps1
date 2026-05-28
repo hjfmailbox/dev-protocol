@@ -28,6 +28,9 @@ function Get-CaseDirName {
         '18' { return 'case-18-active-work-reconstruction' }
         '19' { return 'case-19-real-status-stale-focus' }
         '20' { return 'case-20-checkpoint-freshness-runtime' }
+        '21' { return 'case-21-goal-completion-closes-workflow' }
+        '22' { return 'case-22-dev-save-completion-semantics' }
+        '23' { return 'case-23-no-op-validation-completion' }
         'A'  { return 'case-a-phase-inference' }
         'B'  { return 'case-b-noop-save' }
         'C'  { return 'case-c-focus-migration' }
@@ -940,6 +943,104 @@ if ($Case -eq '20') {
         Fail "case-20: PROMPT.md missing Checkpoint Freshness (divergence from SKILL.md)"
     }
     Pass-Check "case-20: PROMPT.md also contains Checkpoint Freshness (synchronized)"
+}
+
+# ── W. Case-21 specific checks (goal completion closes workflow) ─────
+
+if ($Case -eq '21') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-21 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-21 test-plan.md exists"
+
+    $PromptFile = Join-Path $PWD.Path "skills/dev-scope/PROMPT.md"
+    $SkillFile = Join-Path $PWD.Path "skills/dev-scope/SKILL.md"
+
+    if (-not (Test-Path $PromptFile)) {
+        Fail "case-21: skills/dev-scope/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $PromptFile -Raw
+
+    if ($PromptContent -notmatch "Workflow Status") {
+        Fail "case-21: /dev-scope prompt missing Workflow Status block"
+    }
+    Pass-Check "case-21: /dev-scope prompt contains Workflow Status"
+
+    if ($PromptContent -notmatch "No remaining protocol tasks") {
+        Fail "case-21: /dev-scope prompt missing 'No remaining protocol tasks'"
+    }
+    Pass-Check "case-21: /dev-scope prompt declares no remaining tasks"
+
+    $SkillContent = Get-Content $SkillFile -Raw
+    if ($SkillContent -notmatch "Scope declaration complete" -and $SkillContent -notmatch "Workflow completed") {
+        Fail "case-21: /dev-scope SKILL.md missing completion declaration"
+    }
+    Pass-Check "case-21: /dev-scope SKILL.md defines completion reporting"
+}
+
+# ── X. Case-22 specific checks (dev-save completion semantics) ───────
+
+if ($Case -eq '22') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-22 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-22 test-plan.md exists"
+
+    $PromptFile = Join-Path $PWD.Path "skills/dev-save/PROMPT.md"
+    $SkillFile = Join-Path $PWD.Path "skills/dev-save/SKILL.md"
+
+    if (-not (Test-Path $PromptFile)) {
+        Fail "case-22: skills/dev-save/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $PromptFile -Raw
+
+    if ($PromptContent -notmatch "Workflow completed") {
+        Fail "case-22: /dev-save prompt missing 'Workflow completed'"
+    }
+    Pass-Check "case-22: /dev-save prompt declares workflow completion"
+
+    if ($PromptContent -notmatch "No remaining protocol tasks") {
+        Fail "case-22: /dev-save prompt missing 'No remaining protocol tasks'"
+    }
+    Pass-Check "case-22: /dev-save prompt declares no remaining tasks"
+
+    $SkillContent = Get-Content $SkillFile -Raw
+    if ($SkillContent -notmatch "Workflow completed") {
+        Fail "case-22: /dev-save SKILL.md missing completion declaration"
+    }
+    Pass-Check "case-22: /dev-save SKILL.md defines completion reporting"
+}
+
+# ── Y. Case-23 specific checks (no-op validation completion) ─────────
+
+if ($Case -eq '23') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-23 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-23 test-plan.md exists"
+
+    $SavePrompt = Join-Path $PWD.Path "skills/dev-save/PROMPT.md"
+    $StatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+
+    if (-not (Test-Path $SavePrompt)) {
+        Fail "case-23: skills/dev-save/PROMPT.md not found"
+    }
+    $SaveContent = Get-Content $SavePrompt -Raw
+
+    if ($SaveContent -notmatch "Workflow completed \(no-op\)") {
+        Fail "case-23: /dev-save prompt missing no-op completion declaration"
+    }
+    Pass-Check "case-23: /dev-save prompt defines no-op completion"
+
+    if (-not (Test-Path $StatusPrompt)) {
+        Fail "case-23: skills/dev-status/PROMPT.md not found"
+    }
+    $StatusContent = Get-Content $StatusPrompt -Raw
+
+    if ($StatusContent -notmatch "Protocol Task Status") {
+        Fail "case-23: /dev-status prompt missing Protocol Task Status section"
+    }
+    Pass-Check "case-23: /dev-status prompt contains Protocol Task Status"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

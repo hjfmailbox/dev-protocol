@@ -137,6 +137,7 @@ If the user's request is ambiguous:
 - Include machine-checkable validation criteria
 - Prefer smaller scopes (1-3 files ideal)
 - Suggest decomposition for scopes affecting 8+ files
+- Report "Scope declaration complete" and "No remaining protocol tasks pending" on success
 
 ## DO NOT
 

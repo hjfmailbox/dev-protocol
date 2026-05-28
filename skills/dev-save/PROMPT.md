@@ -212,6 +212,10 @@ After successful commit, output:
 - Branch: <branch>
 - Workspace: <clean/dirty>
 
+**Workflow Status**:
+- Workflow completed
+- No remaining protocol tasks
+
 **Next Steps**:
 1. Continue working or start a new session with /dev-status
 ```
@@ -238,6 +242,10 @@ After successful commit, output:
 - Last commit: <hash>
 - Branch: <branch>
 - Workspace: clean
+
+**Workflow Status**:
+- Workflow completed (no-op)
+- No remaining protocol tasks
 
 **Next Steps**:
 1. Continue working or start a new session with /dev-status

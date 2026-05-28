@@ -35,12 +35,12 @@ COMPLETED
 
 - .agents/dev-protocol/goal-output.json
 - .agents/dev-protocol/goal-output.md
-- docs/command-contracts.md
-- docs/v2-redesign-roadmap.md
-- skills/dev-status/PROMPT.md
-- tests/case-16-stale-focus-contamination/test-plan.md
-- tests/case-17-checkpoint-freshness/test-plan.md
-- tests/case-18-active-work-reconstruction/test-plan.md
+- docs/runtime-audit.md
+- skills/dev-save/SKILL.md
+- skills/dev-scope/SKILL.md
+- skills/dev-status/SKILL.md
+- tests/case-19-real-status-stale-focus/test-plan.md
+- tests/case-20-checkpoint-freshness-runtime/test-plan.md
 - tests/run-tests.ps1
 ## Stop Reason
 

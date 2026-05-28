@@ -339,6 +339,9 @@ Provide:
 
 **Recommended Next Action**:
 - <concrete next step>
+
+**Protocol Task Status**:
+- <workflow completed / X pending tasks>
 ```
 
 For drift severity **high**:

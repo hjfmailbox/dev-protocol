@@ -159,6 +159,11 @@ After outputting the scope:
 
 "Review the scope above. Confirm or refine before proceeding to implementation."
 
+**Workflow Status**:
+- Scope declaration complete
+- No remaining protocol tasks pending
+- Awaiting user confirmation before /goal
+
 ---
 
 ## DO

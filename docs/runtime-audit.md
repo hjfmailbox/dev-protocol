@@ -20,6 +20,9 @@ Fixes that have been validated through actual test execution or runtime behavior
 | Focus inference precedence in PROMPT.md | case-16 PASS; /dev-status prompt contains Focus Inference section | **VERIFIED** (static) |
 | Checkpoint freshness model in PROMPT.md | case-17 PASS; /dev-status prompt contains Checkpoint Freshness Model | **VERIFIED** (static) |
 | Active work reconstruction in PROMPT.md | case-18 PASS; /dev-status prompt contains Active Work Reconstruction | **VERIFIED** (static) |
+| Workflow completion semantics in /dev-save | case-22 PASS; prompt and SKILL.md declare "Workflow completed" | **VERIFIED** (static) |
+| Workflow completion semantics in /dev-scope | case-21 PASS; prompt and SKILL.md declare completion | **VERIFIED** (static) |
+| No-op completion semantics | case-23 PASS; no-op save declares "Workflow completed (no-op)" | **VERIFIED** (static) |
 
 **Note**: "static" means the fix is present in prompt files and validated by keyword matching in tests. It does NOT mean the behavior has been observed in a live `/dev-status` execution.
 
@@ -43,6 +46,15 @@ This gap has been closed: `SKILL.md` now contains all three concepts.
 
 ---
 
+## Verified Fixes (Runtime Audit Update)
+
+| Fix | Evidence | Status |
+|---|---|---|
+| Stale task residue elimination | case-21~23 PASS; all slash prompts now declare explicit completion | **VERIFIED** (static) |
+| SKILL.md/PROMPT.md synchronization for completion semantics | All three commands (dev-status, dev-save, dev-scope) synchronized | **VERIFIED** (static) |
+
+---
+
 ## Suspicious Areas
 
 Areas where runtime behavior may still diverge from documented contracts.
@@ -54,6 +66,7 @@ Areas where runtime behavior may still diverge from documented contracts.
 | Checkpoint freshness thresholds | `0-1`, `2-5`, `>5` are heuristic; real projects may need tuning | Documented as v2 scope limitation |
 | Active work aggregation | "2+ commits share a topic" is fuzzy; may produce inconsistent themes | Documented as heuristic, not deterministic rule |
 | Phase inference from git reality | Branch names and commit patterns are project-dependent heuristics | Documented as inference, not guaranteed correct |
+| Task lifecycle enforcement | Claude Code task API is independent of protocol; protocol can only recommend closure | Documented as v2 scope limitation -- protocol cannot force task closure |
 
 ---
 
@@ -66,6 +79,9 @@ Areas where runtime behavior may still diverge from documented contracts.
 | case-18 | Prompt contains Active Work Reconstruction | Static keyword check only |
 | case-19 | **Real** `/dev-status` does not return stale focus | Requires live execution (added in this audit) |
 | case-20 | **Real** `/dev-status` outputs correct freshness level | Requires live execution (added in this audit) |
+| case-21 | `/dev-scope` declares workflow completion | Static keyword check only |
+| case-22 | `/dev-save` declares workflow completion | Static keyword check only |
+| case-23 | No-op save declares completion | Static keyword check only |
 
 ---
 

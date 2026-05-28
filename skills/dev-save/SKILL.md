@@ -143,6 +143,7 @@ FAIL. Report why recovery is insufficient.
 - Update `checkpoint.last_commit` to current HEAD
 - Validate state consistency before committing
 - Allow no-op saves on clean workspace
+- Report "Workflow completed" and "No remaining protocol tasks" on success
 
 ## DO NOT
 
