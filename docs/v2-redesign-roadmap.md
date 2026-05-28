@@ -1,180 +1,282 @@
-# Stabilization Roadmap
+# Protocol Iteration Roadmap
 
-Post-v2 roadmap after feature freeze.
-
-Direction switched from **feature delivery** to **stability + ergonomics + protocol robustness**.
-
----
-
-## Phase A — Stabilization
-
-Goal: Harden onboarding, fix state reconciliation, document command contracts.
-
-### A1. Command contract documentation
-
-Document the exact contract for each v2 command:
-
-- `/dev-init` — what it does, what it does not do, what it outputs
-- `/dev-scope` — scope format, validation criteria, ambiguity rules
-- `/dev-save` — staging rules, commit format, auto-commit behavior
-- `/dev-status` — read-only guarantee, drift classification, reconstruction rules
-
-Source of truth: `skills/*/SKILL.md` and `skills/*/PROMPT.md`.
-
-Deliverable: `docs/command-contracts.md`
-
-### A2. Project onboarding hardening
-
-From deferred D08 (protocol documentation split):
-
-- Clarify ownership boundaries between `docs/` and `.agents/dev-protocol/docs/`
-- Define authoritative runtime docs vs public documentation
-- Document synchronization rules
-
-From deferred D04 (/dev-status phase recovery):
-
-- `/dev-status` should infer reasonable working phase automatically
-- Weighted inference from: protocol state, recent commits, checkpoint summary
-- Reduce `phase: unknown` frequency
-
-From real-project validation friction:
-
-- `/dev-init` warns if `.agents/` matches `.gitignore`
-- `/dev-init` on dirty workspace requires explicit confirmation
-- `/dev-init` does not overwrite existing state without reason
-
-### A3. State simplification
-
-From deferred D08:
-
-- Two documentation locations exist: `docs/` and `.agents/dev-protocol/docs/`
-- Ambiguity about source of truth
-
-Action:
-
-- Define `docs/` = public, user-facing documentation
-- Define `.agents/dev-protocol/docs/` = runtime protocol and agent-facing documentation
-- Document this separation in README and onboarding
-
-See `docs/state-file-review.md` for full analysis.
-
-### A4. Save/status guard fixes
-
-From deferred D04:
-
-- `/dev-status` phase recovery remains weak
-- Infer active phase using weighted signals instead of defaulting to `unknown`
-
-From deferred D09:
-
-- Checkpoint commits rely on naming conventions (`chore(protocol):`, `chore(checkpoint):`)
-- Make protocol commits structurally identifiable
-- Consider explicit metadata marker (`[protocol-checkpoint]`)
-
-From deferred D05:
-
-- `/dev-save` should fully close workflow task state
-- Successful save implies task closure semantics
-- No stale pending protocol task remains
+> **Living document**. This is the current execution roadmap, not a historical record.
+>
+> **Rule**: Before starting any work, verify this roadmap matches reality. If it does not, update it first.
 
 ---
 
-## Phase B — Ergonomics
+## Current Status
 
-Goal: Reduce workflow friction, support planned execution, handle edge cases.
+**Phase**: p3 -- Stabilization (active)
 
-### B1. Reduce `/dev-scope` → `/goal` duplication
+**What is frozen**:
 
-From deferred D01:
+* v2 command surface (`/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status`)
+* State file format (`workflow-state.yml`, `handoff.md`, `project-rules.md`)
+* Protocol commit conventions (`chore(checkpoint):`, `chore(protocol):`, `chore(state):`)
+* Drift detection and classification rules
+* Runtime-agnostic core architecture
 
-- Simple scoped work requires both `/dev-scope` and `/goal`
-- Introduce lightweight execution mode: `/dev-scope --execute` or implicit auto-execution
-- Keep explicit `/goal` for: multi-step planning, repo-wide changes, ambiguous work
+**What is complete**:
 
-### B2. Continue loop
+* [x] v2 command surface defined and implemented
+* [x] v1 commands deprecated with redirect aliases
+* [x] State file templates and validation rules
+* [x] Runtime directory at `.agents/dev-protocol/`
+* [x] Commit convention and failure policy
+* [x] Unified onboarding guide with happy path and recovery paths
+* [x] External benchmark of 7 workflow systems -- assessment: READY\_TO\_FREEZE\_V2
+* [x] Command contracts documented (`docs/command-contracts.md`)
+* [x] Phase inference implemented (5-step priority: next-phase-plan \> roadmap \> handoff \> workflow-state \> unknown)
+* [x] No-op save support (clean workspace checkpoint commits)
+* [x] Protocol commit detection stable (case-12)
+* [x] Test matrix expanded to case-12 + case-A/B/C
+* [x] All active tests passing: case-05~12 PASS, case-A/B/C PASS
 
-From deferred D02:
+**What remains active**:
 
-- Planned execution requires repeated manual orchestration
-- Add plan-aware continuation mode
-- Sources: `next-phase-plan.md`, `current-focus.md`, recent completed loops
-- Automatically detect next planned loop, derive scope, execute workflow
-
-### B3. No-op validation support
-
-From deferred D07:
-
-- Some loops conclude with `behavior already correct` (no implementation required)
-- Current workflow assumes every loop produces code/docs changes
-- Planning workflow should explicitly recognize: validation loop, verification loop, no-op success
-
-From deferred D03:
-
-- `/dev-save` optional arguments for explicit context
-- Support: `/dev-save "loop 5 undo implementation"`, `/dev-save --summary="loop 5"`
-- Fully backward compatible, no required arguments
+* Stabilization of edge cases and documentation drift
+* Onboarding hardening for real-project validation
+* Workflow compression design (not yet implemented)
 
 ---
 
-## Phase C — Long-running robustness
+## Immediate Fixes (Now)
 
-Goal: Support deterministic replay, eliminate stale state, prevent drift.
+Goal: Close remaining stabilization gaps before real-project validation.
 
-### C1. Deterministic replay
+### N1. Project background generation
 
-From deferred D06 (constants coverage audit):
+**Problem**: When an agent first opens a repository, reconstructing project reality requires reading many files across the codebase. There is no single document that captures the essential project context for fast agent onboarding.
 
-- Duplicated literals may gradually reappear after implementation loops
-- Examples: thresholds, retry intervals, timeout values, status literals
-- Add periodic audit command or validation: `/dev-audit-constants`
-- Ensure no duplicated thresholds, no repeated timeout literals, no status string drift
+**Target**: Add a `dev-*` workflow or script that generates a project background document.
 
-### C2. Stale task residue
+**Contents**:
 
-From deferred D05:
+* Project structure and directory layout
+* Technology stack and dependencies
+* Runtime architecture
+* Conventions (naming, organization, patterns)
+* Important folders and their roles
+* Key workflows (build, test, deploy)
 
-- After successful `/dev-save`, Claude Code may retain stale internal tasks
-- Successful save should imply: checkpoint complete, protocol task resolved
-- Improve completion behavior so protocol save cleanly terminates workflow context
+**Explicitly not**:
 
-### C3. Save guard improvements
+* Not a requirements document
+* Not a design spec
+* Not a task list
 
-From deferred D03:
+**Deliverable**: `PROJECT_BACKGROUND.md` generator or template, integrated into `/dev-init` or as a standalone `/dev-background` command.
 
-- `/dev-save` optional arguments for explicit metadata control
-- User can provide checkpoint summary, save reason, commit context explicitly
-- Preserve current auto behavior as default
+**Source**: `C` in goal directive.
+
+---
+
+### N2. Test coverage completion
+
+**Problem**: The test matrix has expanded to case-12, but some scenarios remain without automated validation. run-tests.ps1 still validates static files and prompt keywords, not runtime behavior.
+
+**Remaining gaps**:
+
+| Gap | Status | Case |
+|---|---|---|
+| Slash command edge cases | Partial | case-07 (dirty workspace) validated via prompt keywords only |
+| Dirty workspace onboarding | Missing | No automated test for `/dev-init` on dirty workspace |
+| History rewrite recovery | Partial | case-09 validated via prompt keywords only |
+| Protocol replay | Missing | No test for deterministic state reconstruction |
+| `/dev-init` full onboarding | Missing | No validation of YAML generation, phase default, empty last\_commit |
+| `/dev-scope` ambiguity detection | Missing | No validation of fuzzy input handling |
+
+**Target**: Close gaps by either:
+
+1. Adding automated static validation where possible (prompt keyword checks, file structure checks)
+2. Documenting manual validation steps where automated testing is not feasible
+3. Marking gaps as "requires manual verification" in test matrix
+
+**Deliverable**: Updated `docs/test-matrix.md` with explicit PASS/MANUAL/SKIP status per scenario.
+
+**Source**: `D` in goal directive.
+
+---
+
+### N3. Documentation drift cleanup
+
+**Problem**: v1-era references remain in multiple documents, causing confusion for new contributors and agents.
+
+**Known drift items**:
+
+* [ ] `PROJECT_BACKGROUND.md` -- references `/dev-bootstrap`, `/dev-checkpoint`, `/dev-resume`
+* [ ] `references/workflow-rules.md` -- example workflow uses v1 commands
+* [ ] `skills/dev-checkpoint/PROMPT.md` -- claims "NEVER stage files, NEVER auto-commit" (contradicts v2 `/dev-save`)
+* [ ] `skills/dev-resume/PROMPT.md` -- uses old drift terms "none/minor/major"
+* [ ] `skills/dev-bootstrap/PROMPT.md` -- references legacy `.agent/` path
+* [ ] `skills/dev-help/PROMPT.md` -- displays v1 command table
+* [ ] `skills/dev-doctor/PROMPT.md` -- may reference v1 diagnostics
+
+**Target**: Audit and update all v1 alias skills to consistent redirect semantics. Update all example workflows in docs to use v2 commands.
+
+**Deliverable**: Clean v1 references across `skills/*/` and `docs/`.
+
+---
+
+## Near-term Iteration (Next)
+
+Goal: Reduce friction for iterative development. Design-only unless explicitly scoped.
+
+### X1. `/dev-scope` to `/goal` friction reduction
+
+**Problem**: Simple scoped work currently requires both `/dev-scope` and `/goal`, creating unnecessary steps for low-risk changes.
+
+**Design status**: Documented in `docs/workflow-compression.md`. Implementation frozen until stabilization complete.
+
+**Direction**:
+
+* Lightweight execution mode for simple scopes (single-file changes, no API changes, validation criteria trivial)
+* Keep explicit `/goal` for: multi-step planning, repo-wide changes, ambiguous work
+
+**Deliverable**: Design doc update or prototype. Not for implementation in this phase.
+
+---
+
+### X2. Continue loop execution
+
+**Problem**: Planned execution still requires repeated manual orchestration even when `next-phase-plan.md` exists.
+
+**Design status**: Documented in `docs/workflow-compression.md`. Implementation frozen until stabilization complete.
+
+**Direction**:
+
+* Detect next planned loop from `next-phase-plan.md`
+* Derive scope automatically
+* Execute workflow with minimal agent intervention
+
+**Deliverable**: Design doc update or prototype. Not for implementation in this phase.
+
+---
+
+### X3. No-op workflow formalization
+
+**Status**: Already implemented in `/dev-save`. Clean workspace produces valid checkpoint commit.
+
+**Remaining work**: Document no-op loop as a first-class workflow outcome in planning conventions.
+
+**Deliverable**: Update `references/workflow-rules.md` or `docs/command-contracts.md` to explicitly list no-op/verification loop as valid workflow pattern.
+
+---
+
+### X4. Save metadata arguments
+
+**Problem**: `/dev-save` infers checkpoint summary and save reason heuristically. User cannot provide explicit context.
+
+**Target**: Support optional arguments such as:
+
+```text
+/dev-save "loop 5 undo implementation"
+/dev-save --summary="loop 5"
+```
+
+**Rules**:
+
+* Fully backward compatible
+* No required arguments
+* Preserve current auto behavior as default
+
+**Deliverable**: Design doc or prototype. Implementation optional for this phase.
+
+---
+
+## Deferred / Later
+
+Goal: Long-running robustness. Not scheduled until stabilization and near-term iteration are complete.
+
+### L1. Deterministic replay
+
+Support replaying protocol state transitions deterministically from a clean state. Enables:
+
+* Regression testing of protocol behavior
+* Recovery from total state loss
+* Verification that state transitions are reproducible
+
+**Blocked by**: Stabilization of state file format and save semantics.
+
+---
+
+### L2. Stale task residue
+
+After successful `/dev-save`, the agent runtime may retain stale internal task context. Target:
+
+* Successful save implies clean task termination
+* No stale pending protocol task remains
+
+**Blocked by**: Requires integration with agent runtime task lifecycle (Claude Code-specific).
+
+---
+
+### L3. Constants audit
+
+Periodic validation ensuring no duplicated literals drift into the codebase:
+
+* Thresholds
+* Retry intervals
+* Timeout values
+* Status literals
+
+**Blocked by**: Requires AST parsing or structured grep across skills/ and scripts/.
+
+---
+
+### L4. Protocol checkpoint metadata
+
+Make protocol commits structurally identifiable beyond naming conventions.
+
+**Options**:
+
+* Explicit metadata marker in commit body (`[protocol-checkpoint]`)
+* Structured commit annotation (trailers)
+* Commit message footer with protocol version
+
+**Blocked by**: Requires consensus on format and backward compatibility with existing commits.
 
 ---
 
 ## Exit Criteria
 
-Phase A is complete when:
+**Stabilization phase (p3) is complete when**:
 
-- All command contracts documented
-- Onboarding hardened with dirty-workspace and gitignore detection
-- State file boundaries clarified
-- `/dev-status` phase recovery improved
+- [ ] All v1 references removed from docs and alias skills
+- [ ] Test matrix explicitly marks all gaps (automated vs manual vs missing)
+- [ ] Project background generation workflow defined
+- [ ] No-op workflow documented as first-class outcome
+- [ ] Real-project validation checklist executed on at least one external project
+- [ ] `docs/test-matrix.md` and `run-tests.ps1` are in sync (no orphaned cases, no missing mappings)
 
-Phase B is complete when:
+**Near-term iteration phase begins when**:
 
-- `/dev-scope --execute` or equivalent reduces scope-to-goal friction
-- Plan-aware continuation mode implemented
-- No-op goals handled without false failures
-- Optional `/dev-save` arguments supported
+- Stabilization exit criteria met
+- External validation confirms no critical workflow friction
+- Design docs for workflow compression reviewed
 
-Phase C is complete when:
+**Deferred items enter schedule when**:
 
-- Constants audit command exists
-- Stale task residue eliminated
-- Protocol commits structurally identifiable
+- Near-term iteration complete
+- State format declared stable (no breaking changes for 3+ iterations)
+- External adoption justifies investment in robustness features
 
 ---
 
-## Deferred Items Not in Scope
+## How to Update This Roadmap
 
-These remain in `.agents/dev-protocol/docs/deferred-improvements.md` and are not assigned to any phase:
+1. **After `/dev-save`**: Review this document. Move completed items to "What is complete".
+2. **When reality changes**: Update "Current Status" immediately. Do not let the roadmap drift from reality.
+3. **When adding work**: Add to appropriate section. If unsure, add to "Deferred / Later" and discuss.
+4. **When removing work**: Do not delete. Move to "What is complete" with `[x]` or mark as `[wontfix]` with reason.
 
-- D06: Constants coverage audit (assigned to Phase C)
-- D08: Protocol documentation split (assigned to Phase A)
-- D09: Workflow checkpoint semantics (assigned to Phase A)
+**Source of truth**: This file (`docs/v2-redesign-roadmap.md`).
+
+**Related documents**:
+
+* `.agents/dev-protocol/docs/deferred-improvements.md` -- unresolved improvements with demonstrated workflow value
+* `docs/test-matrix.md` -- protocol critical path test scenarios
+* `docs/command-contracts.md` -- command contracts and failure modes
+* `docs/workflow-compression.md` -- workflow compression design (frozen)

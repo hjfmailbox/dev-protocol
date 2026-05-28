@@ -16,11 +16,12 @@ dev-protocol solves this by persisting development state to durable files in the
 
 Before making any changes:
 
-1. Read `PROJECT_BACKGROUND.md`
-2. Read `.agents/dev-protocol/handoff.md`
-3. Run `/dev-status`
-4. Check `.agents/dev-protocol/docs/deferred-improvements.md`
-5. Follow active roadmap instead of inventing new direction
+1. **Read `docs/v2-redesign-roadmap.md`** -- this is the current execution roadmap and single source of truth for active work
+2. Read `PROJECT_BACKGROUND.md`
+3. Read `.agents/dev-protocol/handoff.md`
+4. Run `/dev-status`
+5. Check `.agents/dev-protocol/docs/deferred-improvements.md`
+6. Follow active roadmap instead of inventing new direction
 
 This repository is developed using **dev-protocol itself**.
 
@@ -154,32 +155,56 @@ Test cases are under `tests/`:
 | `case-01-basic` | Full lifecycle: init → scope → work → save → status → idempotent save |
 | `case-05-first-checkpoint` | First save from an initialized (no prior checkpoint) state |
 | `case-06-goal-workflow` | Scope declaration and completion cycle |
+| `case-07-dirty-workspace` | Dirty workspace handling during save |
+| `case-08-noop-save` | No-op workflow with clean workspace |
+| `case-09-history-rewrite` | History rewrite (rebase/reset) resilience |
+| `case-10-compact-resume` | Session compaction survival |
+| `case-11-phase-inference` | Phase inference from context |
+| `case-12-protocol-commit` | Protocol commit classification |
+| `case-a-phase-inference` | Phase inference extended validation |
+| `case-b-noop-save` | No-op save extended validation |
+| `case-c-focus-migration` | Focus recovery without current-focus.md |
+
+Run all tests:
+
+```bash
+pwsh tests/run-tests.ps1
+```
+
+For the full protocol test matrix, see [`docs/test-matrix.md`](docs/test-matrix.md).
 
 ## Current Status
 
 **Phase**: p3 (v2-frozen-ready-for-real-project-validation) — **active**
 
 **Completed**:
-- v2 command surface defined (init, scope, save, status)
-- v1 commands deprecated with migration path
+- v2 command surface defined and implemented (`/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status`)
+- v1 commands deprecated with redirect aliases
 - State file templates and validation rules
 - Runtime directory at `.agents/dev-protocol/`
 - Commit convention and failure policy
-- case-05 and case-06 test validation passed (17/17 checks)
-- v1 retrospective completed and frozen
-- Unified onboarding guide with happy path and recovery path
+- Unified onboarding guide with happy path and recovery paths
 - Validation order explicitly documented
 - `.agents` directory convention documented
-- Incident logging mechanism
-- Real-project onboarding guide
-- External benchmark of 7 workflow systems (ECC, Superpowers, Spec Kit, LangGraph, wshobson/commands, barkain, Microsoft Agent Framework)
-- v2 freeze readiness assessment: READY_TO_FREEZE_V2
+- External benchmark of 7 workflow systems -- assessment: READY_TO_FREEZE_V2
+- Command contracts documented (`docs/command-contracts.md`)
+- Phase inference implemented (5-step priority)
+- No-op save support (clean workspace checkpoint commits)
+- Protocol commit detection stable (case-12)
+- Test matrix expanded to case-12 + case-A/B/C
+- All active tests passing: case-05~12 PASS, case-A/B/C PASS
+
+**In progress (stabilization)**:
+- v1 reference cleanup across docs and alias skills
+- Project background generation workflow
+- Test coverage gap closure
 
 **Known limitations (v2 scope)**:
 - Single-agent only (no multi-agent support)
 - No auto-repair or complex document inference
 - No advanced hooks or long-term memory
 - Confidence downgrade mechanism untested in real projects
+- Workflow compression design complete, implementation deferred
 
 ## Runtime Support
 
