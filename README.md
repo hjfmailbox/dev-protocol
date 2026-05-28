@@ -17,11 +17,12 @@ dev-protocol solves this by persisting development state to durable files in the
 Before making any changes:
 
 1. **Read `docs/v2-redesign-roadmap.md`** -- this is the current execution roadmap and single source of truth for active work
-2. Read `PROJECT_BACKGROUND.md`
-3. Read `.agents/dev-protocol/handoff.md`
-4. Run `/dev-status`
-5. Check `.agents/dev-protocol/docs/deferred-improvements.md`
-6. Follow active roadmap instead of inventing new direction
+2. **Read `docs/command-contracts.md`** -- exact contracts for when/how to use each `/dev-*` command
+3. Read `PROJECT_BACKGROUND.md`
+4. Read `.agents/dev-protocol/handoff.md`
+5. Run `/dev-status`
+6. Check `.agents/dev-protocol/docs/deferred-improvements.md`
+7. Follow active roadmap instead of inventing new direction
 
 This repository is developed using **dev-protocol itself**.
 

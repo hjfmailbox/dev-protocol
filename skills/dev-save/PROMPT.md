@@ -245,14 +245,46 @@ After successful commit, output:
 
 ---
 
-## RULES
+## DO
 
-- **NEVER modify source code**
-- **NEVER stage non-protocol files**
+- Stage ONLY `.agents/dev-protocol/*` files
+- Create protocol commit with `chore(checkpoint):` prefix
+- Update `checkpoint.last_commit` to current HEAD
+- Validate state consistency before committing
+- Allow no-op saves on clean workspace
+- Prefer git reality over persisted state
+- Overwrite state, never append history
+
+## DO NOT
+
+- **NEVER stage or commit source code files**
+- **NEVER stage or commit non-protocol files**
+- **NEVER create mixed commits** (protocol + source changes together)
 - **NEVER ask for confirmation** — commit automatically
+- **NEVER modify source code**
 - **NEVER partially succeed**
 - **NEVER invent progress**
+- **NEVER overwrite state without validation**
+- **NEVER proceed if both protocol files AND source files are staged** — unstage source files first
+
+## PRECONDITIONS
+
+- `.agents/dev-protocol/workflow-state.yml` exists
+- `.agents/dev-protocol/handoff.md` exists
+- Git repository is initialized
+- `git rev-parse HEAD` succeeds
+
+## FAILURE CONDITIONS
+
+STOP and report failure if ANY of the following occur:
+
+- State files do not exist
+- `workflow-state.yml` is invalid YAML or missing required fields
+- Fresh session cannot reconstruct context from state files
+- Both protocol files and source files are staged (mixed commit detected)
+- `git commit` fails for any reason
+
+## RULES
+
 - **ALWAYS validate before committing**
-- **ALWAYS prefer git reality over persisted state**
-- **ALWAYS overwrite state, never append history**
 - **ALWAYS create a protocol commit** — do not leave modified state files unstaged

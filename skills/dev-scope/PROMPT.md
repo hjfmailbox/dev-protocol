@@ -161,13 +161,41 @@ After outputting the scope:
 
 ---
 
+## DO
+
+- Ask clarifying questions when intent is ambiguous
+- Define explicit in-scope and out-of-scope boundaries
+- Include machine-checkable validation criteria
+- Prefer smaller scopes (1–3 files ideal)
+- Suggest decomposition for scopes affecting 8+ files
+- Include validation criteria in every scope
+- Distinguish in-scope from out-of-scope explicitly
+
+## DO NOT
+
+- **NEVER implement code**
+- **NEVER modify repository files**
+- **NEVER commit or checkpoint**
+- **NEVER silently expand scope**
+- **NEVER proceed with ambiguous requirements**
+- **NEVER force /goal for trivial single-file changes** -- simple tasks may skip explicit /goal
+
+## PRECONDITIONS
+
+- Git repository is initialized
+- Project state is known (run `/dev-status` first if unsure)
+
+## FAILURE CONDITIONS
+
+STOP and report failure if ANY of the following occur:
+
+- User intent is empty and no input provided
+- Scope boundaries cannot be determined after clarifying questions
+- Validation criteria are missing
+- Goal structure violates the output contract format
+
 ## RULES
 
-- NEVER implement code
-- NEVER modify repository files
-- NEVER commit or checkpoint
-- NEVER silently expand scope
-- NEVER proceed with ambiguous requirements
-- ALWAYS prefer smaller scopes
-- ALWAYS include validation criteria
-- ALWAYS distinguish in-scope from out-of-scope explicitly
+- **ALWAYS prefer smaller scopes**
+- **ALWAYS include validation criteria**
+- **ALWAYS distinguish in-scope from out-of-scope explicitly**

@@ -136,10 +136,10 @@ When `workflow-state.yml` reports `phase: unknown` or phase is stale:
 Infer phase using strict priority order. Stop at first valid result.
 
 ```
-1. next-phase-plan.md
-2. roadmap (docs/v2-redesign-roadmap.md or active roadmap)
-3. handoff.md
-4. workflow-state.yml (persisted phase, if not unknown)
+1. git reality (branch name, recent commit patterns, active work indicators)
+2. workflow-state.yml (persisted phase, if not unknown and checkpoint current)
+3. current-focus (handoff.md Current Focus section, mapped to phase language)
+4. roadmap (docs/v2-redesign-roadmap.md or active roadmap phase label)
 5. fallback: unknown
 ```
 
@@ -147,17 +147,17 @@ Infer phase using strict priority order. Stop at first valid result.
 
 | Source | Read | Valid Phase Indicators |
 |---|---|---|
-| next-phase-plan.md | `.agents/dev-protocol/next-phase-plan.md` | Pending loop content: "stabilization"/"hardening"/"fix" → `stabilization`; "ergonomics"/"compression"/"friction" → `ergonomics`; "robustness"/"replay"/"audit" → `robustness` |
-| roadmap | `docs/v2-redesign-roadmap.md` or active roadmap | "Current Direction" or "Current Phase" section. Explicit phase labels: `p0`-`p4`, `stabilization`, `ergonomics`, `robustness` |
-| handoff.md | `.agents/dev-protocol/handoff.md` | "Current Focus" section: stabilization language → `stabilization`; ergonomics language → `ergonomics`; "Next Recommended Actions" content |
+| git reality | `git status`, `git log --oneline -5`, `git branch` | Active feature branch with recent `feat:` commits → `development`; stabilization branch with `chore(checkpoint):` dominance → `stabilization`; active refactoring → `refactoring` |
 | workflow-state.yml | `.agents/dev-protocol/workflow-state.yml` | `current_state.phase` if not `unknown` and `checkpoint.last_commit` matches HEAD or HEAD~1 |
+| current-focus | `.agents/dev-protocol/handoff.md` | "Current Focus" section: stabilization language → `stabilization`; ergonomics language → `ergonomics`; "Next Recommended Actions" content |
+| roadmap | `docs/v2-redesign-roadmap.md` or active roadmap | "Current Direction" or "Current Phase" section. Explicit phase labels: `p0`-`p4`, `stabilization`, `ergonomics`, `robustness` |
 
 **Algorithm:**
 
-1. Read next-phase-plan.md. If exists and contains pending loops with phase indicators → use inferred phase.
-2. Read roadmap. If contains explicit phase label → use that phase.
+1. Inspect git reality. If branch name or recent commits indicate active work phase → use inferred phase from git.
+2. Read workflow-state.yml phase. If not `unknown` and checkpoint is current (matches HEAD or HEAD~1) → use persisted phase.
 3. Read handoff.md Current Focus. If contains phase-indicator language → map to phase.
-4. Read workflow-state.yml phase. If not `unknown` and checkpoint is current → use persisted phase.
+4. Read roadmap. If contains explicit phase label → use that phase.
 5. Output `unknown` with note: "Phase could not be inferred from available context."
 
 **Output format for inferred phase:**
@@ -168,6 +168,38 @@ Infer phase using strict priority order. Stop at first valid result.
 
 If phase was inferred, add note:
 "Phase was inferred from <source>. Run /dev-save to persist."
+
+## DO
+
+- Report phase with inference source when inferred
+- Prefer git reality over persisted state when they conflict
+- Report drift honestly
+- Reconstruct context from all available sources
+
+## DO NOT
+
+- **NEVER modify files**
+- **NEVER write state**
+- **NEVER auto-fix drift**
+- **NEVER commit or stage**
+- **NEVER create incident logs or any new files**
+- **NEVER scan the repository for work-in-progress indicators**
+- **NEVER perform recursive grep**
+- **NEVER assume branch names (no hardcoded `main`)**
+- **NEVER leave phase as `unknown` when git reality or other sources provide clear signal**
+
+## PRECONDITIONS
+
+- Git repository is initialized
+- Agent has read access to `.agents/dev-protocol/`
+
+## FAILURE CONDITIONS
+
+STOP and report failure if ANY of the following occur:
+
+- State files are missing and cannot be recovered
+- Repository is corrupted (`git status` fails)
+- State inconsistency is too severe to reconstruct context
 
 ### 4.2 Context Reconstruction
 

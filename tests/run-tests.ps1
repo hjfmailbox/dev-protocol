@@ -20,6 +20,9 @@ function Get-CaseDirName {
         '10' { return 'case-10-compact-resume' }
         '11' { return 'case-11-phase-inference' }
         '12' { return 'case-12-protocol-commit' }
+        '13' { return 'case-13-mixed-staged-files' }
+        '14' { return 'case-14-phase-inference-precedence' }
+        '15' { return 'case-15-scope-misuse' }
         'A'  { return 'case-a-phase-inference' }
         'B'  { return 'case-b-noop-save' }
         'C'  { return 'case-c-focus-migration' }
@@ -657,6 +660,113 @@ if ($Case -eq '12') {
         Fail "case-12: /dev-status prompt missing 'drift = high' classification"
     }
     Pass-Check "case-12: /dev-status prompt defines drift = high for source commits"
+}
+
+# ── O. Case-13 specific checks (mixed staged files) ──────────────────
+
+if ($Case -eq '13') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-13 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-13 test-plan.md exists"
+
+    # Verify /dev-save prompt contains mixed staged files rejection
+    $DevSavePrompt = Join-Path $PWD.Path "skills/dev-save/PROMPT.md"
+    if (-not (Test-Path $DevSavePrompt)) {
+        Fail "case-13: skills/dev-save/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevSavePrompt -Raw
+
+    if ($PromptContent -notmatch "mixed commit") {
+        Fail "case-13: /dev-save prompt missing mixed commit detection"
+    }
+    Pass-Check "case-13: /dev-save prompt detects mixed commits"
+
+    if ($PromptContent -notmatch "NEVER proceed if both protocol files AND source files are staged") {
+        Fail "case-13: /dev-save prompt missing staged mixed files rejection"
+    }
+    Pass-Check "case-13: /dev-save prompt rejects mixed staged files"
+
+    if ($PromptContent -notmatch "FAILURE CONDITIONS") {
+        Fail "case-13: /dev-save prompt missing FAILURE CONDITIONS block"
+    }
+    Pass-Check "case-13: /dev-save prompt defines FAILURE CONDITIONS"
+}
+
+# ── P. Case-14 specific checks (phase inference precedence) ──────────
+
+if ($Case -eq '14') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-14 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-14 test-plan.md exists"
+
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-14: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+
+    if ($PromptContent -notmatch "Phase Inference") {
+        Fail "case-14: /dev-status prompt missing Phase Inference section"
+    }
+    Pass-Check "case-14: /dev-status prompt contains phase inference"
+
+    # Verify precedence order: git reality > workflow-state > current-focus > roadmap > fallback
+    $GitPos = $PromptContent.IndexOf("git reality")
+    $WsPos = $PromptContent.IndexOf("workflow-state.yml")
+    $FocusPos = $PromptContent.IndexOf("current-focus")
+    $RoadmapPos = $PromptContent.IndexOf("roadmap")
+    $FallbackPos = $PromptContent.IndexOf("fallback")
+
+    if ($GitPos -eq -1 -or $WsPos -eq -1 -or $FocusPos -eq -1 -or $RoadmapPos -eq -1 -or $FallbackPos -eq -1) {
+        Fail "case-14: /dev-status prompt missing one or more precedence sources"
+    }
+
+    if (-not ($GitPos -lt $WsPos -and $WsPos -lt $FocusPos -and $FocusPos -lt $RoadmapPos -and $RoadmapPos -lt $FallbackPos)) {
+        Fail "case-14: phase inference precedence order incorrect (expected: git reality > workflow-state > current-focus > roadmap > fallback)"
+    }
+    Pass-Check "case-14: /dev-status prompt defines correct phase inference precedence"
+
+    if ($PromptContent -notmatch "DO NOT") {
+        Fail "case-14: /dev-status prompt missing DO NOT block"
+    }
+    Pass-Check "case-14: /dev-status prompt defines DO NOT constraints"
+}
+
+# ── Q. Case-15 specific checks (scope misuse detection) ──────────────
+
+if ($Case -eq '15') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-15 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-15 test-plan.md exists"
+
+    $DevScopePrompt = Join-Path $PWD.Path "skills/dev-scope/PROMPT.md"
+    if (-not (Test-Path $DevScopePrompt)) {
+        Fail "case-15: skills/dev-scope/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevScopePrompt -Raw
+
+    if ($PromptContent -notmatch "DO NOT") {
+        Fail "case-15: /dev-scope prompt missing DO NOT block"
+    }
+    Pass-Check "case-15: /dev-scope prompt defines DO NOT constraints"
+
+    if ($PromptContent -notmatch "PRECONDITIONS") {
+        Fail "case-15: /dev-scope prompt missing PRECONDITIONS block"
+    }
+    Pass-Check "case-15: /dev-scope prompt defines PRECONDITIONS"
+
+    if ($PromptContent -notmatch "FAILURE CONDITIONS") {
+        Fail "case-15: /dev-scope prompt missing FAILURE CONDITIONS block"
+    }
+    Pass-Check "case-15: /dev-scope prompt defines FAILURE CONDITIONS"
+
+    if ($PromptContent -notmatch "NEVER force /goal") {
+        Fail "case-15: /dev-scope prompt missing scope misuse detection (NEVER force /goal)"
+    }
+    Pass-Check "case-15: /dev-scope prompt detects scope misuse"
 }
 
 # ── Final result ─────────────────────────────────────────────────────
