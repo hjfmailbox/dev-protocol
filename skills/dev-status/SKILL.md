@@ -127,12 +127,63 @@ When `checkpoint.last_commit` differs from HEAD:
 | low | Minor inconsistency, context still usable |
 | high | Significant mismatch or unrecorded non-protocol commits |
 
-### 4. Reconstruct Context
+### 4. Checkpoint Freshness Model
+
+Measure how far `checkpoint.last_commit` is from HEAD:
+
+| Level | Source commits since checkpoint | Confidence |
+|---|---|---|
+| fresh | 0-1 | high |
+| stale | 2-5 | medium |
+| outdated | >5 | low |
+
+A **source commit** is any commit that is NOT a protocol commit (`chore(checkpoint):`, `chore(protocol):`, `chore(state):`).
+
+If checkpoint is stale or outdated, workflow-state focus is a LOW CONFIDENCE signal. Do NOT let old focus override new reality.
+
+### 5. Phase Inference
+
+When `workflow-state.yml` reports `phase: unknown` or phase is stale:
+
+Infer phase using strict priority order. Stop at first valid result.
+
+```
+1. git reality (branch name, recent commit patterns, active work indicators)
+2. workflow-state.yml (persisted phase, if not unknown and checkpoint current)
+3. current-focus (handoff.md Current Focus section, mapped to phase language)
+4. roadmap (docs/v2-redesign-roadmap.md or active roadmap phase label)
+5. fallback: unknown
+```
+
+### 6. Focus Inference
+
+Determine the current active focus using strict priority order. Stop at first valid result.
+
+```
+1. git reality (highest) -- recent commit subjects, branch names, changed files
+2. recent scoped work -- recent goal commits, docs changes, roadmap workstream
+3. workflow-state.yml -- ONLY if checkpoint is fresh (0-1 source commit since last checkpoint)
+4. current-focus (handoff.md Current Focus section)
+5. roadmap fallback
+6. unknown
+```
+
+**Downgrade rule:**
+If checkpoint is stale or outdated, `workflow-state.yml` focus is LOW CONFIDENCE. Do NOT let old focus override new reality. Prefer git-derived focus instead.
+
+### 7. Active Work Reconstruction
+
+When `/dev-save` has NOT been run after recent goal work, reconstruct active work from git history.
+
+Aggregate recent conventional commits (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`) by topic/theme. If 2+ commits share a topic, report that as active work.
+
+### 8. Reconstruct Context
 
 Rebuild:
 
-- current phase (from state, with drift note if mismatch)
-- active focus
+- current phase (from inference, with drift note if mismatch)
+- active focus (from inference, validated against recent commits)
+- active work (from reconstruction, if no recent save)
 - in-progress tasks
 - blockers
 - next actions
@@ -172,4 +223,6 @@ Must recommend `/dev-init` if recoverable state does not exist.
 - **NEVER write state**
 - **NEVER auto-fix drift**
 - **NEVER commit or stage**
+- **NEVER return stale focus when git reality indicates newer active work**
+- **NEVER leave phase as `unknown` when git reality or other sources provide clear signal**
 - **Read-only only**

@@ -33,6 +33,14 @@ COMPLETED
 
 ## Changed Files
 
+- .agents/dev-protocol/goal-output.json
+- .agents/dev-protocol/goal-output.md
+- docs/command-contracts.md
+- docs/v2-redesign-roadmap.md
+- skills/dev-status/PROMPT.md
+- tests/case-16-stale-focus-contamination/test-plan.md
+- tests/case-17-checkpoint-freshness/test-plan.md
+- tests/case-18-active-work-reconstruction/test-plan.md
 - tests/run-tests.ps1
 ## Stop Reason
 

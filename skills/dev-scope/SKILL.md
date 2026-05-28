@@ -130,19 +130,32 @@ If the user's request is ambiguous:
 
 ---
 
-## Hard Constraints
+## DO
+
+- Ask clarifying questions when intent is ambiguous
+- Define explicit in-scope and out-of-scope boundaries
+- Include machine-checkable validation criteria
+- Prefer smaller scopes (1-3 files ideal)
+- Suggest decomposition for scopes affecting 8+ files
+
+## DO NOT
 
 - **NEVER implement code**
 - **NEVER modify repository files**
 - **NEVER commit or checkpoint**
 - **NEVER silently expand scope**
+- **NEVER proceed with ambiguous requirements**
+- **NEVER force `/goal` for trivial single-file changes**
 - **Prefer smaller scopes over large scopes**
 
----
+## PRECONDITIONS
 
-## Failure Rules
+- Git repository is initialized
+- Project state is known (run `/dev-status` first if unsure)
 
-/dev-scope fails if:
+## FAILURE CONDITIONS
+
+STOP and report failure if ANY of the following occur:
 
 - user intent is empty and no input provided
 - scope boundaries cannot be determined

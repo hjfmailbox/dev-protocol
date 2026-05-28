@@ -26,6 +26,8 @@ function Get-CaseDirName {
         '16' { return 'case-16-stale-focus-contamination' }
         '17' { return 'case-17-checkpoint-freshness' }
         '18' { return 'case-18-active-work-reconstruction' }
+        '19' { return 'case-19-real-status-stale-focus' }
+        '20' { return 'case-20-checkpoint-freshness-runtime' }
         'A'  { return 'case-a-phase-inference' }
         'B'  { return 'case-b-noop-save' }
         'C'  { return 'case-c-focus-migration' }
@@ -865,6 +867,79 @@ if ($Case -eq '18') {
         Fail "case-18: /dev-status prompt missing recent commits reference"
     }
     Pass-Check "case-18: /dev-status prompt references recent commits"
+}
+
+# ── U. Case-19 specific checks (real status stale focus validation) ──
+
+if ($Case -eq '19') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-19 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-19 test-plan.md exists"
+
+    $SkillFile = Join-Path $PWD.Path "skills/dev-status/SKILL.md"
+    $PromptFile = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+
+    if (-not (Test-Path $SkillFile)) {
+        Fail "case-19: skills/dev-status/SKILL.md not found"
+    }
+    $SkillContent = Get-Content $SkillFile -Raw
+
+    if ($SkillContent -notmatch "Focus Inference") {
+        Fail "case-19: SKILL.md missing Focus Inference section"
+    }
+    Pass-Check "case-19: SKILL.md contains Focus Inference"
+
+    if ($SkillContent -notmatch "downgrade" -and $SkillContent -notmatch "low confidence") {
+        Fail "case-19: SKILL.md missing downgrade rule for stale checkpoints"
+    }
+    Pass-Check "case-19: SKILL.md defines downgrade rule"
+
+    if ($SkillContent -notmatch "NEVER return stale focus") {
+        Fail "case-19: SKILL.md missing stale focus prevention"
+    }
+    Pass-Check "case-19: SKILL.md prevents stale focus return"
+
+    # Cross-check with PROMPT.md
+    $PromptContent = Get-Content $PromptFile -Raw
+    if ($PromptContent -notmatch "Focus Inference") {
+        Fail "case-19: PROMPT.md missing Focus Inference (divergence from SKILL.md)"
+    }
+    Pass-Check "case-19: PROMPT.md also contains Focus Inference (synchronized)"
+}
+
+# ── V. Case-20 specific checks (checkpoint freshness runtime) ─────────
+
+if ($Case -eq '20') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-20 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-20 test-plan.md exists"
+
+    $SkillFile = Join-Path $PWD.Path "skills/dev-status/SKILL.md"
+    $PromptFile = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+
+    if (-not (Test-Path $SkillFile)) {
+        Fail "case-20: skills/dev-status/SKILL.md not found"
+    }
+    $SkillContent = Get-Content $SkillFile -Raw
+
+    if ($SkillContent -notmatch "Checkpoint Freshness") {
+        Fail "case-20: SKILL.md missing Checkpoint Freshness Model"
+    }
+    Pass-Check "case-20: SKILL.md contains Checkpoint Freshness"
+
+    if ($SkillContent -notmatch "fresh" -or $SkillContent -notmatch "stale" -or $SkillContent -notmatch "outdated") {
+        Fail "case-20: SKILL.md missing one or more freshness levels"
+    }
+    Pass-Check "case-20: SKILL.md defines all freshness levels"
+
+    # Cross-check with PROMPT.md
+    $PromptContent = Get-Content $PromptFile -Raw
+    if ($PromptContent -notmatch "Checkpoint Freshness") {
+        Fail "case-20: PROMPT.md missing Checkpoint Freshness (divergence from SKILL.md)"
+    }
+    Pass-Check "case-20: PROMPT.md also contains Checkpoint Freshness (synchronized)"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

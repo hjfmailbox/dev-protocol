@@ -2,6 +2,14 @@
   "goal_status": "COMPLETED",
   "goal_summary": "Decoupled Claude runtime integration from dev-protocol core. Refactored architecture so .claude/ becomes an optional runtime adapter, not a protocol dependency. Updated README, onboarding, workflow-rules, commit-rules, goal-output-contract, goal-prompt-template, goal-workflow, and created runtime-integrations.md.",
   "changed_files": [
+    ".agents/dev-protocol/goal-output.json",
+    ".agents/dev-protocol/goal-output.md",
+    "docs/command-contracts.md",
+    "docs/v2-redesign-roadmap.md",
+    "skills/dev-status/PROMPT.md",
+    "tests/case-16-stale-focus-contamination/test-plan.md",
+    "tests/case-17-checkpoint-freshness/test-plan.md",
+    "tests/case-18-active-work-reconstruction/test-plan.md",
     "tests/run-tests.ps1"
   ],
   "validation_results": [

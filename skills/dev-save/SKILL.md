@@ -129,10 +129,38 @@ FAIL. Report why recovery is insufficient.
 
 ---
 
+## Preconditions
+
+- `.agents/dev-protocol/workflow-state.yml` exists
+- `.agents/dev-protocol/handoff.md` exists
+- Git repository is initialized
+- `git rev-parse HEAD` succeeds
+
+## DO
+
+- Stage ONLY `.agents/dev-protocol/*` files
+- Create protocol commit with `chore(checkpoint):` prefix
+- Update `checkpoint.last_commit` to current HEAD
+- Validate state consistency before committing
+- Allow no-op saves on clean workspace
+
+## DO NOT
+
+- **NEVER stage or commit source code files**
+- **NEVER stage or commit non-protocol files**
+- **NEVER create mixed commits** (protocol + source changes together)
+- **NEVER proceed if both protocol files AND source files are staged**
+- **NEVER ask for confirmation** -- commit automatically
+- **NEVER mutate source code**
+- **NEVER partially succeed**
+- **Prefer current truth over historical description**
+- **State files only** -- only write to `.agents/dev-protocol/`
+
 ## Hard Constraints
 
 - **NEVER mutate source code**
 - **NEVER stage non-protocol files**
+- **NEVER create mixed commits**
 - **NEVER ask for confirmation** — commit automatically
 - **NEVER partially succeed**
 - **Prefer current truth over historical description**
@@ -150,3 +178,4 @@ FAIL. Report why recovery is insufficient.
 - state validation fails
 - recoverability validation fails
 - any corruption detected
+- mixed staged files detected (both protocol and source files staged)
