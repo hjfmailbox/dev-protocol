@@ -54,6 +54,52 @@ Repeat the scope → work → save → new session → status cycle as needed.
 In Claude Code, these semantic operations map to slash commands:
 `Init` = `/dev-init`, `Scope` = `/dev-scope`, `Save` = `/dev-save`, `Status` = `/dev-status`.
 
+## Protocol Workflow
+
+### Standard Implementation Loop
+
+```text
+/dev-status
+/dev-scope
+/goal
+implement
+/dev-save
+```
+
+1. `/dev-status` — Recover context in a fresh session
+2. `/dev-scope` — Declare a focused goal with validation criteria
+3. `/goal` — Implement changes within the declared scope
+4. `implement` — Make normal git commits during work
+5. `/dev-save` — Persist protocol state after completing the goal
+
+### Verification Loop
+
+Not every loop requires source code changes.
+
+```text
+/dev-status
+verify
+/dev-save
+```
+
+1. `/dev-status` — Recover context
+2. `verify` — Check existing behavior (e.g., audit, review, validation)
+3. `/dev-save` — Record verification result even if no files changed
+
+**Rule**: Not all loops produce code or documentation changes. Verification loops, no-op confirmations, and behavioral audits are valid outcomes. `/dev-save` supports these cases.
+
+### Command Reference
+
+| Command | When to Use | Never Use For |
+|---------|-------------|---------------|
+| `/dev-status` | Start of session, check state, detect drift | Saving progress, declaring goals, modifying files |
+| `/dev-scope` | Before any implementation work | Already-clear tasks, exploration without deliverables |
+| `/goal` | Implementation within a scoped objective | Unscoped work, saving state, inspecting context |
+| `/dev-save` | After completing work, before ending session | Uncommitted source changes you intend to keep, unscoped work |
+| `/dev-init` | First contact, missing state files, corrupted state | Projects with existing valid state |
+
+For detailed command contracts, see [`docs/command-contracts.md`](docs/command-contracts.md).
+
 ## Commands
 
 Protocol commands are semantic operations. The Claude Code representations use slash commands; other runtimes may use function calls, CLI tools, or chat prompts.
