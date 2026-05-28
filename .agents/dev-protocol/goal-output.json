@@ -5,11 +5,15 @@
     ".agents/dev-protocol/goal-output.json",
     ".agents/dev-protocol/goal-output.md",
     "docs/runtime-audit.md",
+    "skills/dev-save/PROMPT.md",
     "skills/dev-save/SKILL.md",
+    "skills/dev-scope/PROMPT.md",
     "skills/dev-scope/SKILL.md",
+    "skills/dev-status/PROMPT.md",
     "skills/dev-status/SKILL.md",
-    "tests/case-19-real-status-stale-focus/test-plan.md",
-    "tests/case-20-checkpoint-freshness-runtime/test-plan.md",
+    "tests/case-21-goal-completion-closes-workflow/test-plan.md",
+    "tests/case-22-dev-save-completion-semantics/test-plan.md",
+    "tests/case-23-no-op-validation-completion/test-plan.md",
     "tests/run-tests.ps1"
   ],
   "validation_results": [

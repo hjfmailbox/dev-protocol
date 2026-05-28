@@ -31,8 +31,8 @@
 * [x] Phase inference implemented (5-step priority: next-phase-plan \> roadmap \> handoff \> workflow-state \> unknown)
 * [x] No-op save support (clean workspace checkpoint commits)
 * [x] Protocol commit detection stable (case-12)
-* [x] Test matrix expanded to case-12 + case-A/B/C
-* [x] All active tests passing: case-05~12 PASS, case-A/B/C PASS
+* [x] Test matrix expanded to case-12 + case-24/25/26
+* [x] All active tests passing: case-05~26 PASS
 * [x] Focus inference implemented with git-reality precedence
 * [x] Checkpoint freshness model (fresh/stale/outdated)
 * [x] Active work reconstruction from recent commits

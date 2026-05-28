@@ -162,9 +162,9 @@ Test cases are under `tests/`:
 | `case-10-compact-resume` | Session compaction survival |
 | `case-11-phase-inference` | Phase inference from context |
 | `case-12-protocol-commit` | Protocol commit classification |
-| `case-a-phase-inference` | Phase inference extended validation |
-| `case-b-noop-save` | No-op save extended validation |
-| `case-c-focus-migration` | Focus recovery without current-focus.md |
+| `case-24-phase-inference-extended` | Phase inference extended validation |
+| `case-25-noop-save-extended` | No-op save extended validation |
+| `case-26-focus-migration` | Focus recovery without current-focus.md |
 
 Run all tests:
 

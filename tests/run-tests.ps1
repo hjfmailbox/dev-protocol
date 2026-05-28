@@ -31,9 +31,9 @@ function Get-CaseDirName {
         '21' { return 'case-21-goal-completion-closes-workflow' }
         '22' { return 'case-22-dev-save-completion-semantics' }
         '23' { return 'case-23-no-op-validation-completion' }
-        'A'  { return 'case-a-phase-inference' }
-        'B'  { return 'case-b-noop-save' }
-        'C'  { return 'case-c-focus-migration' }
+        '24' { return 'case-24-phase-inference-extended' }
+        '25' { return 'case-25-noop-save-extended' }
+        '26' { return 'case-26-focus-migration' }
         default { return "case-$Case" }
     }
 }
@@ -348,123 +348,123 @@ if ($Case -eq '06') {
     }
 }
 
-# ── F. Case-A specific checks (phase inference) ──────────────────────
+# ── F. Case-24 specific checks (phase inference extended) ────────────
 
-if ($Case -eq 'A') {
+if ($Case -eq '24') {
     if (-not (Test-Path $TestPlan)) {
-        Fail "case-A test-plan.md not found at $TestPlan"
+        Fail "case-24 test-plan.md not found at $TestPlan"
     }
-    Pass-Check "case-A test-plan.md exists"
+    Pass-Check "case-24 test-plan.md exists"
 
     # Verify workflow-state.yml exists
     $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
     $WorkflowState = Join-Path $StateRoot "workflow-state.yml"
     if (-not (Test-Path $WorkflowState)) {
-        Fail "case-A: workflow-state.yml not found"
+        Fail "case-24: workflow-state.yml not found"
     }
-    Pass-Check "case-A: workflow-state.yml exists"
+    Pass-Check "case-24: workflow-state.yml exists"
 
     # Verify phase inference sources exist
     $Roadmap = Join-Path $PWD.Path "docs/v2-redesign-roadmap.md"
     $Handoff = Join-Path $StateRoot "handoff.md"
     if (-not (Test-Path $Roadmap) -and -not (Test-Path $Handoff)) {
-        Fail "case-A: no phase inference source found (roadmap or handoff)"
+        Fail "case-24: no phase inference source found (roadmap or handoff)"
     }
-    Pass-Check "case-A: phase inference source exists"
+    Pass-Check "case-24: phase inference source exists"
 
     # Verify current-focus.md does NOT exist (prevention)
     $CurrentFocus = Join-Path $StateRoot "current-focus.md"
     if (Test-Path $CurrentFocus) {
-        Fail "case-A: current-focus.md should not exist"
+        Fail "case-24: current-focus.md should not exist"
     }
-    Pass-Check "case-A: current-focus.md absent (redundancy prevention)"
+    Pass-Check "case-24: current-focus.md absent (redundancy prevention)"
 }
 
-# ── G. Case-B specific checks (no-op save) ───────────────────────────
+# ── G. Case-25 specific checks (no-op save extended) ─────────────────
 
-if ($Case -eq 'B') {
+if ($Case -eq '25') {
     if (-not (Test-Path $TestPlan)) {
-        Fail "case-B test-plan.md not found at $TestPlan"
+        Fail "case-25 test-plan.md not found at $TestPlan"
     }
-    Pass-Check "case-B test-plan.md exists"
+    Pass-Check "case-25 test-plan.md exists"
 
     # Workspace must be clean
     & git diff --quiet
     if ($LASTEXITCODE -ne 0) {
-        Fail "case-B: workspace must be clean for no-op save test"
+        Fail "case-25: workspace must be clean for no-op save test"
     }
-    Pass-Check "case-B: workspace clean"
+    Pass-Check "case-25: workspace clean"
 
     & git diff --cached --quiet
     if ($LASTEXITCODE -ne 0) {
-        Fail "case-B: staged changes detected"
+        Fail "case-25: staged changes detected"
     }
-    Pass-Check "case-B: no staged changes"
+    Pass-Check "case-25: no staged changes"
 
     # Verify state files exist
     $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
     $WorkflowState = Join-Path $StateRoot "workflow-state.yml"
     if (-not (Test-Path $WorkflowState)) {
-        Fail "case-B: workflow-state.yml not found"
+        Fail "case-25: workflow-state.yml not found"
     }
-    Pass-Check "case-B: workflow-state.yml exists"
+    Pass-Check "case-25: workflow-state.yml exists"
 
     $Handoff = Join-Path $StateRoot "handoff.md"
     if (-not (Test-Path $Handoff)) {
-        Fail "case-B: handoff.md not found"
+        Fail "case-25: handoff.md not found"
     }
-    Pass-Check "case-B: handoff.md exists"
+    Pass-Check "case-25: handoff.md exists"
 }
 
-# ── H. Case-C specific checks (focus migration) ──────────────────────
+# ── H. Case-26 specific checks (focus migration) ─────────────────────
 
-if ($Case -eq 'C') {
+if ($Case -eq '26') {
     if (-not (Test-Path $TestPlan)) {
-        Fail "case-C test-plan.md not found at $TestPlan"
+        Fail "case-26 test-plan.md not found at $TestPlan"
     }
-    Pass-Check "case-C test-plan.md exists"
+    Pass-Check "case-26 test-plan.md exists"
 
     $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
 
     # current-focus.md must NOT exist
     $CurrentFocus = Join-Path $StateRoot "current-focus.md"
     if (Test-Path $CurrentFocus) {
-        Fail "case-C: current-focus.md should not exist"
+        Fail "case-26: current-focus.md should not exist"
     }
-    Pass-Check "case-C: current-focus.md absent"
+    Pass-Check "case-26: current-focus.md absent"
 
     # handoff.md must contain Current Focus section
     $Handoff = Join-Path $StateRoot "handoff.md"
     if (-not (Test-Path $Handoff)) {
-        Fail "case-C: handoff.md not found"
+        Fail "case-26: handoff.md not found"
     }
     $HandoffContent = Get-Content $Handoff -Raw
     if ($HandoffContent -notmatch "Current Focus") {
-        Fail "case-C: handoff.md missing 'Current Focus' section"
+        Fail "case-26: handoff.md missing 'Current Focus' section"
     }
-    Pass-Check "case-C: handoff.md contains Current Focus"
+    Pass-Check "case-26: handoff.md contains Current Focus"
 
     # workflow-state.yml must contain focus field
     $WorkflowState = Join-Path $StateRoot "workflow-state.yml"
     if (-not (Test-Path $WorkflowState)) {
-        Fail "case-C: workflow-state.yml not found"
+        Fail "case-26: workflow-state.yml not found"
     }
     $StateContent = Get-Content $WorkflowState -Raw
     if ($StateContent -notmatch "focus:") {
-        Fail "case-C: workflow-state.yml missing focus field"
+        Fail "case-26: workflow-state.yml missing focus field"
     }
-    Pass-Check "case-C: workflow-state.yml contains focus field"
+    Pass-Check "case-26: workflow-state.yml contains focus field"
 
     # references/workflow-rules.md must contain preventive rule
     $WorkflowRules = Join-Path $PWD.Path "references/workflow-rules.md"
     if (-not (Test-Path $WorkflowRules)) {
-        Fail "case-C: references/workflow-rules.md not found"
+        Fail "case-26: references/workflow-rules.md not found"
     }
     $RulesContent = Get-Content $WorkflowRules -Raw
     if ($RulesContent -notmatch "current-focus.md") {
-        Fail "case-C: references/workflow-rules.md missing current-focus.md prevention rule"
+        Fail "case-26: references/workflow-rules.md missing current-focus.md prevention rule"
     }
-    Pass-Check "case-C: workflow-rules.md documents current-focus.md prevention"
+    Pass-Check "case-26: workflow-rules.md documents current-focus.md prevention"
 }
 
 # ── I. Case-07 specific checks (dirty workspace) ─────────────────────
