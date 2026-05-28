@@ -14,6 +14,12 @@ function Get-CaseDirName {
     switch ($Case) {
         '05' { return 'case-05-first-checkpoint' }
         '06' { return 'case-06-goal-workflow' }
+        '07' { return 'case-07-dirty-workspace' }
+        '08' { return 'case-08-noop-save' }
+        '09' { return 'case-09-history-rewrite' }
+        '10' { return 'case-10-compact-resume' }
+        '11' { return 'case-11-phase-inference' }
+        '12' { return 'case-12-protocol-commit' }
         'A'  { return 'case-a-phase-inference' }
         'B'  { return 'case-b-noop-save' }
         'C'  { return 'case-c-focus-migration' }
@@ -450,7 +456,210 @@ if ($Case -eq 'C') {
     Pass-Check "case-C: workflow-rules.md documents current-focus.md prevention"
 }
 
-# ── K. Final result ──────────────────────────────────────────────────
+# ── I. Case-07 specific checks (dirty workspace) ─────────────────────
+
+if ($Case -eq '07') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-07 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-07 test-plan.md exists"
+
+    $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
+
+    # State files must exist
+    $WorkflowState = Join-Path $StateRoot "workflow-state.yml"
+    if (-not (Test-Path $WorkflowState)) {
+        Fail "case-07: workflow-state.yml not found"
+    }
+    Pass-Check "case-07: workflow-state.yml exists"
+
+    # Verify /dev-save does not stage source files
+    # (This is a protocol contract check, not a runtime execution)
+    $DevSavePrompt = Join-Path $PWD.Path "skills/dev-save/PROMPT.md"
+    if (-not (Test-Path $DevSavePrompt)) {
+        Fail "case-07: skills/dev-save/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevSavePrompt -Raw
+    if ($PromptContent -notmatch "NEVER stage non-protocol files") {
+        Fail "case-07: /dev-save prompt missing 'NEVER stage non-protocol files' constraint"
+    }
+    Pass-Check "case-07: /dev-save prompt enforces non-protocol file exclusion"
+}
+
+# ── J. Case-08 specific checks (no-op save) ──────────────────────────
+
+if ($Case -eq '08') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-08 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-08 test-plan.md exists"
+
+    # Workspace must be clean
+    & git diff --quiet
+    if ($LASTEXITCODE -ne 0) {
+        Fail "case-08: workspace must be clean for no-op save test"
+    }
+    Pass-Check "case-08: workspace clean"
+
+    $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
+    $WorkflowState = Join-Path $StateRoot "workflow-state.yml"
+    if (-not (Test-Path $WorkflowState)) {
+        Fail "case-08: workflow-state.yml not found"
+    }
+    Pass-Check "case-08: workflow-state.yml exists"
+
+    # Verify no-op support in /dev-save prompt
+    $DevSavePrompt = Join-Path $PWD.Path "skills/dev-save/PROMPT.md"
+    $PromptContent = Get-Content $DevSavePrompt -Raw
+    if ($PromptContent -notmatch "no-op") {
+        Fail "case-08: /dev-save prompt missing no-op save support"
+    }
+    Pass-Check "case-08: /dev-save prompt supports no-op saves"
+}
+
+# ── K. Case-09 specific checks (history rewrite) ─────────────────────
+
+if ($Case -eq '09') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-09 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-09 test-plan.md exists"
+
+    $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
+    $WorkflowState = Join-Path $StateRoot "workflow-state.yml"
+    if (-not (Test-Path $WorkflowState)) {
+        Fail "case-09: workflow-state.yml not found"
+    }
+    Pass-Check "case-09: workflow-state.yml exists"
+
+    # Verify checkpoint.last_commit is a valid hash
+    $Content = Get-Content $WorkflowState -Raw
+    $Match = [regex]::Match($Content, 'last_commit:\s*"([a-f0-9]{7,40})"')
+    if (-not $Match.Success) {
+        Fail "case-09: last_commit does not match valid hash pattern"
+    }
+    Pass-Check "case-09: last_commit is valid hash"
+
+    # Verify /dev-status handles invalid baseline
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+    if ($PromptContent -notmatch "checkpoint.last_commit") {
+        Fail "case-09: /dev-status prompt missing checkpoint baseline handling"
+    }
+    Pass-Check "case-09: /dev-status prompt handles checkpoint baseline"
+}
+
+# ── L. Case-10 specific checks (compact resume) ──────────────────────
+
+if ($Case -eq '10') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-10 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-10 test-plan.md exists"
+
+    $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
+
+    # handoff.md must contain all required sections for recovery
+    $Handoff = Join-Path $StateRoot "handoff.md"
+    if (-not (Test-Path $Handoff)) {
+        Fail "case-10: handoff.md not found"
+    }
+    $HandoffContent = Get-Content $Handoff -Raw
+    $RequiredSections = @("Current Focus", "Current Status", "Next Recommended Actions", "Notes For Next Session")
+    foreach ($section in $RequiredSections) {
+        if ($HandoffContent -notmatch [regex]::Escape($section)) {
+            Fail "case-10: handoff.md missing required section: $section"
+        }
+    }
+    Pass-Check "case-10: handoff.md contains all recovery sections"
+
+    # workflow-state.yml must contain recoverable fields
+    $WorkflowState = Join-Path $StateRoot "workflow-state.yml"
+    if (-not (Test-Path $WorkflowState)) {
+        Fail "case-10: workflow-state.yml not found"
+    }
+    $StateContent = Get-Content $WorkflowState -Raw
+    $RequiredFields = @("phase:", "focus:", "status:")
+    foreach ($field in $RequiredFields) {
+        if ($StateContent -notmatch $field) {
+            Fail "case-10: workflow-state.yml missing required field: $field"
+        }
+    }
+    Pass-Check "case-10: workflow-state.yml contains recoverable fields"
+}
+
+# ── M. Case-11 specific checks (phase inference) ─────────────────────
+
+if ($Case -eq '11') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-11 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-11 test-plan.md exists"
+
+    $StateRoot = Join-Path $PWD.Path ".agents/dev-protocol"
+
+    # Verify phase inference exists in /dev-status prompt
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-11: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+    if ($PromptContent -notmatch "Phase Inference") {
+        Fail "case-11: /dev-status prompt missing Phase Inference section"
+    }
+    Pass-Check "case-11: /dev-status prompt contains phase inference"
+
+    # Verify inference sources documented
+    $InferenceSources = @("next-phase-plan", "roadmap", "handoff", "workflow-state")
+    foreach ($source in $InferenceSources) {
+        if ($PromptContent -notmatch $source) {
+            Fail "case-11: /dev-status prompt missing inference source: $source"
+        }
+    }
+    Pass-Check "case-11: /dev-status prompt defines all inference sources"
+}
+
+# ── N. Case-12 specific checks (protocol commit classification) ──────
+
+if ($Case -eq '12') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-12 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-12 test-plan.md exists"
+
+    # Verify /dev-status prompt contains protocol commit detection rules
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-12: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+
+    $RequiredPatterns = @(
+        "chore\(checkpoint\)",
+        "chore\(protocol\)",
+        "chore\(state\)",
+        "protocol commit"
+    )
+    foreach ($pattern in $RequiredPatterns) {
+        if ($PromptContent -notmatch $pattern) {
+            Fail "case-12: /dev-status prompt missing protocol commit pattern: $pattern"
+        }
+    }
+    Pass-Check "case-12: /dev-status prompt defines all protocol commit patterns"
+
+    # Verify drift classification exists
+    if ($PromptContent -notmatch "drift = none") {
+        Fail "case-12: /dev-status prompt missing 'drift = none' classification"
+    }
+    Pass-Check "case-12: /dev-status prompt defines drift = none for protocol commits"
+
+    if ($PromptContent -notmatch "drift = high") {
+        Fail "case-12: /dev-status prompt missing 'drift = high' classification"
+    }
+    Pass-Check "case-12: /dev-status prompt defines drift = high for source commits"
+}
+
+# ── Final result ─────────────────────────────────────────────────────
 
 Write-Host ""
 Write-Host "RESULT: PASS"

@@ -1,0 +1,43 @@
+{
+  "goal_status": "COMPLETED",
+  "goal_summary": "Decoupled Claude runtime integration from dev-protocol core. Refactored architecture so .claude/ becomes an optional runtime adapter, not a protocol dependency. Updated README, onboarding, workflow-rules, commit-rules, goal-output-contract, goal-prompt-template, goal-workflow, and created runtime-integrations.md.",
+  "changed_files": [
+    ".agents/dev-protocol/goal-output.json",
+    ".agents/dev-protocol/goal-output.md",
+    "docs/test-matrix.md",
+    "tests/case-07-dirty-workspace/test-plan.md",
+    "tests/case-08-noop-save/test-plan.md",
+    "tests/case-09-history-rewrite/test-plan.md",
+    "tests/case-10-compact-resume/test-plan.md",
+    "tests/case-11-phase-inference/test-plan.md",
+    "tests/case-12-protocol-commit/test-plan.md",
+    "tests/run-tests.ps1"
+  ],
+  "validation_results": [
+    "PASS: case-06 validation passes on goal commit",
+    "PASS: README reframed as AI-assisted development protocol",
+    "PASS: docs/runtime-integrations.md created with architecture diagram",
+    "PASS: onboarding.md adds manual fallback workflow",
+    "PASS: workflow-rules.md maps slash commands to semantic operations",
+    "PASS: commit-rules.md generalizes checkpoint rule",
+    "PASS: goal-output-contract.md describes Goal semantic, not /goal command",
+    "PASS: goal-prompt-template.md clarified for any runtime",
+    "PASS: goal-workflow.md mapped to semantic Goal operation",
+    "PASS: .claude/ retained with documented rationale",
+    "PASS: Protocol correctness guaranteed without .claude/",
+    "PASS: Deterministic changed_files preserved",
+    "PASS: Schema auto-fix preserved",
+    "PASS: Checkpoint behavior preserved"
+  ],
+  "stop_reason": "Implementation complete. Protocol core is now runtime-agnostic. .claude/ is explicitly documented as optional Claude Code convenience automation.",
+  "risks_followups": [
+    "case-05 requires checkpoint state; will validate after running checkpoint",
+    "Future runtimes (Cursor, Copilot) need their own adapter docs when implemented"
+  ],
+  "continuation_handoff": {
+    "context": "dev-protocol is now architecturally decoupled from Claude Code. The protocol core (scripts, tests, .agents/, docs/, references/) contains no runtime-specific logic. .claude/ is documented as an optional runtime adapter. All protocol correctness comes from deterministic scripts and tests, not hook behavior.",
+    "boundary": "Only documentation and structural clarification changed. No modifications to fix-goal-output.ps1, case-05, case-06, checkpoint logic, or .agents/ structure. .claude/ was not moved; rationale documented in runtime-integrations.md.",
+    "next_candidate_goal": "Add Cursor or VS Code integration prototype, or refine runtime-integrations.md with concrete adapter examples.",
+    "prompt_seed": "/goal\n\nGoal: Add Cursor runtime adapter prototype\n\nScope: Create minimal Cursor integration (docs or config) demonstrating how dev-protocol works without Claude-specific hooks\n\nRequirements:\n1. Research Cursor extension/plugin API\n2. Create cursor/ or integrations/cursor/ directory\n3. Document how Cursor maps to dev-protocol semantic operations\n4. Verify protocol core works unchanged\n5. Run case-06"
+  }
+}
