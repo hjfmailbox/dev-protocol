@@ -697,6 +697,178 @@ Scope document from `/dev-scope`:
 
 ---
 
+## continue loop
+
+### Purpose
+
+Reduce manual orchestration for planned execution by automatically deriving and executing the next loop from `next-phase-plan.md`.
+
+### When to use
+
+- `next-phase-plan.md` exists with planned work
+- User wants to proceed to the next planned loop without manual scoping
+- After `/dev-save`, when the next loop is already defined in the plan
+
+### When NOT to use
+
+- No `next-phase-plan.md` exists (use `/dev-scope` instead)
+- Workspace has uncommitted non-protocol changes
+- Next planned loop is ambiguous (use `/dev-scope` instead)
+- All planned loops are already completed
+- You want to inspect state (use `/dev-status` instead)
+- You want to save progress (use `/dev-save` instead)
+
+### Inputs
+
+None. `continue loop` is a no-argument command.
+
+### Preconditions
+
+ALL must be true:
+
+| # | Condition |
+|---|---|
+| 1 | `next-phase-plan.md` exists in `.agents/dev-protocol/` |
+| 2 | `next-phase-plan.md` is not empty |
+| 3 | Workspace is clean OR only protocol state files modified |
+| 4 | No unresolved blockers in `handoff.md` |
+| 5 | `checkpoint.last_commit` matches HEAD or HEAD~1 |
+
+### Side Effects
+
+| Aspect | Behavior |
+|---|---|
+| Files modified | May modify source code (if auto-executing); updates `next-phase-plan.md` status |
+| Git commit | **YES** — creates normal commits during auto-execution |
+| Git push | **NO** |
+| Plan status | Updates loop status to `completed` or `skipped` |
+
+### Outputs
+
+**Auto-execution path:**
+```
+**Continue Loop**: Auto-executing Loop N — [name]
+
+**Derived Scope**: <summary>
+**Execution Result**: <implementation summary>
+
+**Workflow Status**:
+- Loop N completed
+- Workflow completed
+- No remaining protocol tasks pending
+- Run /dev-save to persist state
+```
+
+**Scope document path:**
+```
+**Continue Loop**: Loop N — [name]
+
+**Derived Scope**: <full scope document>
+**Auto-execution**: Criteria NOT met. Separate /goal required.
+
+**Workflow Status**:
+- Scope derived from plan
+- Workflow completed
+- No remaining protocol tasks pending
+- Review scope above, then run /goal to implement
+```
+
+### Execution Sequence
+
+```text
+continue loop
+  → 1. verify preconditions
+  → 2. read next-phase-plan.md
+  → 3. identify next uncompleted loop (tolerant parsing)
+  → 4. evaluate loop clarity (detect ambiguity)
+  → 5. derive scope from plan + handoff + recent commits
+  → 6. evaluate auto-execution criteria (same as /dev-scope)
+  → 7. if auto-execute: execute immediately, update plan status
+     else: output scope document, STOP, wait for /goal
+```
+
+### DO
+
+- Verify ALL preconditions first
+- Use tolerant parsing for loop detection
+- Derive scope from plan context
+- Apply auto-execution criteria strictly
+- Update plan status after completion
+- STOP on ambiguity, drift, or dirty workspace
+
+### DO NOT
+
+- Proceed without `next-phase-plan.md`
+- Auto-execute ambiguous or architectural loops
+- Ignore dirty workspace or checkpoint drift
+- Invent requirements not implied by the plan
+- Modify source code if auto-execution criteria are NOT met
+
+### Success Signals
+
+- Next incomplete loop identified
+- Scope derived with clear boundaries
+- Either: auto-execution completes with normal commits, OR scope document produced for `/goal`
+- Plan status updated
+
+### Failure Modes
+
+| Mode | Cause | Recovery |
+|---|---|---|
+| Missing plan | `next-phase-plan.md` does not exist | Run `/dev-scope` to declare a goal |
+| Empty plan | `next-phase-plan.md` exists but is empty | Update plan or run `/dev-scope` |
+| Dirty workspace | Uncommitted non-protocol changes | Commit or stash before continuing |
+| Blockers | Unresolved issues in `handoff.md` | Resolve blockers first |
+| Ambiguity | Next loop lacks files or validation | Clarify `next-phase-plan.md` or run `/dev-scope` |
+| Drift | `checkpoint.last_commit` does not match HEAD | Run `/dev-status` to review |
+| All complete | No incomplete loops remain | "All planned loops completed." |
+| Unrecognizable format | Plan does not match any loop pattern | Reformat `next-phase-plan.md` |
+
+### Examples
+
+**Normal -- plan exists, auto-executes**
+```
+continue loop
+→ reads next-phase-plan.md
+→ finds Loop 3: "Update command contracts for /dev-save"
+→ derives scope: files=docs/command-contracts.md
+→ auto-executes (1 file, no API changes)
+→ produces commit: docs(contracts): add dirty workspace behavior
+→ updates Loop 3 status to completed
+→ prompts: "/dev-save to persist state"
+```
+
+**Boundary -- plan exists, requires /goal**
+```
+continue loop
+→ reads next-phase-plan.md
+→ finds Loop 4: "Refactor auth across all modules"
+→ derives scope: files=src/auth/*, tests/*, docs/*
+→ criteria NOT met (>3 files, cross-cutting)
+→ outputs scope document
+→ STOPs
+→ user reviews, then runs /goal
+```
+
+**Error -- no plan**
+```
+continue loop
+→ next-phase-plan.md not found
+→ STOP
+→ "No plan found. Run /dev-scope to declare a goal."
+```
+
+**Error -- all completed**
+```
+continue loop
+→ reads next-phase-plan.md
+→ all loops have status: completed
+→ STOP
+→ "All planned loops completed."
+```
+
+---
+
 ## Secondary Commands (Deprecated Aliases)
 
 These commands redirect to canonical v2 commands. They remain callable for backward compatibility.
@@ -746,7 +918,9 @@ These commands redirect to canonical v2 commands. They remain callable for backw
    ↓
 /dev-status   -- inspect state (read-only)
    ↓
-/dev-scope    -- declare goal (auto-executes if criteria met)
+continue loop -- derive next loop from plan (if exists)
+   ↓              ↓ (no plan)
+/dev-scope    -- declare goal (auto-executes if simple)
    ↓              ↓ (auto-execution)
 /goal         -- implement within scope   normal commits
    ↓ (commit source)                       goal-output artifact
@@ -768,3 +942,5 @@ case-05       -- validate checkpoint
 - /dev-scope declares intent; auto-execution is an optimization for simple scopes.
 - /dev-init NEVER auto-commits. User must manually commit state files.
 - /goal NEVER modifies protocol state files.
+- `continue loop` ALWAYS verifies preconditions before reading plan.
+- `continue loop` NEVER auto-executes ambiguous or architectural loops.

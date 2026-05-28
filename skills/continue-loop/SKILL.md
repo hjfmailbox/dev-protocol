@@ -1,0 +1,198 @@
+# continue loop
+
+## Purpose
+
+Reduce manual orchestration for planned execution by automatically deriving and executing the next loop from `next-phase-plan.md`.
+
+Goal:
+
+When a plan exists, continue execution without requiring the user to manually declare each scope.
+
+**Boundary rule**: `continue loop` reads the plan, derives scope, and decides execution path. It does NOT invent new direction or proceed with ambiguous scope.
+
+---
+
+## When to Use
+
+- A `next-phase-plan.md` exists with planned work
+- The user wants to proceed to the next planned loop without manual scoping
+- After `/dev-save`, when the next loop is already defined in the plan
+- During iterative development with a pre-defined plan
+
+---
+
+## When NOT to Use
+
+- No `next-phase-plan.md` exists (use `/dev-scope` instead)
+- Workspace has uncommitted non-protocol changes
+- The next planned loop is ambiguous or unclear (use `/dev-scope` instead)
+- All planned loops are already completed
+- You want to inspect state (use `/dev-status` instead)
+- You want to save progress (use `/dev-save` instead)
+
+---
+
+## What It Does
+
+1. **Verifies preconditions** — checks plan existence, workspace cleanliness, blockers, drift
+2. **Reads plan** — parses `next-phase-plan.md` using tolerant loop detection
+3. **Identifies next loop** — finds first incomplete loop (`pending`, `todo`, `[ ]`)
+4. **Evaluates clarity** — detects ambiguity before scope derivation
+5. **Derives scope** — generates structured scope from plan + handoff + recent commits
+6. **Decides execution path** — auto-executes if criteria met, else produces scope document
+7. **Updates plan status** — marks loop as `completed` or `skipped`
+
+---
+
+## Typical Workflow
+
+### With plan and auto-execution
+
+```
+continue loop
+→ reads next-phase-plan.md
+→ finds Loop 3: "Update command contracts"
+→ derives scope: files=docs/command-contracts.md
+→ auto-executes (1 file, non-architectural)
+→ produces commit
+→ updates plan status to completed
+→ prompts: "/dev-save to persist state"
+```
+
+### With plan but requires /goal
+
+```
+continue loop
+→ reads next-phase-plan.md
+→ finds Loop 4: "Refactor auth across modules"
+→ derives scope: files=src/auth/*, tests/*, docs/*
+→ criteria NOT met (>3 files, cross-cutting)
+→ outputs scope document
+→ STOPs
+→ user reviews, then runs /goal
+```
+
+### No plan
+
+```
+continue loop
+→ next-phase-plan.md not found
+→ STOP
+→ "No plan found. Run /dev-scope to declare a goal."
+```
+
+---
+
+## Responsibilities
+
+### 1. Verify Preconditions
+
+ALL must be true before proceeding:
+
+| # | Condition | Failure Output |
+|---|---|---|
+| 1 | `next-phase-plan.md` exists | "No plan found. Run /dev-scope to declare a goal." |
+| 2 | `next-phase-plan.md` is not empty | "Plan exists but is empty." |
+| 3 | Workspace clean (or only protocol files modified) | "Workspace has uncommitted changes." |
+| 4 | No unresolved blockers in `handoff.md` | "Blockers detected: [list]." |
+| 5 | `checkpoint.last_commit` matches HEAD or HEAD~1 | "State drift detected. Run /dev-status." |
+
+### 2. Parse Plan (Tolerant)
+
+Support multiple loop formats:
+
+- `## Loop N — [name]`
+- `## Loop N: [name]`
+- `## N. [name]`
+- Status markers: `pending`, `in_progress`, `completed`, `skipped`, `todo`, `done`, `[ ]`, `[x]`
+
+Scan for first incomplete loop. If none found: "All planned loops completed."
+
+### 3. Detect Ambiguity
+
+Ambiguity signals:
+
+- Vague description
+- No file references
+- No validation criteria
+- Dependencies on uncompleted previous loops
+
+If ambiguous: STOP, output the ambiguous item, ask for clarification.
+
+### 4. Derive Scope
+
+Generate structured scope from plan entry:
+
+| Plan Field | Scope Section |
+|---|---|
+| `Goal:` / `Objective:` | Goal statement |
+| `Files:` | In-scope list |
+| `Validation:` | Validation criteria |
+| Missing `Files:` | Derive from goal or recent commits |
+| Missing `Validation:` | `[Manual] Verify behavior` |
+
+### 5. Evaluate Auto-Execution
+
+Apply `/dev-scope` auto-execution criteria:
+
+1. File count ≤ 3
+2. No public API changes
+3. No cross-module dependencies
+4. Single-step validation
+5. No ambiguous language
+6. Non-architectural
+7. Low blast radius
+
+### 6. Execute or Produce Scope
+
+**If ALL criteria met**:
+- Execute immediately
+- Create normal git commits
+- Produce goal-output artifact
+- Update plan status to `completed`
+- Report "Workflow completed"
+
+**If ANY criterion not met**:
+- Output derived scope document
+- STOP
+- Wait for `/goal`
+
+---
+
+## DO
+
+- Verify ALL preconditions before reading plan
+- Use tolerant parsing for loop detection
+- Derive scope from plan, handoff, and recent commits
+- Apply auto-execution criteria strictly
+- Update plan status after loop completion
+- STOP on ambiguity, drift, or dirty workspace
+- Allow user to skip loops
+
+## DO NOT
+
+- **NEVER proceed without `next-phase-plan.md`**
+- **NEVER auto-execute ambiguous or architectural loops**
+- **NEVER ignore dirty workspace or checkpoint drift**
+- **NEVER invent requirements not implied by the plan**
+- **NEVER skip precondition verification**
+- **NEVER modify source code if auto-execution criteria are NOT met**
+
+## PRECONDITIONS
+
+- `.agents/dev-protocol/next-phase-plan.md` exists and is not empty
+- Workspace is clean or only protocol files modified
+- No unresolved blockers in `handoff.md`
+- `checkpoint.last_commit` matches HEAD or HEAD~1
+
+## FAILURE CONDITIONS
+
+STOP and report failure if ANY of the following occur:
+
+- `next-phase-plan.md` is missing or empty
+- Workspace has uncommitted non-protocol changes
+- Unresolved blockers exist
+- Checkpoint drift detected
+- Next loop is ambiguous
+- All loops are already completed
+- Plan format is unrecognizable

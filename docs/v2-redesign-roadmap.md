@@ -150,19 +150,24 @@ Goal: Reduce friction for iterative development. Design-only unless explicitly s
 
 ---
 
-### X2. Continue loop execution
+### ~~X2. Continue loop execution~~
 
-**Problem**: Planned execution still requires repeated manual orchestration even when `next-phase-plan.md` exists.
+**Status**: IMPLEMENTED
 
-**Design status**: Documented in `docs/workflow-compression.md`. Implementation frozen until stabilization complete.
+**Deliverable**: `skills/continue-loop/PROMPT.md` and `SKILL.md` created. Command contract documented in `docs/command-contracts.md`.
 
-**Direction**:
+**Behavior**:
+- Reads `next-phase-plan.md` from `.agents/dev-protocol/`
+- Uses tolerant parsing to detect loops (`Loop N`, status markers `[x]`, `pending`, `todo`, etc.)
+- Finds first incomplete loop
+- Derives scope from plan + handoff + recent commits
+- Applies auto-execution criteria (same as `/dev-scope`)
+- If criteria met: executes immediately, updates plan status
+- If criteria not met: produces scope document, waits for `/goal`
 
-* Detect next planned loop from `next-phase-plan.md`
-* Derive scope automatically
-* Execute workflow with minimal agent intervention
+**Stop conditions**: no plan, empty plan, dirty workspace, blockers, drift, ambiguity, all completed, unrecognizable format
 
-**Deliverable**: Design doc update or prototype. Not for implementation in this phase.
+**Tests**: case-30 (normal continue), case-31 (all completed), case-32 (ambiguous), case-33 (large requires goal)
 
 ---
 

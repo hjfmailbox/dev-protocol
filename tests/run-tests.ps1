@@ -37,6 +37,10 @@ function Get-CaseDirName {
         '27' { return 'case-27-simple-scope-auto-execution' }
         '28' { return 'case-28-complex-scope-requires-goal' }
         '29' { return 'case-29-ambiguous-scope-clarification' }
+        '30' { return 'case-30-continue-loop-normal' }
+        '31' { return 'case-31-all-loops-completed' }
+        '32' { return 'case-32-ambiguous-next-loop' }
+        '33' { return 'case-33-large-loop-requires-goal' }
         default { return "case-$Case" }
     }
 }
@@ -1223,6 +1227,192 @@ if ($Case -eq '29') {
         Fail "case-29: /dev-scope SKILL.md missing ambiguity detection"
     }
     Pass-Check "case-29: /dev-scope SKILL.md defines ambiguity detection"
+}
+
+# ── AC. Case-30 specific checks (continue loop normal) ───────────────
+
+if ($Case -eq '30') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-30 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-30 test-plan.md exists"
+
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    $ContinueSkill = Join-Path $PWD.Path "skills/continue-loop/SKILL.md"
+
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-30: skills/continue-loop/PROMPT.md not found"
+    }
+    Pass-Check "case-30: skills/continue-loop/PROMPT.md exists"
+
+    if (-not (Test-Path $ContinueSkill)) {
+        Fail "case-30: skills/continue-loop/SKILL.md not found"
+    }
+    Pass-Check "case-30: skills/continue-loop/SKILL.md exists"
+
+    $PromptContent = Get-Content $ContinuePrompt -Raw
+
+    # Verify preconditions exist
+    if ($PromptContent -notmatch "Preconditions") {
+        Fail "case-30: continue-loop prompt missing preconditions"
+    }
+    Pass-Check "case-30: continue-loop prompt defines preconditions"
+
+    # Verify tolerant parsing
+    if ($PromptContent -notmatch "tolerant") {
+        Fail "case-30: continue-loop prompt missing tolerant parsing"
+    }
+    Pass-Check "case-30: continue-loop prompt defines tolerant parsing"
+
+    # Verify scope derivation
+    if ($PromptContent -notmatch "derive scope" -and $PromptContent -notmatch "Derive Scope") {
+        Fail "case-30: continue-loop prompt missing scope derivation"
+    }
+    Pass-Check "case-30: continue-loop prompt defines scope derivation"
+
+    # Verify auto-execution decision
+    if ($PromptContent -notmatch "Auto-Execution") {
+        Fail "case-30: continue-loop prompt missing auto-execution decision"
+    }
+    Pass-Check "case-30: continue-loop prompt defines auto-execution decision"
+
+    # Verify execution sequence in SKILL.md
+    $SkillContent = Get-Content $ContinueSkill -Raw
+    if ($SkillContent -notmatch "Execution Sequence") {
+        Fail "case-30: continue-loop SKILL.md missing execution sequence"
+    }
+    Pass-Check "case-30: continue-loop SKILL.md defines execution sequence"
+}
+
+# ── AD. Case-31 specific checks (all loops completed) ────────────────
+
+if ($Case -eq '31') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-31 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-31 test-plan.md exists"
+
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    $ContinueSkill = Join-Path $PWD.Path "skills/continue-loop/SKILL.md"
+
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-31: skills/continue-loop/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ContinuePrompt -Raw
+
+    # Verify all-completed stop condition
+    if ($PromptContent -notmatch "All planned loops completed") {
+        Fail "case-31: continue-loop prompt missing all-completed message"
+    }
+    Pass-Check "case-31: continue-loop prompt defines all-completed stop"
+
+    # Verify no-scope behavior when all done
+    if ($PromptContent -notmatch "no incomplete loop") {
+        Fail "case-31: continue-loop prompt missing no-incomplete-loop handling"
+    }
+    Pass-Check "case-31: continue-loop prompt handles no incomplete loops"
+
+    # Verify SKILL.md has failure mode for all completed
+    $SkillContent = Get-Content $ContinueSkill -Raw
+    if ($SkillContent -notmatch "All complete") {
+        Fail "case-31: continue-loop SKILL.md missing all-complete failure mode"
+    }
+    Pass-Check "case-31: continue-loop SKILL.md defines all-complete failure mode"
+}
+
+# ── AE. Case-32 specific checks (ambiguous next loop) ────────────────
+
+if ($Case -eq '32') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-32 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-32 test-plan.md exists"
+
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    $ContinueSkill = Join-Path $PWD.Path "skills/continue-loop/SKILL.md"
+
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-32: skills/continue-loop/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ContinuePrompt -Raw
+
+    # Verify ambiguity detection precedes scope derivation
+    $AmbiguityPos = $PromptContent.IndexOf("Evaluate Loop Clarity")
+    $ScopePos = $PromptContent.IndexOf("Derive Scope")
+    if ($AmbiguityPos -eq -1 -or $ScopePos -eq -1) {
+        Fail "case-32: continue-loop prompt missing ambiguity or scope derivation section"
+    }
+    if (-not ($AmbiguityPos -lt $ScopePos)) {
+        Fail "case-32: ambiguity detection must precede scope derivation"
+    }
+    Pass-Check "case-32: ambiguity detection precedes scope derivation"
+
+    # Verify ambiguity signals
+    if ($PromptContent -notmatch "vague") {
+        Fail "case-32: continue-loop prompt missing vague description signal"
+    }
+    Pass-Check "case-32: continue-loop prompt defines ambiguity signals"
+
+    # Verify STOP on ambiguity
+    if ($PromptContent -notmatch "Next loop is ambiguous") {
+        Fail "case-32: continue-loop prompt missing ambiguous loop STOP message"
+    }
+    Pass-Check "case-32: continue-loop prompt STOPs on ambiguous loop"
+
+    # Verify SKILL.md has ambiguity handling
+    $SkillContent = Get-Content $ContinueSkill -Raw
+    if ($SkillContent -notmatch "Ambiguity") {
+        Fail "case-32: continue-loop SKILL.md missing ambiguity handling"
+    }
+    Pass-Check "case-32: continue-loop SKILL.md defines ambiguity handling"
+}
+
+# ── AF. Case-33 specific checks (large loop requires /goal) ──────────
+
+if ($Case -eq '33') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-33 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-33 test-plan.md exists"
+
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    $ContinueSkill = Join-Path $PWD.Path "skills/continue-loop/SKILL.md"
+
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-33: skills/continue-loop/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ContinuePrompt -Raw
+
+    # Verify auto-execution criteria applied
+    if ($PromptContent -notmatch "Auto-Execution Eligibility") {
+        Fail "case-33: continue-loop prompt missing auto-execution evaluation"
+    }
+    Pass-Check "case-33: continue-loop prompt evaluates auto-execution eligibility"
+
+    # Verify scope document path when criteria fail
+    if ($PromptContent -notmatch "Scope document required") {
+        Fail "case-33: continue-loop prompt missing scope document path"
+    }
+    Pass-Check "case-33: continue-loop prompt defines scope document path"
+
+    # Verify /goal required message
+    if ($PromptContent -notmatch "Separate /goal required") {
+        Fail "case-33: continue-loop prompt missing /goal required signal"
+    }
+    Pass-Check "case-33: continue-loop prompt requires /goal for complex loops"
+
+    # Verify no source modification when criteria fail
+    if ($PromptContent -notmatch "NEVER modify source code if auto-execution criteria are NOT met") {
+        Fail "case-33: continue-loop prompt missing source modification prevention"
+    }
+    Pass-Check "case-33: continue-loop prompt prevents source modification for complex loops"
+
+    # Verify SKILL.md has scope document path
+    $SkillContent = Get-Content $ContinueSkill -Raw
+    if ($SkillContent -notmatch "scope document" -and $SkillContent -notmatch "Scope document") {
+        Fail "case-33: continue-loop SKILL.md missing scope document path"
+    }
+    Pass-Check "case-33: continue-loop SKILL.md defines scope document path"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

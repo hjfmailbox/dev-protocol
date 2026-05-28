@@ -112,6 +112,26 @@ verify
 
 **Rule**: Not all loops produce code or documentation changes. Verification loops, no-op confirmations, and behavioral audits are valid outcomes. `/dev-save` supports these cases.
 
+### Planned Execution Loop (`continue loop`)
+
+When `next-phase-plan.md` exists, automatically derive and execute the next planned loop.
+
+```text
+/dev-status
+continue loop
+/dev-save
+```
+
+1. `/dev-status` — Recover context
+2. `continue loop` — Read plan, find next incomplete loop, derive scope, auto-execute or produce scope document
+3. `/dev-save` — Persist protocol state after loop completion
+
+**Behavior**:
+- If next loop is simple (≤3 files, non-architectural, concrete): auto-executes directly
+- If next loop is complex: produces scope document, waits for `/goal`
+- If no plan exists: recommends `/dev-scope`
+- If all loops completed: reports completion
+
 ### Command Reference
 
 | Command | When to Use | Never Use For |
@@ -119,6 +139,7 @@ verify
 | `/dev-status` | Start of session, check state, detect drift | Saving progress, declaring goals, modifying files |
 | `/dev-scope` | Before any implementation work; auto-executes simple scopes | Already-clear tasks, exploration without deliverables |
 | `/goal` | Implementation within a scoped objective | Unscoped work, saving state, inspecting context |
+| `continue loop` | When `next-phase-plan.md` exists; proceed to next planned loop | No plan exists, ambiguous next loop, dirty workspace |
 | `/dev-save` | After completing work, before ending session | Uncommitted source changes you intend to keep, unscoped work |
 | `/dev-init` | First contact, missing state files, corrupted state | Projects with existing valid state |
 
@@ -136,6 +157,7 @@ Protocol commands are semantic operations. The Claude Code representations use s
 | Scope | `/dev-scope` | No | Declare a focused goal with validation criteria |
 | Save | `/dev-save` | Yes | Persist protocol state files only, validate (fails on inconsistency) |
 | Status | `/dev-status` | No | Inspect current protocol state and reconstruct context |
+| Continue | `continue loop` | Conditional | Derive and execute next loop from `next-phase-plan.md` |
 
 ### Legacy Aliases (Backward Compatibility Only)
 

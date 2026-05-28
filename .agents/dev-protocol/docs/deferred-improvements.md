@@ -74,7 +74,17 @@ P2
 
 ---
 
-## D02 — Continuous loop execution from plan
+## ~~D02 — Continuous loop execution from plan~~
+
+**Status**: RESOLVED
+
+`continue loop` workflow implemented in `skills/continue-loop/PROMPT.md` and `SKILL.md`.
+
+`continue loop` reads `next-phase-plan.md`, identifies the next incomplete loop via tolerant parsing, derives scope from plan + handoff + recent commits, applies auto-execution criteria, and either executes immediately or produces a scope document for `/goal`.
+
+Preconditions verified before execution. Stop conditions defined for no plan, empty plan, dirty workspace, blockers, drift, ambiguity, all completed, and unrecognizable format.
+
+See: `docs/workflow-compression.md` for design rationale. See: `docs/command-contracts.md` for command contract.
 
 ### Problem
 
