@@ -184,6 +184,36 @@ fallback inference (unknown)
 
 Stop at first valid result.
 
+### Focus Inference Precedence
+
+When `workflow-state.yml` focus may be stale:
+
+```
+git reality (recent commits, changed files)
+  ↓
+recent scoped work (aggregated commit themes)
+  ↓
+workflow-state.yml (persisted focus, ONLY if checkpoint fresh)
+  ↓
+current-focus (handoff.md Current Focus section)
+  ↓
+roadmap fallback
+  ↓
+unknown
+```
+
+Stop at first valid result.
+
+### Checkpoint Freshness
+
+| Level | Source commits since last checkpoint | Confidence |
+|---|---|---|
+| fresh | 0-1 | high |
+| stale | 2-5 | medium |
+| outdated | >5 | low |
+
+If stale or outdated: workflow-state focus is low-confidence; prefer git-derived focus.
+
 ### Success Signals
 
 - Summary block contains phase, focus, branch, workspace, drift, confidence

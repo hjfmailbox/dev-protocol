@@ -33,6 +33,11 @@
 * [x] Protocol commit detection stable (case-12)
 * [x] Test matrix expanded to case-12 + case-A/B/C
 * [x] All active tests passing: case-05~12 PASS, case-A/B/C PASS
+* [x] Focus inference implemented with git-reality precedence
+* [x] Checkpoint freshness model (fresh/stale/outdated)
+* [x] Active work reconstruction from recent commits
+* [x] Stale focus contamination fix (case-16)
+* [x] Test matrix expanded to case-15 + case-16/17/18
 
 **What remains active**:
 

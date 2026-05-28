@@ -33,15 +33,6 @@ COMPLETED
 
 ## Changed Files
 
-- .agents/dev-protocol/goal-output.json
-- .agents/dev-protocol/goal-output.md
-- docs/test-matrix.md
-- tests/case-07-dirty-workspace/test-plan.md
-- tests/case-08-noop-save/test-plan.md
-- tests/case-09-history-rewrite/test-plan.md
-- tests/case-10-compact-resume/test-plan.md
-- tests/case-11-phase-inference/test-plan.md
-- tests/case-12-protocol-commit/test-plan.md
 - tests/run-tests.ps1
 ## Stop Reason
 

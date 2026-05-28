@@ -123,6 +123,30 @@ When `checkpoint.last_commit` != HEAD:
 | **low** | Minor mismatch (e.g., focus wording outdated, one task status mismatch) |
 | **high** | Major mismatch (phase wrong, workspace claim contradicts git status, unrecorded non-protocol commits) |
 
+### Checkpoint Freshness Model
+
+Measure how far `checkpoint.last_commit` is from HEAD:
+
+| Level | Source commits since checkpoint | Confidence |
+|---|---|---|
+| fresh | 0-1 | high |
+| stale | 2-5 | medium |
+| outdated | >5 | low |
+
+A **source commit** is any commit that is NOT a protocol commit (see commit-type drift check above).
+
+Algorithm:
+1. List commits between `checkpoint.last_commit` and HEAD: `git log --oneline <checkpoint.last_commit>..HEAD`
+2. Exclude protocol commits using the classification rules above
+3. Count remaining source commits
+4. Map to freshness level
+5. Report freshness in summary: `checkpoint: <fresh/stale/outdated>`
+
+If `checkpoint.last_commit` is empty, absent, or null:
+- freshness is `none` (no baseline)
+- Skip diff-based drift comparison
+- Do NOT report "since last checkpoint" phrasing
+
 Drift detection is report-only. Do NOT write incidents, do NOT modify state files, do NOT auto-fix.
 
 ---
@@ -169,12 +193,100 @@ Infer phase using strict priority order. Stop at first valid result.
 If phase was inferred, add note:
 "Phase was inferred from <source>. Run /dev-save to persist."
 
+### 4.2 Focus Inference
+
+Determine the current active focus using strict priority order. Stop at first valid result.
+
+```
+1. git reality (highest) -- recent commit subjects, branch names, changed files
+2. recent scoped work -- recent goal commits, docs/command-contracts changes, roadmap workstream
+3. workflow-state.yml -- ONLY if checkpoint is fresh (0-1 source commit since last checkpoint)
+4. current-focus (handoff.md Current Focus section)
+5. roadmap fallback
+6. unknown
+```
+
+**Extraction rules per source:**
+
+| Source | Read | Valid Focus Indicators |
+|---|---|---|
+| git reality | `git log --oneline -5`, `git diff --name-only HEAD~1` | Commit subjects like `docs(protocol): ...`, `fix(tests): ...`, `test(case-13): ...` indicate active workstream; changed files in `skills/`, `docs/`, `tests/` suggest focus area |
+| recent scoped work | Same as git reality | Multiple related commits on same topic aggregate into focus theme |
+| workflow-state.yml | `.agents/dev-protocol/workflow-state.yml` | `current_state.focus` ONLY if checkpoint is fresh (matches HEAD or HEAD~1, or 0-1 source commit since checkpoint) |
+| current-focus | `.agents/dev-protocol/handoff.md` | "Current Focus" section text |
+| roadmap | `docs/v2-redesign-roadmap.md` | "Current Direction" or active section headers |
+
+**Downgrade rule:**
+If checkpoint is stale or outdated (see Checkpoint Freshness Model in Step 3), `workflow-state.yml` focus is a LOW CONFIDENCE signal. Do NOT let old focus override new reality. Prefer git-derived focus instead.
+
+**Algorithm:**
+
+1. Inspect git reality. If recent commits indicate clear active work -- use inferred focus from git.
+2. Check checkpoint freshness. If fresh and workflow-state focus is present -- use persisted focus.
+3. If checkpoint is stale or outdated -- downgrade workflow-state focus to suggestion only; prefer git reality.
+4. Read handoff.md Current Focus. If present and checkpoint is not outdated -- use as secondary signal.
+5. Read roadmap for fallback focus.
+6. Output `unknown` with note: "Focus could not be inferred from available context."
+
+**Output format for inferred focus:**
+
+```
+**Focus**: <focus> (inferred from <source>)
+```
+
+If focus was inferred from git reality due to stale checkpoint, add note:
+"Focus inferred from recent commits. Previous workflow-state focus was stale (<N> commits old). Run /dev-save to persist."
+
+### 4.3 Active Work Reconstruction
+
+When `/dev-save` has NOT been run after recent goal work, reconstruct active work from git history.
+
+**Signals to aggregate:**
+- Recent conventional commit prefixes: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`
+- Recent scope areas: `skills/`, `docs/`, `tests/`, `references/`
+- Commit co-occurrence: multiple commits on same topic indicate ongoing workstream
+
+**Aggregation rule:**
+Group recent commits by topic/theme. If 2+ commits share a topic, report that as active work.
+
+Example:
+- `docs(protocol): harden slash command contracts`
+- `fix(tests): correct regex in case-14 validation`
+- `test(case-13): add mixed staged files test`
+-> Active Work: "slash command contract hardening and test expansion"
+
+**Output:**
+Include under **Active Work** section in summary.
+
+### 4.4 Context Reconstruction
+
+Rebuild from trusted sources in priority order:
+
+1. Git reality (current branch, recent commits, dirty/clean)
+2. Protocol state (workflow-state.yml, handoff.md)
+3. Project rules (project-rules.md constraints)
+
+Output:
+
+- **Current phase**: from inference (4.1) or persisted state, with drift note if mismatch detected
+- **Active focus**: from inference (4.2), validated against recent commits
+- **In-progress tasks**: from handoff, validated against git status
+- **Blockers**: from handoff, noted if stale
+- **Next actions**: recommend based on reconstructed context
+
+If state files are stale but not corrupted:
+
+- Report the drift
+- Still reconstruct context from available information
+- Recommend running `/dev-save` after corrections
+
 ## DO
 
-- Report phase with inference source when inferred
+- Report phase and focus with inference source when inferred
 - Prefer git reality over persisted state when they conflict
 - Report drift honestly
 - Reconstruct context from all available sources
+- Report checkpoint freshness level
 
 ## DO NOT
 
@@ -187,6 +299,7 @@ If phase was inferred, add note:
 - **NEVER perform recursive grep**
 - **NEVER assume branch names (no hardcoded `main`)**
 - **NEVER leave phase as `unknown` when git reality or other sources provide clear signal**
+- **NEVER return stale focus when git reality indicates newer active work**
 
 ## PRECONDITIONS
 
@@ -200,28 +313,6 @@ STOP and report failure if ANY of the following occur:
 - State files are missing and cannot be recovered
 - Repository is corrupted (`git status` fails)
 - State inconsistency is too severe to reconstruct context
-
-### 4.2 Context Reconstruction
-
-Rebuild from trusted sources in priority order:
-
-1. Git reality (current branch, recent commits, dirty/clean)
-2. Protocol state (workflow-state.yml, handoff.md)
-3. Project rules (project-rules.md constraints)
-
-Output:
-
-- **Current phase**: from inference (4.1) or persisted state, with drift note if mismatch detected
-- **Active focus**: from state, validated against recent commits
-- **In-progress tasks**: from handoff, validated against git status
-- **Blockers**: from handoff, noted if stale
-- **Next actions**: recommend based on reconstructed context
-
-If state files are stale but not corrupted:
-
-- Report the drift
-- Still reconstruct context from available information
-- Recommend running `/dev-save` after corrections
 
 ---
 
@@ -237,10 +328,11 @@ Provide:
 **Branch**: <current branch>
 **Workspace**: <clean/dirty + details>
 **Drift**: <none/low/high> — <specifics>
+**Checkpoint**: <fresh/stale/outdated/none> — <source commits since baseline>
 **Confidence**: <high/medium/low>
 
 **Active Work**:
-- <in-progress tasks or "none">
+- <reconstructed active work from recent commits or "none">
 
 **Blockers**:
 - <blockers or "none">

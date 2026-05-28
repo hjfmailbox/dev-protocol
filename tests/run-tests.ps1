@@ -23,6 +23,9 @@ function Get-CaseDirName {
         '13' { return 'case-13-mixed-staged-files' }
         '14' { return 'case-14-phase-inference-precedence' }
         '15' { return 'case-15-scope-misuse' }
+        '16' { return 'case-16-stale-focus-contamination' }
+        '17' { return 'case-17-checkpoint-freshness' }
+        '18' { return 'case-18-active-work-reconstruction' }
         'A'  { return 'case-a-phase-inference' }
         'B'  { return 'case-b-noop-save' }
         'C'  { return 'case-c-focus-migration' }
@@ -768,6 +771,100 @@ if ($Case -eq '15') {
         Fail "case-15: /dev-scope prompt missing scope misuse detection (NEVER force /goal)"
     }
     Pass-Check "case-15: /dev-scope prompt detects scope misuse"
+}
+
+# ── R. Case-16 specific checks (stale focus contamination) ───────────
+
+if ($Case -eq '16') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-16 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-16 test-plan.md exists"
+
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-16: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+
+    if ($PromptContent -notmatch "Focus Inference") {
+        Fail "case-16: /dev-status prompt missing Focus Inference section"
+    }
+    Pass-Check "case-16: /dev-status prompt contains Focus Inference"
+
+    if ($PromptContent -notmatch "Downgrade rule") {
+        Fail "case-16: /dev-status prompt missing downgrade rule for stale checkpoints"
+    }
+    Pass-Check "case-16: /dev-status prompt defines downgrade rule"
+
+    if ($PromptContent -notmatch "NEVER return stale focus") {
+        Fail "case-16: /dev-status prompt missing stale focus prevention"
+    }
+    Pass-Check "case-16: /dev-status prompt prevents stale focus return"
+}
+
+# ── S. Case-17 specific checks (checkpoint freshness) ────────────────
+
+if ($Case -eq '17') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-17 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-17 test-plan.md exists"
+
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-17: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+
+    if ($PromptContent -notmatch "Checkpoint Freshness Model") {
+        Fail "case-17: /dev-status prompt missing Checkpoint Freshness Model"
+    }
+    Pass-Check "case-17: /dev-status prompt defines Checkpoint Freshness Model"
+
+    if ($PromptContent -notmatch "fresh" -or $PromptContent -notmatch "stale" -or $PromptContent -notmatch "outdated") {
+        Fail "case-17: /dev-status prompt missing one or more freshness levels"
+    }
+    Pass-Check "case-17: /dev-status prompt defines all freshness levels"
+
+    # Verify threshold table exists
+    $FreshPos = $PromptContent.IndexOf("fresh")
+    $StalePos = $PromptContent.IndexOf("stale")
+    $OutdatedPos = $PromptContent.IndexOf("outdated")
+    if ($FreshPos -eq -1 -or $StalePos -eq -1 -or $OutdatedPos -eq -1) {
+        Fail "case-17: freshness level keywords not found"
+    }
+    Pass-Check "case-17: freshness thresholds present"
+}
+
+# ── T. Case-18 specific checks (active work reconstruction) ──────────
+
+if ($Case -eq '18') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-18 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-18 test-plan.md exists"
+
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-18: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+
+    if ($PromptContent -notmatch "Active Work Reconstruction") {
+        Fail "case-18: /dev-status prompt missing Active Work Reconstruction section"
+    }
+    Pass-Check "case-18: /dev-status prompt contains Active Work Reconstruction"
+
+    if ($PromptContent -notmatch "Aggregation rule") {
+        Fail "case-18: /dev-status prompt missing aggregation rule"
+    }
+    Pass-Check "case-18: /dev-status prompt defines aggregation rule"
+
+    if ($PromptContent -notmatch "recent commits") {
+        Fail "case-18: /dev-status prompt missing recent commits reference"
+    }
+    Pass-Check "case-18: /dev-status prompt references recent commits"
 }
 
 # ── Final result ─────────────────────────────────────────────────────
