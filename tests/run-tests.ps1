@@ -483,8 +483,8 @@ if ($Case -eq '07') {
         Fail "case-07: skills/dev-save/PROMPT.md not found"
     }
     $PromptContent = Get-Content $DevSavePrompt -Raw
-    if ($PromptContent -notmatch "NEVER stage non-protocol files") {
-        Fail "case-07: /dev-save prompt missing 'NEVER stage non-protocol files' constraint"
+    if ($PromptContent -notmatch "NEVER stage (or commit )?non-protocol files") {
+        Fail "case-07: /dev-save prompt missing non-protocol file exclusion constraint"
     }
     Pass-Check "case-07: /dev-save prompt enforces non-protocol file exclusion"
 }
@@ -713,11 +713,17 @@ if ($Case -eq '14') {
     Pass-Check "case-14: /dev-status prompt contains phase inference"
 
     # Verify precedence order: git reality > workflow-state > current-focus > roadmap > fallback
-    $GitPos = $PromptContent.IndexOf("git reality")
-    $WsPos = $PromptContent.IndexOf("workflow-state.yml")
-    $FocusPos = $PromptContent.IndexOf("current-focus")
-    $RoadmapPos = $PromptContent.IndexOf("roadmap")
-    $FallbackPos = $PromptContent.IndexOf("fallback")
+    # Restrict check to the Phase Inference block to avoid false matches from STEP 1
+    $PhaseInferenceBlock = [regex]::Match($PromptContent, "(?s)Phase Inference.*?(?=## DO|## STEP 5:)")
+    if (-not $PhaseInferenceBlock.Success) {
+        Fail "case-14: Could not isolate Phase Inference block for precedence check"
+    }
+    $Block = $PhaseInferenceBlock.Value
+    $GitPos = $Block.IndexOf("git reality")
+    $WsPos = $Block.IndexOf("workflow-state.yml")
+    $FocusPos = $Block.IndexOf("current-focus")
+    $RoadmapPos = $Block.IndexOf("roadmap")
+    $FallbackPos = $Block.IndexOf("fallback")
 
     if ($GitPos -eq -1 -or $WsPos -eq -1 -or $FocusPos -eq -1 -or $RoadmapPos -eq -1 -or $FallbackPos -eq -1) {
         Fail "case-14: /dev-status prompt missing one or more precedence sources"
