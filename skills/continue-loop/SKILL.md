@@ -159,6 +159,22 @@ Apply `/dev-scope` auto-execution criteria:
 
 ---
 
+## Execution Sequence
+
+```text
+continue loop
+  → 1. verify preconditions
+  → 2. read next-phase-plan.md
+  → 3. identify next uncompleted loop (tolerant parsing)
+  → 4. evaluate loop clarity (detect ambiguity)
+  → 5. derive scope from plan + handoff + recent commits
+  → 6. evaluate auto-execution criteria (same as /dev-scope)
+  → 7. if auto-execute: execute immediately, update plan status
+     else: output scope document, STOP, wait for /goal
+```
+
+---
+
 ## DO
 
 - Verify ALL preconditions before reading plan
@@ -194,5 +210,5 @@ STOP and report failure if ANY of the following occur:
 - Unresolved blockers exist
 - Checkpoint drift detected
 - Next loop is ambiguous
-- All loops are already completed
+- All complete: all loops are already completed
 - Plan format is unrecognizable
