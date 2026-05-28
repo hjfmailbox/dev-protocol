@@ -1,46 +1,26 @@
 {
   "goal_status": "COMPLETED",
-  "goal_summary": "Decoupled Claude runtime integration from dev-protocol core. Refactored architecture so .claude/ becomes an optional runtime adapter, not a protocol dependency. Updated README, onboarding, workflow-rules, commit-rules, goal-output-contract, goal-prompt-template, goal-workflow, and created runtime-integrations.md.",
+  "goal_summary": "Verified hook lifecycle termination behavior after completed workflow. Confirmed that Claude Code Stop hook triggers on session end, executes validation logic, outputs results, and exits cleanly (exit 0) without repeated triggers, hanging state, or context contamination.",
   "changed_files": [
-    ".agents/dev-protocol/goal-output.json",
-    ".agents/dev-protocol/goal-output.md",
-    "docs/runtime-audit.md",
-    "skills/dev-save/PROMPT.md",
-    "skills/dev-save/SKILL.md",
-    "skills/dev-scope/PROMPT.md",
-    "skills/dev-scope/SKILL.md",
-    "skills/dev-status/PROMPT.md",
-    "skills/dev-status/SKILL.md",
-    "tests/case-21-goal-completion-closes-workflow/test-plan.md",
-    "tests/case-22-dev-save-completion-semantics/test-plan.md",
-    "tests/case-23-no-op-validation-completion/test-plan.md",
-    "tests/run-tests.ps1"
+    "docs/runtime-audit.md"
   ],
   "validation_results": [
-    "PASS: case-06 validation passes on goal commit",
-    "PASS: README reframed as AI-assisted development protocol",
-    "PASS: docs/runtime-integrations.md created with architecture diagram",
-    "PASS: onboarding.md adds manual fallback workflow",
-    "PASS: workflow-rules.md maps slash commands to semantic operations",
-    "PASS: commit-rules.md generalizes checkpoint rule",
-    "PASS: goal-output-contract.md describes Goal semantic, not /goal command",
-    "PASS: goal-prompt-template.md clarified for any runtime",
-    "PASS: goal-workflow.md mapped to semantic Goal operation",
-    "PASS: .claude/ retained with documented rationale",
-    "PASS: Protocol correctness guaranteed without .claude/",
-    "PASS: Deterministic changed_files preserved",
-    "PASS: Schema auto-fix preserved",
-    "PASS: Checkpoint behavior preserved"
+    "PASS: Stop hook triggered on session end after /dev-status execution",
+    "PASS: Hook executed without errors (exit 0)",
+    "PASS: No repeated trigger observed",
+    "PASS: No hanging state or delayed cleanup",
+    "PASS: Next slash command context clean (no contamination)",
+    "PASS: runtime-audit.md updated with verified behavior entry"
   ],
-  "stop_reason": "Implementation complete. Protocol core is now runtime-agnostic. .claude/ is explicitly documented as optional Claude Code convenience automation.",
+  "stop_reason": "Verification complete. Hook lifecycle termination confirmed as normal cleanup behavior. No code changes required.",
   "risks_followups": [
-    "case-05 requires checkpoint state; will validate after running checkpoint",
-    "Future runtimes (Cursor, Copilot) need their own adapter docs when implemented"
+    "Monitor future hook executions for any anomaly",
+    "If stop-hook.ps1 is modified, re-verify termination behavior"
   ],
   "continuation_handoff": {
-    "context": "dev-protocol is now architecturally decoupled from Claude Code. The protocol core (scripts, tests, .agents/, docs/, references/) contains no runtime-specific logic. .claude/ is documented as an optional runtime adapter. All protocol correctness comes from deterministic scripts and tests, not hook behavior.",
-    "boundary": "Only documentation and structural clarification changed. No modifications to fix-goal-output.ps1, case-05, case-06, checkpoint logic, or .agents/ structure. .claude/ was not moved; rationale documented in runtime-integrations.md.",
-    "next_candidate_goal": "Add Cursor or VS Code integration prototype, or refine runtime-integrations.md with concrete adapter examples.",
-    "prompt_seed": "/goal\n\nGoal: Add Cursor runtime adapter prototype\n\nScope: Create minimal Cursor integration (docs or config) demonstrating how dev-protocol works without Claude-specific hooks\n\nRequirements:\n1. Research Cursor extension/plugin API\n2. Create cursor/ or integrations/cursor/ directory\n3. Document how Cursor maps to dev-protocol semantic operations\n4. Verify protocol core works unchanged\n5. Run case-06"
+    "context": "Stop hook behavior verified: triggers on Claude Code Stop event, runs normalization + validation if goal-output artifacts exist, exits cleanly. No residual lifecycle ambiguity.",
+    "boundary": "Only documentation updated. No changes to hook scripts or settings.",
+    "next_candidate_goal": "Continue with roadmap N1-N3 stabilization items (project background generation, test coverage, v1 reference cleanup)",
+    "prompt_seed": ""
   }
 }

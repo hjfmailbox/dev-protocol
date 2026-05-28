@@ -52,6 +52,7 @@ This gap has been closed: `SKILL.md` now contains all three concepts.
 |---|---|---|
 | Stale task residue elimination | case-21~23 PASS; all slash prompts now declare explicit completion | **VERIFIED** (static) |
 | SKILL.md/PROMPT.md synchronization for completion semantics | All three commands (dev-status, dev-save, dev-scope) synchronized | **VERIFIED** (static) |
+| Hook lifecycle termination after completed workflow | Stop hook triggered on session end, output emitted, clean exit (exit 0), no repeated triggers, no hanging state | **VERIFIED** (live) |
 
 ---
 
