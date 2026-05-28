@@ -10,6 +10,32 @@ dev-protocol solves this by persisting development state to durable files in the
 
 **Runtime-agnostic**: The protocol core works with Claude Code, Cursor, GitHub Copilot, custom agents, or manual workflows. Claude Code is the reference runtime; other environments use the same files and scripts through their own interaction models. See [`docs/runtime-integrations.md`](docs/runtime-integrations.md) for details.
 
+---
+
+## Agent Quick Start (Required)
+
+Before making any changes:
+
+1. Read `PROJECT_BACKGROUND.md`
+2. Read `.agents/dev-protocol/handoff.md`
+3. Run `/dev-status`
+4. Check `.agents/dev-protocol/docs/deferred-improvements.md`
+5. Follow active roadmap instead of inventing new direction
+
+This repository is developed using **dev-protocol itself**.
+
+Do not:
+- start coding without reading context
+- ignore deferred items
+- redesign architecture without scope
+- skip protocol state updates
+
+Current development mode:
+
+> stabilization → ergonomics → long-running robustness
+
+---
+
 ## Core Workflow
 
 ```
