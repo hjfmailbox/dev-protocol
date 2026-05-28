@@ -5,7 +5,17 @@
 
 ---
 
-## D01 — Reduce `/dev-scope` → `/goal` duplication
+## ~~D01 — Reduce `/dev-scope` → `/goal` duplication~~
+
+**Status**: RESOLVED
+
+Auto-execution for simple scopes implemented in `skills/dev-scope/PROMPT.md` and `SKILL.md`.
+
+`/dev-scope` now evaluates auto-execution criteria after scope generation. When ALL criteria are met (≤3 files, non-architectural, no API changes, single-step validation, low ambiguity, low blast radius), the scope executes directly without requiring a separate `/goal`.
+
+Complex, ambiguous, or architectural work still requires explicit `/goal`.
+
+See: `docs/workflow-compression.md` for design rationale.
 
 ### Problem
 
@@ -460,3 +470,42 @@ Low
 ### Priority
 
 P4
+
+---
+
+## D10 — Cross-runtime hook lifecycle compatibility
+
+### Problem
+
+Stop hook lifecycle termination has been verified for Claude Code only.
+
+Other runtimes (Cursor, Trae, Roo, custom agents) may have different hook semantics or lack equivalent cleanup mechanisms.
+
+### Why Deferred
+
+Claude Code is the reference runtime. Other runtime integrations are future work.
+
+No immediate breakage risk — protocol core does not depend on hooks.
+
+### Desired Outcome
+
+Verify or document equivalent hook cleanup semantics for each supported runtime.
+
+If a runtime does not support equivalent hooks, document the limitation and provide fallback behavior.
+
+### Suggested Fix
+
+Per-runtime adapter validation:
+
+- Cursor: verify extension unload behavior
+- Trae: verify lifecycle hooks
+- Roo: verify task termination
+- Manual: document that hook validation is optional
+
+### Risk
+
+Low
+
+### Priority
+
+P3

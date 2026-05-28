@@ -129,18 +129,24 @@ Goal: Close remaining stabilization gaps before real-project validation.
 
 Goal: Reduce friction for iterative development. Design-only unless explicitly scoped.
 
-### X1. `/dev-scope` to `/goal` friction reduction
+### ~~X1. `/dev-scope` to `/goal` friction reduction~~
 
-**Problem**: Simple scoped work currently requires both `/dev-scope` and `/goal`, creating unnecessary steps for low-risk changes.
+**Status**: IMPLEMENTED
 
-**Design status**: Documented in `docs/workflow-compression.md`. Implementation frozen until stabilization complete.
+**Deliverable**: `skills/dev-scope/PROMPT.md` and `SKILL.md` updated with auto-execution rules.
 
-**Direction**:
+**Auto-execution criteria** (ALL must be true):
+- File count ≤ 3
+- No public API changes
+- No cross-module dependencies
+- Single-step validation
+- No ambiguous language
+- Non-architectural change
+- Low blast radius
 
-* Lightweight execution mode for simple scopes (single-file changes, no API changes, validation criteria trivial)
-* Keep explicit `/goal` for: multi-step planning, repo-wide changes, ambiguous work
+**Behavior**: When criteria are met, `/dev-scope` executes directly. When not met, produces scope document and waits for `/goal`.
 
-**Deliverable**: Design doc update or prototype. Not for implementation in this phase.
+**Tests**: case-27 (allowed auto-execution), case-28 (blocked requires /goal), case-29 (ambiguous clarification).
 
 ---
 

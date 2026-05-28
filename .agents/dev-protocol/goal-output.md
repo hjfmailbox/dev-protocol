@@ -10,8 +10,9 @@ Verified hook lifecycle termination behavior after completed workflow. Confirmed
 
 ## Changed Files
 
+- .agents/dev-protocol/goal-output.json
+- .agents/dev-protocol/goal-output.md
 - docs/runtime-audit.md
-
 ## Validation Results
 
 - PASS: Stop hook triggered on session end after /dev-status execution

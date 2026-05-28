@@ -34,6 +34,9 @@ function Get-CaseDirName {
         '24' { return 'case-24-phase-inference-extended' }
         '25' { return 'case-25-noop-save-extended' }
         '26' { return 'case-26-focus-migration' }
+        '27' { return 'case-27-simple-scope-auto-execution' }
+        '28' { return 'case-28-complex-scope-requires-goal' }
+        '29' { return 'case-29-ambiguous-scope-clarification' }
         default { return "case-$Case" }
     }
 }
@@ -1041,6 +1044,185 @@ if ($Case -eq '23') {
         Fail "case-23: /dev-status prompt missing Protocol Task Status section"
     }
     Pass-Check "case-23: /dev-status prompt contains Protocol Task Status"
+}
+
+# ── Z. Case-27 specific checks (simple scope auto-execution) ─────────
+
+if ($Case -eq '27') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-27 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-27 test-plan.md exists"
+
+    $ScopePrompt = Join-Path $PWD.Path "skills/dev-scope/PROMPT.md"
+    $ScopeSkill = Join-Path $PWD.Path "skills/dev-scope/SKILL.md"
+
+    if (-not (Test-Path $ScopePrompt)) {
+        Fail "case-27: skills/dev-scope/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ScopePrompt -Raw
+
+    # Verify auto-execution criteria exist
+    if ($PromptContent -notmatch "Auto-execution criteria") {
+        Fail "case-27: /dev-scope prompt missing auto-execution criteria"
+    }
+    Pass-Check "case-27: /dev-scope prompt defines auto-execution criteria"
+
+    # Verify 7 criteria are present
+    $CriteriaPatterns = @(
+        "File count",
+        "public API",
+        "cross-module",
+        "Single-step validation",
+        "ambiguous",
+        "Non-architectural",
+        "blast radius"
+    )
+    foreach ($pattern in $CriteriaPatterns) {
+        if ($PromptContent -notmatch $pattern) {
+            Fail "case-27: /dev-scope prompt missing auto-execution criterion: $pattern"
+        }
+    }
+    Pass-Check "case-27: /dev-scope prompt defines all 7 auto-execution criteria"
+
+    # Verify simple scope examples
+    if ($PromptContent -notmatch "fix typo") {
+        Fail "case-27: /dev-scope prompt missing simple scope example"
+    }
+    Pass-Check "case-27: /dev-scope prompt includes auto-execution examples"
+
+    # Verify auto-execution path produces completion
+    if ($PromptContent -notmatch "auto-executes") {
+        Fail "case-27: /dev-scope prompt missing auto-execution path"
+    }
+    Pass-Check "case-27: /dev-scope prompt defines auto-execution path"
+
+    # Verify SKILL.md synchronization
+    if (-not (Test-Path $ScopeSkill)) {
+        Fail "case-27: skills/dev-scope/SKILL.md not found"
+    }
+    $SkillContent = Get-Content $ScopeSkill -Raw
+
+    if ($SkillContent -notmatch "auto-execution" -and $SkillContent -notmatch "Auto-execution") {
+        Fail "case-27: /dev-scope SKILL.md missing auto-execution logic"
+    }
+    Pass-Check "case-27: /dev-scope SKILL.md defines auto-execution"
+}
+
+# ── AA. Case-28 specific checks (complex scope requires /goal) ───────
+
+if ($Case -eq '28') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-28 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-28 test-plan.md exists"
+
+    $ScopePrompt = Join-Path $PWD.Path "skills/dev-scope/PROMPT.md"
+    $ScopeSkill = Join-Path $PWD.Path "skills/dev-scope/SKILL.md"
+
+    if (-not (Test-Path $ScopePrompt)) {
+        Fail "case-28: skills/dev-scope/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ScopePrompt -Raw
+
+    # Verify blocked scope examples
+    $BlockedExamples = @("architecture redesign", "refactor", "OAuth", "cross-cutting")
+    $HasBlocked = $false
+    foreach ($example in $BlockedExamples) {
+        if ($PromptContent -match $example) {
+            $HasBlocked = $true
+            break
+        }
+    }
+    if (-not $HasBlocked) {
+        Fail "case-28: /dev-scope prompt missing blocked scope examples"
+    }
+    Pass-Check "case-28: /dev-scope prompt defines blocked scope examples"
+
+    # Verify STOP behavior for non-auto-executable scopes
+    if ($PromptContent -notmatch "Separate /goal required") {
+        Fail "case-28: /dev-scope prompt missing '/goal required' signal for complex scopes"
+    }
+    Pass-Check "case-28: /dev-scope prompt requires /goal for complex scopes"
+
+    # Verify DO NOT prevents auto-execution of complex work
+    if ($PromptContent -notmatch "NEVER auto-execute when scope is ambiguous") {
+        Fail "case-28: /dev-scope prompt missing auto-execution prevention for ambiguous scopes"
+    }
+    Pass-Check "case-28: /dev-scope prompt prevents auto-execution of ambiguous scopes"
+
+    if ($PromptContent -notmatch "architectural") {
+        Fail "case-28: /dev-scope prompt missing architectural scope prevention"
+    }
+    Pass-Check "case-28: /dev-scope prompt prevents auto-execution of architectural scopes"
+
+    # Verify SKILL.md synchronization
+    if (-not (Test-Path $ScopeSkill)) {
+        Fail "case-28: skills/dev-scope/SKILL.md not found"
+    }
+    $SkillContent = Get-Content $ScopeSkill -Raw
+
+    if ($SkillContent -notmatch "NEVER auto-execute") {
+        Fail "case-28: /dev-scope SKILL.md missing auto-execution prevention"
+    }
+    Pass-Check "case-28: /dev-scope SKILL.md prevents auto-execution of complex scopes"
+}
+
+# ── AB. Case-29 specific checks (ambiguous scope clarification) ──────
+
+if ($Case -eq '29') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-29 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-29 test-plan.md exists"
+
+    $ScopePrompt = Join-Path $PWD.Path "skills/dev-scope/PROMPT.md"
+    $ScopeSkill = Join-Path $PWD.Path "skills/dev-scope/SKILL.md"
+
+    if (-not (Test-Path $ScopePrompt)) {
+        Fail "case-29: skills/dev-scope/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ScopePrompt -Raw
+
+    # Verify ambiguity detection exists
+    if ($PromptContent -notmatch "Detect Ambiguity") {
+        Fail "case-29: /dev-scope prompt missing ambiguity detection section"
+    }
+    Pass-Check "case-29: /dev-scope prompt defines ambiguity detection"
+
+    # Verify ambiguity precedes auto-execution
+    $AmbiguityPos = $PromptContent.IndexOf("Detect Ambiguity")
+    $AutoExecPos = $PromptContent.IndexOf("Auto-Execution")
+    if ($AmbiguityPos -eq -1 -or $AutoExecPos -eq -1) {
+        Fail "case-29: /dev-scope prompt missing ambiguity or auto-execution section"
+    }
+    if (-not ($AmbiguityPos -lt $AutoExecPos)) {
+        Fail "case-29: ambiguity detection must precede auto-execution evaluation"
+    }
+    Pass-Check "case-29: ambiguity detection precedes auto-execution"
+
+    # Verify "No ambiguous language" is an auto-execution criterion
+    if ($PromptContent -notmatch "No ambiguous language") {
+        Fail "case-29: /dev-scope prompt missing 'No ambiguous language' criterion"
+    }
+    Pass-Check "case-29: 'No ambiguous language' is an auto-execution criterion"
+
+    # Verify clarifying questions behavior
+    if ($PromptContent -notmatch "clarifying questions") {
+        Fail "case-29: /dev-scope prompt missing clarifying questions for ambiguous scopes"
+    }
+    Pass-Check "case-29: /dev-scope prompt asks clarifying questions for ambiguous scopes"
+
+    # Verify SKILL.md has ambiguity detection
+    if (-not (Test-Path $ScopeSkill)) {
+        Fail "case-29: skills/dev-scope/SKILL.md not found"
+    }
+    $SkillContent = Get-Content $ScopeSkill -Raw
+
+    if ($SkillContent -notmatch "Detect Ambiguity") {
+        Fail "case-29: /dev-scope SKILL.md missing ambiguity detection"
+    }
+    Pass-Check "case-29: /dev-scope SKILL.md defines ambiguity detection"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

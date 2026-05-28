@@ -155,14 +155,89 @@ Output the complete structured scope:
 ...
 ```
 
-After outputting the scope:
+After outputting the scope, proceed to Step 8 to determine execution path.
 
-"Review the scope above. Confirm or refine before proceeding to implementation."
+---
+
+## STEP 8: Auto-Execution Decision
+
+After generating the scope, evaluate whether it qualifies for auto-execution.
+
+**Auto-execution** means the scope is implemented immediately without requiring a separate `/goal`.
+
+### Auto-execution criteria
+
+ALL of the following must be true:
+
+1. **File count ≤ 3** — scope affects 3 or fewer files
+2. **No public API changes** — does not modify exported interfaces, signatures, or contracts
+3. **No cross-module dependencies** — changes are localized to a single area or module
+4. **Single-step validation** — validation criteria can be verified in one step
+5. **No ambiguous language** — scope description uses concrete, specific language
+6. **Non-architectural** — does not restructure code, introduce new patterns, or change architecture
+7. **Low blast radius** — failure of this change would not cascade to other systems
+
+### Examples
+
+**Auto-executable (direct execution)**:
+- "Fix typo in README installation section"
+- "Add missing import to auth.py"
+- "Update command table in docs"
+- "Rename variable for clarity in single file"
+- "Extract constant in one module"
+- "Sync documentation with current state"
+- "Single-file test coverage gap"
+
+**Requires separate `/goal`**:
+- "Refactor error handling across all endpoints" (> 3 files)
+- "Add OAuth flow: register, login, token refresh" (multi-step)
+- "Change authentication response format" (API change)
+- "Migrate from callbacks to async/await" (architectural, cross-cutting)
+- "Improve performance" (ambiguous)
+- "Update README and all docs" (> 3 files)
+- "Architecture redesign" (architectural)
+
+### Decision path
+
+**If ALL criteria are met**:
+
+1. Execute the scope immediately within defined boundaries
+2. Make normal git commits during work (`feat:`, `fix:`, `docs:`, etc.)
+3. Produce `goal-output.json` or `goal-output.md` artifact
+4. Validate against criteria
+5. Report completion
+
+Output:
+```
+**Auto-execution**: Criteria met. Executing scope directly.
+
+<implementation output>
+
+**Workflow Status**:
+- Scope executed directly (auto-execution)
+- Workflow completed
+- No remaining protocol tasks pending
+- Run /dev-save to persist state
+```
+
+**If ANY criterion is not met**:
+
+1. Output the scope document (from Step 7)
+2. STOP
+3. Prompt user to review before proceeding to `/goal`
+
+Output:
+```
+**Auto-execution**: Criteria NOT met. Separate /goal required.
+
+Review the scope above. Confirm or refine before proceeding to /goal.
 
 **Workflow Status**:
 - Scope declaration complete
+- Workflow completed
 - No remaining protocol tasks pending
 - Awaiting user confirmation before /goal
+```
 
 ---
 
@@ -178,12 +253,13 @@ After outputting the scope:
 
 ## DO NOT
 
-- **NEVER implement code**
-- **NEVER modify repository files**
-- **NEVER commit or checkpoint**
+- **NEVER implement code** (unless auto-execution criteria are ALL met)
+- **NEVER modify repository files** (unless auto-execution criteria are ALL met)
+- **NEVER commit or checkpoint** (unless auto-execution criteria are ALL met)
 - **NEVER silently expand scope**
 - **NEVER proceed with ambiguous requirements**
-- **NEVER force /goal for trivial single-file changes** -- simple tasks may skip explicit /goal
+- **NEVER auto-execute when scope is ambiguous, architectural, affects > 3 files, or modifies public APIs**
+- **NEVER skip /goal for multi-step, cross-cutting, or high-blast-radius work**
 
 ## PRECONDITIONS
 

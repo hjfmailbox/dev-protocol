@@ -489,15 +489,52 @@ If no description provided, prompt:
 - Commit or checkpoint
 - Silently expand scope
 - Proceed with ambiguous requirements
-- Force `/goal` for trivial single-file changes
+- Auto-execute when scope is ambiguous, architectural, affects > 3 files, or modifies public APIs
 
 ### Scope Size Guidance
 
 | Size | Guidance |
 |---|---|
-| Small (1-3 files) | Ideal. Prefer this. |
-| Medium (4-7 files) | Acceptable if tightly related. |
+| Small (1-3 files) | Ideal. Prefer this. May auto-execute. |
+| Medium (4-7 files) | Acceptable if tightly related. Requires `/goal`. |
 | Large (8+ files) | Must decompose. Suggest splitting. |
+
+### Auto-Execution
+
+For simple, low-risk scopes, `/dev-scope` may execute directly without requiring a separate `/goal`.
+
+**Auto-execution criteria** (ALL must be true):
+
+1. File count <= 3
+2. No public API changes
+3. No cross-module dependencies
+4. Single-step validation
+5. No ambiguous language
+6. Non-architectural change
+7. Low blast radius
+
+**Behavior**:
+
+| Result | Action |
+|---|---|
+| ALL criteria met | Execute immediately; create normal commits; produce goal-output artifact |
+| ANY criterion not met | Output scope document; STOP; wait for `/goal` |
+
+**Examples**:
+
+```text
+/dev-scope "fix typo in README"
+-> auto-executes (1 file, non-architectural, concrete)
+-> produces commit: docs(readme): fix typo
+-> prompts for /dev-save
+```
+
+```text
+/dev-scope "refactor auth across all modules"
+-> produces scope document (affects > 3 files, cross-cutting)
+-> STOPs
+-> user reviews, then runs /goal
+```
 
 ### Success Signals
 
@@ -709,11 +746,12 @@ These commands redirect to canonical v2 commands. They remain callable for backw
    ↓
 /dev-status   -- inspect state (read-only)
    ↓
-/dev-scope    -- declare goal
-   ↓
-/goal         -- implement within scope
-   ↓ (commit source)
-case-06       -- validate goal commit
+/dev-scope    -- declare goal (auto-executes if criteria met)
+   ↓              ↓ (auto-execution)
+/goal         -- implement within scope   normal commits
+   ↓ (commit source)                       goal-output artifact
+   ↓                                         ↓
+case-06       -- validate goal commit ←──────┘
    ↓
 /dev-save     -- persist protocol state
    ↓
@@ -724,8 +762,9 @@ case-05       -- validate checkpoint
 
 **Key rules**:
 
-- /dev-save NEVER commits source code. Source commits happen during /goal.
+- /dev-save NEVER commits source code. Source commits happen during /goal or auto-execution.
 - /dev-status NEVER modifies anything. It is strictly read-only.
-- /dev-scope NEVER implements anything. It only declares intent.
+- /dev-scope MAY implement directly when auto-execution criteria are ALL met.
+- /dev-scope declares intent; auto-execution is an optimization for simple scopes.
 - /dev-init NEVER auto-commits. User must manually commit state files.
 - /goal NEVER modifies protocol state files.

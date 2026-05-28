@@ -74,6 +74,28 @@ implement
 4. `implement` — Make normal git commits during work
 5. `/dev-save` — Persist protocol state after completing the goal
 
+### Simple Scope Loop (Auto-Execution)
+
+For simple, low-risk work, `/dev-scope` can execute directly without a separate `/goal`.
+
+```text
+/dev-status
+/dev-scope "fix typo in README"
+/dev-save
+```
+
+**Auto-execution criteria** (ALL must be true):
+- Affects ≤ 3 files
+- No public API changes
+- No cross-module dependencies
+- Single-step validation
+- Non-architectural change
+- Low blast radius
+
+If criteria are met, `/dev-scope` executes immediately, creates normal commits, and produces a goal-output artifact.
+
+If criteria are NOT met, `/dev-scope` produces a scope document and waits for `/goal` as usual.
+
 ### Verification Loop
 
 Not every loop requires source code changes.
@@ -95,7 +117,7 @@ verify
 | Command | When to Use | Never Use For |
 |---------|-------------|---------------|
 | `/dev-status` | Start of session, check state, detect drift | Saving progress, declaring goals, modifying files |
-| `/dev-scope` | Before any implementation work | Already-clear tasks, exploration without deliverables |
+| `/dev-scope` | Before any implementation work; auto-executes simple scopes | Already-clear tasks, exploration without deliverables |
 | `/goal` | Implementation within a scoped objective | Unscoped work, saving state, inspecting context |
 | `/dev-save` | After completing work, before ending session | Uncommitted source changes you intend to keep, unscoped work |
 | `/dev-init` | First contact, missing state files, corrupted state | Projects with existing valid state |

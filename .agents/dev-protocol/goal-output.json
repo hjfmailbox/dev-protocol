@@ -2,6 +2,8 @@
   "goal_status": "COMPLETED",
   "goal_summary": "Verified hook lifecycle termination behavior after completed workflow. Confirmed that Claude Code Stop hook triggers on session end, executes validation logic, outputs results, and exits cleanly (exit 0) without repeated triggers, hanging state, or context contamination.",
   "changed_files": [
+    ".agents/dev-protocol/goal-output.json",
+    ".agents/dev-protocol/goal-output.md",
     "docs/runtime-audit.md"
   ],
   "validation_results": [

@@ -30,8 +30,7 @@ After scoping, the goal must have:
 
 ## When NOT to Use
 
-- The goal is already fully specified by the user
-- Simple single-file changes with obvious scope
+- The goal is already fully specified by the user and auto-execution criteria are met (it will execute directly)
 - Exploration or research without concrete deliverables
 - You want to save progress (use /dev-save instead)
 - You want to inspect state (use /dev-status instead)
@@ -54,6 +53,8 @@ The output is execution-ready. The agent consuming this scope must implement exa
 
 ## Typical Workflow
 
+### Standard path (complex scope)
+
 ```
 /dev-scope
 → goal structure generated
@@ -61,6 +62,17 @@ The output is execution-ready. The agent consuming this scope must implement exa
 → /goal <structured scope>
 → implement within scoped boundaries
 → validate against criteria
+→ /dev-save
+```
+
+### Auto-execution path (simple scope)
+
+```
+/dev-scope "fix typo in README"
+→ criteria evaluated: ≤3 files, non-architectural, no API changes
+→ auto-executes directly
+→ normal git commit created
+→ goal-output artifact produced
 → /dev-save
 ```
 
@@ -128,6 +140,31 @@ If the user's request is ambiguous:
 - Ask clarifying questions
 - Do NOT proceed with assumptions
 
+### 7. Evaluate Auto-Execution Eligibility
+
+After scope generation, determine if the scope qualifies for direct execution.
+
+**Auto-execution criteria** (ALL must be true):
+
+1. File count ≤ 3
+2. No public API changes
+3. No cross-module dependencies
+4. Single-step validation
+5. No ambiguous language
+6. Non-architectural change
+7. Low blast radius
+
+**If ALL criteria met**:
+- Execute scope immediately
+- Create normal git commits during work
+- Produce goal-output artifact
+- Report "Workflow completed"
+
+**If ANY criterion not met**:
+- Output scope document
+- STOP
+- Wait for user confirmation before `/goal`
+
 ---
 
 ## DO
@@ -141,12 +178,13 @@ If the user's request is ambiguous:
 
 ## DO NOT
 
-- **NEVER implement code**
-- **NEVER modify repository files**
-- **NEVER commit or checkpoint**
+- **NEVER implement code** (unless auto-execution criteria are ALL met)
+- **NEVER modify repository files** (unless auto-execution criteria are ALL met)
+- **NEVER commit or checkpoint** (unless auto-execution criteria are ALL met)
 - **NEVER silently expand scope**
 - **NEVER proceed with ambiguous requirements**
-- **NEVER force `/goal` for trivial single-file changes**
+- **NEVER auto-execute when scope is ambiguous, architectural, affects > 3 files, or modifies public APIs**
+- **NEVER skip `/goal` for multi-step, cross-cutting, or high-blast-radius work**
 - **Prefer smaller scopes over large scopes**
 
 ## PRECONDITIONS
