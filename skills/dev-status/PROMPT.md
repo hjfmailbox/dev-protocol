@@ -26,6 +26,11 @@ Read state files from `.agents/dev-protocol/`:
 - `handoff.md`
 - `project-rules.md`
 
+Also read optional context files (if they exist):
+
+- `.agents/dev-protocol/next-phase-plan.md` — for phase inference
+- `docs/v2-redesign-roadmap.md` or active roadmap file — for phase inference
+
 Rules:
 
 - If `.agents/dev-protocol/` has state files, use them exclusively
@@ -124,6 +129,48 @@ Drift detection is report-only. Do NOT write incidents, do NOT modify state file
 
 ## STEP 4: Reconstruct Execution Context
 
+### 4.1 Phase Inference
+
+When `workflow-state.yml` reports `phase: unknown` or phase is stale:
+
+Infer phase using strict priority order. Stop at first valid result.
+
+```
+1. next-phase-plan.md
+2. roadmap (docs/v2-redesign-roadmap.md or active roadmap)
+3. handoff.md
+4. workflow-state.yml (persisted phase, if not unknown)
+5. fallback: unknown
+```
+
+**Extraction rules per source:**
+
+| Source | Read | Valid Phase Indicators |
+|---|---|---|
+| next-phase-plan.md | `.agents/dev-protocol/next-phase-plan.md` | Pending loop content: "stabilization"/"hardening"/"fix" → `stabilization`; "ergonomics"/"compression"/"friction" → `ergonomics`; "robustness"/"replay"/"audit" → `robustness` |
+| roadmap | `docs/v2-redesign-roadmap.md` or active roadmap | "Current Direction" or "Current Phase" section. Explicit phase labels: `p0`-`p4`, `stabilization`, `ergonomics`, `robustness` |
+| handoff.md | `.agents/dev-protocol/handoff.md` | "Current Focus" section: stabilization language → `stabilization`; ergonomics language → `ergonomics`; "Next Recommended Actions" content |
+| workflow-state.yml | `.agents/dev-protocol/workflow-state.yml` | `current_state.phase` if not `unknown` and `checkpoint.last_commit` matches HEAD or HEAD~1 |
+
+**Algorithm:**
+
+1. Read next-phase-plan.md. If exists and contains pending loops with phase indicators → use inferred phase.
+2. Read roadmap. If contains explicit phase label → use that phase.
+3. Read handoff.md Current Focus. If contains phase-indicator language → map to phase.
+4. Read workflow-state.yml phase. If not `unknown` and checkpoint is current → use persisted phase.
+5. Output `unknown` with note: "Phase could not be inferred from available context."
+
+**Output format for inferred phase:**
+
+```
+**Current Phase**: <phase> (inferred from <source>)
+```
+
+If phase was inferred, add note:
+"Phase was inferred from <source>. Run /dev-save to persist."
+
+### 4.2 Context Reconstruction
+
 Rebuild from trusted sources in priority order:
 
 1. Git reality (current branch, recent commits, dirty/clean)
@@ -132,7 +179,7 @@ Rebuild from trusted sources in priority order:
 
 Output:
 
-- **Current phase**: from state, with drift note if mismatch detected
+- **Current phase**: from inference (4.1) or persisted state, with drift note if mismatch detected
 - **Active focus**: from state, validated against recent commits
 - **In-progress tasks**: from handoff, validated against git status
 - **Blockers**: from handoff, noted if stale

@@ -71,6 +71,29 @@ Scope → Work → case-06 → Save → case-05
 
 ---
 
+## State File Conventions
+
+### current-focus.md
+
+`current-focus.md` is **not** a recognized protocol state file.
+
+Focus information belongs in:
+
+- `handoff.md` — human-readable narrative
+- `workflow-state.yml` — machine-readable structured data
+
+If `current-focus.md` exists (from external tools or manual creation):
+
+1. Read its content
+2. Merge into `handoff.md` "Current Focus" section
+3. Update `workflow-state.yml` `current_state.focus`
+4. Delete `current-focus.md`
+5. Run `/dev-save`
+
+Agents must not create `current-focus.md`. Use the established state files instead.
+
+---
+
 ## Example Workflow
 
 ```

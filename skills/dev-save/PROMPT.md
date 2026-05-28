@@ -33,6 +33,12 @@ Also verify:
 
 - Git repository is initialized (`git rev-parse HEAD` succeeds)
 
+**Workspace state check**:
+
+- Clean workspace is ALLOWED. No-op saves are valid.
+- Dirty workspace with uncommitted source changes is ALLOWED. /dev-save only commits protocol state.
+- Do NOT fail on clean workspace.
+
 ---
 
 ## STEP 2: Inspect Repository Reality
@@ -98,7 +104,7 @@ Rules:
 
 ---
 
-## STEP 5: Validate State Consistency
+## STEP 5: Validate State Consistency and Detect No-op
 
 Before considering save complete, validate:
 
@@ -125,6 +131,20 @@ Required for recoverability:
 - `workflow-state.yml` contains save-tracking metadata
 - State is internally consistent (no contradictions between files)
 
+### 5.4 No-op detection
+
+Check if this is a no-op save (verification loop with no source changes):
+
+```bash
+git diff --quiet HEAD
+```
+
+If workspace is clean AND state files have no meaningful changes:
+
+- This is a **no-op save**
+- Still valid. Proceed to STEP 6.
+- Record in state: `validated target`, `summary`, `reasoning`, `no-op success`
+
 If any validation fails:
 
 STOP. Output:
@@ -143,12 +163,16 @@ Do NOT report save as successful.
 
 After validation passes, automatically persist the state files:
 
-1. **Stage ONLY protocol state files**:
+1. **Ensure state files have changes to commit**:
+   - If no-op save: update `checkpoint.last_updated` to current date to ensure git detects changes
+   - Update `handoff.md` "Completed Since Last Save" with no-op summary
+
+2. **Stage ONLY protocol state files**:
    ```bash
    git add .agents/dev-protocol/
    ```
 
-2. **Create protocol commit** with conventional format:
+3. **Create protocol commit** with conventional format:
    ```bash
    git commit -m "chore(checkpoint): sync state after <focus summary>"
    ```
@@ -156,10 +180,11 @@ After validation passes, automatically persist the state files:
    Rules for commit message:
    - MUST use `chore(checkpoint):` prefix
    - MUST describe current focus (e.g., "sync state after auth goal", "sync state after onboarding")
+   - For no-op saves: "chore(checkpoint): sync state after validation — no changes required"
    - MUST NOT reuse the previous goal commit message
    - MUST NOT include source code changes
 
-3. **Verify clean workspace**:
+4. **Verify clean workspace**:
    - `git status --short` should show nothing staged and nothing modified in `.agents/`
    - If non-protocol files are modified, they were NOT staged (correct behavior)
 
@@ -168,6 +193,8 @@ After validation passes, automatically persist the state files:
 ## STEP 7: Output Summary
 
 After successful commit, output:
+
+**Standard save:**
 
 ```
 ## /dev-save Complete
@@ -184,6 +211,33 @@ After successful commit, output:
 - Last commit: <hash>
 - Branch: <branch>
 - Workspace: <clean/dirty>
+
+**Next Steps**:
+1. Continue working or start a new session with /dev-status
+```
+
+**No-op save:**
+
+```
+## /dev-save Complete (No-op)
+
+**Validation Result**: No source changes required
+**Validated Target**: <what was verified>
+**Summary**: <brief summary>
+**Reasoning**: <why no changes were needed>
+
+**Files Updated**:
+- `.agents/dev-protocol/workflow-state.yml`
+- `.agents/dev-protocol/handoff.md`
+
+**Protocol Commit**:
+- Message: chore(checkpoint): sync state after validation — no changes required
+- Hash: <new-commit-hash>
+
+**Git Context**:
+- Last commit: <hash>
+- Branch: <branch>
+- Workspace: clean
 
 **Next Steps**:
 1. Continue working or start a new session with /dev-status
