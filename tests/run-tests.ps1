@@ -713,17 +713,12 @@ if ($Case -eq '14') {
     Pass-Check "case-14: /dev-status prompt contains phase inference"
 
     # Verify precedence order: git reality > workflow-state > current-focus > roadmap > fallback
-    # Restrict check to the Phase Inference block to avoid false matches from STEP 1
-    $PhaseInferenceBlock = [regex]::Match($PromptContent, "(?s)Phase Inference.*?(?=## DO|## STEP 5:)")
-    if (-not $PhaseInferenceBlock.Success) {
-        Fail "case-14: Could not isolate Phase Inference block for precedence check"
-    }
-    $Block = $PhaseInferenceBlock.Value
-    $GitPos = $Block.IndexOf("git reality")
-    $WsPos = $Block.IndexOf("workflow-state.yml")
-    $FocusPos = $Block.IndexOf("current-focus")
-    $RoadmapPos = $Block.IndexOf("roadmap")
-    $FallbackPos = $Block.IndexOf("fallback")
+    # Use numbered list items to avoid false matches from prose or table headers
+    $GitPos = $PromptContent.IndexOf("1. git reality")
+    $WsPos = $PromptContent.IndexOf("2. workflow-state.yml")
+    $FocusPos = $PromptContent.IndexOf("3. current-focus")
+    $RoadmapPos = $PromptContent.IndexOf("4. roadmap")
+    $FallbackPos = $PromptContent.IndexOf("5. fallback")
 
     if ($GitPos -eq -1 -or $WsPos -eq -1 -or $FocusPos -eq -1 -or $RoadmapPos -eq -1 -or $FallbackPos -eq -1) {
         Fail "case-14: /dev-status prompt missing one or more precedence sources"
