@@ -775,10 +775,10 @@ if ($Case -eq '15') {
     }
     Pass-Check "case-15: /dev-scope prompt defines FAILURE CONDITIONS"
 
-    if ($PromptContent -notmatch "NEVER force /goal") {
-        Fail "case-15: /dev-scope prompt missing scope misuse detection (NEVER force /goal)"
+    if ($PromptContent -notmatch "NEVER auto-execute when scope is ambiguous") {
+        Fail "case-15: /dev-scope prompt missing scope misuse detection (NEVER auto-execute for ambiguous/architectural scopes)"
     }
-    Pass-Check "case-15: /dev-scope prompt detects scope misuse"
+    Pass-Check "case-15: /dev-scope prompt detects scope misuse (prevents auto-execution of complex work)"
 }
 
 # ── R. Case-16 specific checks (stale focus contamination) ───────────

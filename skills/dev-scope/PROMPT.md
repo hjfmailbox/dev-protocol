@@ -209,7 +209,7 @@ ALL of the following must be true:
 
 Output:
 ```
-**Auto-execution**: Criteria met. Executing scope directly.
+**Auto-execution**: Criteria met. Scope auto-executes directly.
 
 <implementation output>
 
