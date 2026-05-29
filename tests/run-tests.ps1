@@ -41,6 +41,9 @@ function Get-CaseDirName {
         '31' { return 'case-31-all-loops-completed' }
         '32' { return 'case-32-ambiguous-next-loop' }
         '33' { return 'case-33-large-loop-requires-goal' }
+        '34' { return 'case-34-generate-plan-basic' }
+        '35' { return 'case-35-generate-plan-defer-aware' }
+        '36' { return 'case-36-generate-plan-continue-loop-constraints' }
         default { return "case-$Case" }
     }
 }
@@ -1413,6 +1416,239 @@ if ($Case -eq '33') {
         Fail "case-33: continue-loop SKILL.md missing scope document path"
     }
     Pass-Check "case-33: continue-loop SKILL.md defines scope document path"
+}
+
+# ── AG. Case-34 specific checks (generate-plan basic workflow) ───────
+
+if ($Case -eq '34') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-34 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-34 test-plan.md exists"
+
+    $GenPrompt = Join-Path $PWD.Path "skills/generate-plan/PROMPT.md"
+    $GenSkill = Join-Path $PWD.Path "skills/generate-plan/SKILL.md"
+    $GenSymlink = Join-Path $PWD.Path ".claude/skills/generate-plan"
+
+    if (-not (Test-Path $GenPrompt)) {
+        Fail "case-34: skills/generate-plan/PROMPT.md not found"
+    }
+    Pass-Check "case-34: skills/generate-plan/PROMPT.md exists"
+
+    if (-not (Test-Path $GenSkill)) {
+        Fail "case-34: skills/generate-plan/SKILL.md not found"
+    }
+    Pass-Check "case-34: skills/generate-plan/SKILL.md exists"
+
+    if (-not (Test-Path $GenSymlink)) {
+        Fail "case-34: .claude/skills/generate-plan symlink not found"
+    }
+    Pass-Check "case-34: .claude/skills/generate-plan symlink exists"
+
+    $SkillContent = Get-Content $GenSkill -Raw
+
+    # Verify required sections
+    if ($SkillContent -notmatch "Purpose") {
+        Fail "case-34: generate-plan SKILL.md missing Purpose"
+    }
+    Pass-Check "case-34: generate-plan SKILL.md defines Purpose"
+
+    if ($SkillContent -notmatch "When to Use") {
+        Fail "case-34: generate-plan SKILL.md missing When to Use"
+    }
+    Pass-Check "case-34: generate-plan SKILL.md defines When to Use"
+
+    if ($SkillContent -notmatch "When NOT to Use") {
+        Fail "case-34: generate-plan SKILL.md missing When NOT to Use"
+    }
+    Pass-Check "case-34: generate-plan SKILL.md defines When NOT to Use"
+
+    if ($SkillContent -notmatch "Execution Sequence") {
+        Fail "case-34: generate-plan SKILL.md missing Execution Sequence"
+    }
+    Pass-Check "case-34: generate-plan SKILL.md defines Execution Sequence"
+
+    $PromptContent = Get-Content $GenPrompt -Raw
+
+    # Verify STEP 1 (Read Context)
+    if ($PromptContent -notmatch "STEP 1") {
+        Fail "case-34: generate-plan PROMPT.md missing STEP 1"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md defines STEP 1"
+
+    # Verify STEP 3 (Decompose Goal)
+    if ($PromptContent -notmatch "STEP 3") {
+        Fail "case-34: generate-plan PROMPT.md missing STEP 3"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md defines STEP 3"
+
+    # Verify STEP 4 (Write Plan)
+    if ($PromptContent -notmatch "STEP 4") {
+        Fail "case-34: generate-plan PROMPT.md missing STEP 4"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md defines STEP 4"
+
+    # Verify output path
+    if ($PromptContent -notmatch "docs/next-phase-plan.md") {
+        Fail "case-34: generate-plan PROMPT.md missing output path docs/next-phase-plan.md"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md defines output path"
+
+    # Verify execution prohibition
+    if ($PromptContent -notmatch "NEVER execute loops") {
+        Fail "case-34: generate-plan PROMPT.md missing execution prohibition"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md prohibits execution"
+
+    if ($SkillContent -notmatch "NEVER execute loops") {
+        Fail "case-34: generate-plan SKILL.md missing execution prohibition"
+    }
+    Pass-Check "case-34: generate-plan SKILL.md prohibits execution"
+
+    # Verify loop format
+    if ($PromptContent -notmatch "## Loop N") {
+        Fail "case-34: generate-plan PROMPT.md missing loop format"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md defines loop format"
+
+    # Verify loop sections
+    if ($PromptContent -notmatch "Goal:") {
+        Fail "case-34: generate-plan PROMPT.md missing Goal section"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md requires Goal"
+
+    if ($PromptContent -notmatch "Files:") {
+        Fail "case-34: generate-plan PROMPT.md missing Files section"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md requires Files"
+
+    if ($PromptContent -notmatch "Validation:") {
+        Fail "case-34: generate-plan PROMPT.md missing Validation section"
+    }
+    Pass-Check "case-34: generate-plan PROMPT.md requires Validation"
+}
+
+# ── AH. Case-35 specific checks (generate-plan defer-aware planning) ─
+
+if ($Case -eq '35') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-35 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-35 test-plan.md exists"
+
+    $GenPrompt = Join-Path $PWD.Path "skills/generate-plan/PROMPT.md"
+    $GenSkill = Join-Path $PWD.Path "skills/generate-plan/SKILL.md"
+
+    if (-not (Test-Path $GenPrompt)) {
+        Fail "case-35: skills/generate-plan/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $GenPrompt -Raw
+
+    # Verify deferred-improvements.md is read
+    if ($PromptContent -notmatch "deferred-improvements") {
+        Fail "case-35: generate-plan PROMPT.md does not read deferred-improvements.md"
+    }
+    Pass-Check "case-35: generate-plan PROMPT.md reads deferred-improvements.md"
+
+    # Verify roadmap is read
+    if ($PromptContent -notmatch "v2-redesign-roadmap") {
+        Fail "case-35: generate-plan PROMPT.md does not read roadmap"
+    }
+    Pass-Check "case-35: generate-plan PROMPT.md reads roadmap"
+
+    # Verify SKILL.md requires deferred reading
+    $SkillContent = Get-Content $GenSkill -Raw
+    if ($SkillContent -notmatch "deferred-improvements") {
+        Fail "case-35: generate-plan SKILL.md does not require deferred reading"
+    }
+    Pass-Check "case-35: generate-plan SKILL.md requires deferred reading"
+
+    # Verify prefer small loops
+    if ($PromptContent -notmatch "prefer small loops" -and $PromptContent -notmatch "prefer ≤3 files") {
+        Fail "case-35: generate-plan PROMPT.md does not prefer small loops"
+    }
+    Pass-Check "case-35: generate-plan PROMPT.md prefers small loops"
+
+    # Verify avoid repo-wide refactors
+    if ($PromptContent -notmatch "repo-wide" -and $PromptContent -notmatch "avoid.*refactor") {
+        Fail "case-35: generate-plan PROMPT.md does not avoid repo-wide refactors"
+    }
+    Pass-Check "case-35: generate-plan PROMPT.md avoids repo-wide refactors"
+
+    # Verify context output includes deferred/roadmap
+    if ($PromptContent -notmatch "Deferred items" -and $PromptContent -notmatch "Roadmap items") {
+        Fail "case-35: generate-plan PROMPT.md missing deferred/roadmap in context output"
+    }
+    Pass-Check "case-35: generate-plan PROMPT.md includes deferred/roadmap in output"
+}
+
+# ── AI. Case-36 specific checks (generated loops satisfy constraints) ─
+
+if ($Case -eq '36') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-36 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-36 test-plan.md exists"
+
+    $GenPrompt = Join-Path $PWD.Path "skills/generate-plan/PROMPT.md"
+    $GenSkill = Join-Path $PWD.Path "skills/generate-plan/SKILL.md"
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    $ContinueSkill = Join-Path $PWD.Path "skills/continue-loop/SKILL.md"
+
+    if (-not (Test-Path $GenPrompt)) {
+        Fail "case-36: skills/generate-plan/PROMPT.md not found"
+    }
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-36: skills/continue-loop/PROMPT.md not found"
+    }
+    if (-not (Test-Path $ContinueSkill)) {
+        Fail "case-36: skills/continue-loop/SKILL.md not found"
+    }
+
+    $PromptContent = Get-Content $GenPrompt -Raw
+
+    # Verify STEP 5 validates against continue-loop constraints
+    if ($PromptContent -notmatch "STEP 5" -and $PromptContent -notmatch "Validate Plan") {
+        Fail "case-36: generate-plan PROMPT.md missing validation step"
+    }
+    Pass-Check "case-36: generate-plan PROMPT.md defines validation step"
+
+    # Verify file count check
+    if ($PromptContent -notmatch "file count" -and $PromptContent -notmatch "≤3") {
+        Fail "case-36: generate-plan PROMPT.md missing file count constraint"
+    }
+    Pass-Check "case-36: generate-plan PROMPT.md checks file count"
+
+    # Verify ambiguous language check
+    if ($PromptContent -notmatch "ambiguous" -and $PromptContent -notmatch "improve" -and $PromptContent -notmatch "optimize") {
+        Fail "case-36: generate-plan PROMPT.md missing ambiguous language check"
+    }
+    Pass-Check "case-36: generate-plan PROMPT.md checks ambiguous language"
+
+    # Verify non-architectural check
+    if ($PromptContent -notmatch "architectural" -and $PromptContent -notmatch "Non-architectural") {
+        Fail "case-36: generate-plan PROMPT.md missing architectural constraint"
+    }
+    Pass-Check "case-36: generate-plan PROMPT.md checks architectural constraint"
+
+    # Verify SKILL.md has validation section
+    $SkillContent = Get-Content $GenSkill -Raw
+    if ($SkillContent -notmatch "Validate Plan") {
+        Fail "case-36: generate-plan SKILL.md missing Validate Plan section"
+    }
+    Pass-Check "case-36: generate-plan SKILL.md defines Validate Plan"
+
+    # Verify status format compatible with tolerant parsing
+    if ($PromptContent -notmatch "Status:\s*pending") {
+        Fail "case-36: generate-plan PROMPT.md missing Status: pending format"
+    }
+    Pass-Check "case-36: generate-plan PROMPT.md uses compatible status format"
+
+    # Verify auto-execution-friendly wording requirement
+    if ($SkillContent -notmatch "auto-execution" -and $SkillContent -notmatch "Auto-execution") {
+        Fail "case-36: generate-plan SKILL.md missing auto-execution-friendly wording requirement"
+    }
+    Pass-Check "case-36: generate-plan SKILL.md requires auto-execution-friendly wording"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

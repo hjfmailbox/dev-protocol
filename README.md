@@ -118,19 +118,26 @@ When `next-phase-plan.md` exists, automatically derive and execute the next plan
 
 ```text
 /dev-status
+generate plan
 continue loop
 /dev-save
 ```
 
 1. `/dev-status` — Recover context
-2. `continue loop` — Read plan, find next incomplete loop, derive scope, auto-execute or produce scope document
-3. `/dev-save` — Persist protocol state after loop completion
+2. `generate plan` — Read context, decompose goal into loops, write `next-phase-plan.md`
+3. `continue loop` — Read plan, find next incomplete loop, derive scope, auto-execute or produce scope document
+4. `/dev-save` — Persist protocol state after loop completion
 
 **Behavior**:
+- If no plan exists: `generate plan` creates one from context
 - If next loop is simple (≤3 files, non-architectural, concrete): auto-executes directly
 - If next loop is complex: produces scope document, waits for `/goal`
-- If no plan exists: recommends `/dev-scope`
 - If all loops completed: reports completion
+
+**Canonical autonomous workflow**:
+```text
+goal → generate plan → continue loop → /dev-save
+```
 
 ### Command Reference
 
@@ -138,8 +145,9 @@ continue loop
 |---------|-------------|---------------|
 | `/dev-status` | Start of session, check state, detect drift | Saving progress, declaring goals, modifying files |
 | `/dev-scope` | Before any implementation work; auto-executes simple scopes | Already-clear tasks, exploration without deliverables |
-| `/goal` | Implementation within a scoped objective | Unscoped work, saving state, inspecting context |
+| `generate plan` | Before `continue loop`, when no plan exists; decompose goal into loops | Executing work, inspecting state, saving progress |
 | `continue loop` | When `next-phase-plan.md` exists; proceed to next planned loop | No plan exists, ambiguous next loop, dirty workspace |
+| `/goal` | Implementation within a scoped objective | Unscoped work, saving state, inspecting context |
 | `/dev-save` | After completing work, before ending session | Uncommitted source changes you intend to keep, unscoped work |
 | `/dev-init` | First contact, missing state files, corrupted state | Projects with existing valid state |
 
@@ -155,6 +163,7 @@ Protocol commands are semantic operations. The Claude Code representations use s
 |----------|:-----------:|:------------:|-------------|
 | Init | `/dev-init` | Yes | Inspect repository, reconstruct project reality, initialize protocol state |
 | Scope | `/dev-scope` | No | Declare a focused goal with validation criteria |
+| Plan | `generate plan` | Yes | Generate `next-phase-plan.md` from context and goal decomposition |
 | Save | `/dev-save` | Yes | Persist protocol state files only, validate (fails on inconsistency) |
 | Status | `/dev-status` | No | Inspect current protocol state and reconstruct context |
 | Continue | `continue loop` | Conditional | Derive and execute next loop from `next-phase-plan.md` |

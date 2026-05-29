@@ -171,6 +171,36 @@ Goal: Reduce friction for iterative development. Design-only unless explicitly s
 
 ---
 
+### ~~X2.5. Goal-to-Plan bootstrap generation~~
+
+**Status**: IMPLEMENTED
+
+**Deliverable**: `skills/generate-plan/PROMPT.md` and `SKILL.md` created. Command contract documented in `docs/command-contracts.md`.
+
+**Behavior**:
+- Reads context: workflow-state.yml, handoff.md, roadmap, deferred-improvements, recent git history, goal-output
+- Infers current phase, focus, unresolved friction, relevant roadmap/defer items
+- Decomposes high-level goal into numbered loops with explicit validation criteria
+- Writes `docs/next-phase-plan.md` using loop structure compatible with `continue loop`
+- Validates generated loops against continue-loop constraints
+
+**Plan requirements**:
+- Numbered loops
+- Each loop independently executable
+- Explicit validation criteria
+- Explicit completion signals
+- Bounded scope
+- Auto-execution-friendly wording
+
+**Canonical workflow**:
+```
+goal → generate plan → continue loop → /dev-save
+```
+
+**Tests**: case-34 (basic workflow), case-35 (defer-aware planning), case-36 (continue-loop constraint satisfaction)
+
+---
+
 ### X3. No-op workflow formalization
 
 **Status**: Already implemented in `/dev-save`. Clean workspace produces valid checkpoint commit.

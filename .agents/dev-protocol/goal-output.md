@@ -10,13 +10,8 @@ Dogfooded dev-protocol using real protocol workflow. Used /dev-save, next-phase-
 
 ## Changed Files
 
-- skills/dev-save/PROMPT.md
-- skills/continue-loop/PROMPT.md
-- skills/dev-status/SKILL.md
-- skills/dev-status/PROMPT.md
-- .agents/dev-protocol/handoff.md
-- .agents/dev-protocol/next-phase-plan.md
-- .agents/dev-protocol/workflow-state.yml
+- .agents/dev-protocol/goal-output.json
+- .agents/dev-protocol/goal-output.md
 ## Validation Results
 
 - PASS: /dev-save precondition check (workspace clean, no blockers, checkpoint current)

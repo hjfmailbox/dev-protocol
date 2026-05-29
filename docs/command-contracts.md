@@ -869,6 +869,132 @@ continue loop
 
 ---
 
+## generate plan
+
+### Purpose
+
+Convert a high-level goal into a structured `next-phase-plan.md` draft, reducing manual planning friction before `continue loop` execution.
+
+### When to use
+
+- After `/dev-scope` or `/goal` has produced a high-level objective
+- Before `continue loop`, when no `next-phase-plan.md` exists yet
+- When a goal is complex enough to benefit from decomposition into loops
+- After reviewing roadmap or deferred items that suggest multi-step work
+
+### When NOT to use
+
+- A `next-phase-plan.md` already exists (use `continue loop` instead)
+- The goal is simple enough for single-loop auto-execution (use `/dev-scope` directly)
+- You want to inspect state (use `/dev-status` instead)
+- You want to save progress (use `/dev-save` instead)
+
+### Inputs
+
+Goal (optional if inferable from context): brief description of the objective.
+
+If no goal provided and none inferable from context, prompt for one.
+
+### Preconditions
+
+- Git repository is initialized
+- `.agents/dev-protocol/` exists with valid state files
+- Goal is provided or inferable from context
+
+### Side Effects
+
+| Aspect | Behavior |
+|---|---|
+| Files modified | Creates or updates `docs/next-phase-plan.md` |
+| Git commit | **NO** — does not auto-commit |
+| Git push | **NO** |
+| Workflow state | **NO** — does not modify protocol state files |
+
+### Outputs
+
+```
+## generate plan Complete
+
+**Goal Inferred**: <goal summary>
+**Loops Generated**: <N>
+**Plan File**: docs/next-phase-plan.md
+
+**Loop Summary**:
+- Loop 1: <name> — <files> — <auto-execution status>
+- ...
+
+**Context Used**:
+- Phase: <phase>
+- Focus: <focus>
+- Roadmap items: <list>
+- Deferred items: <list>
+
+**Next Steps**:
+1. Review docs/next-phase-plan.md
+2. Edit if needed
+3. Run continue loop to execute
+```
+
+### DO
+
+- Prefer small, focused loops
+- Use concrete language
+- Include explicit validation criteria
+- Reference specific files when possible
+- Validate against continue-loop constraints
+- Allow user to review plan before execution
+
+### DO NOT
+
+- Execute loops
+- Modify source code
+- Invent requirements not implied by context
+- Create loops larger than 8 files without decomposition note
+- Skip context reading
+- Overwrite existing `next-phase-plan.md` without confirmation
+
+### Success Signals
+
+- `docs/next-phase-plan.md` created with numbered loops
+- Each loop has Goal, Files, and Validation sections
+- Plan validated against continue-loop constraints
+- Output includes plan summary and next steps
+
+### Failure Modes
+
+| Mode | Cause | Recovery |
+|---|---|---|
+| Missing state | `.agents/dev-protocol/` does not exist | Run `/dev-init` |
+| No goal | No goal provided and none inferable | Run `/dev-scope` to declare a goal |
+| Ambiguous goal | Cannot determine scope from context | Ask clarifying questions |
+| Zero loops | Goal is too vague to decompose | Refine goal or run `/dev-scope` |
+| All loops violate constraints | Every loop exceeds auto-execution limits | Warn user; suggest `/goal` for complex work |
+
+### Examples
+
+**Normal — goal inferred from context**
+```
+generate plan
+→ reads workflow-state.yml (phase: p3, focus: stabilization)
+→ reads deferred-improvements.md (D03, D04 active)
+→ decomposes into 3 loops
+→ writes docs/next-phase-plan.md
+→ "Review plan, then run continue loop"
+```
+
+**Boundary — goal provided explicitly**
+```
+generate plan "Refactor auth module"
+→ decomposes into 4 loops
+→ Loop 1: audit current auth (2 files) — auto-executable
+→ Loop 2: extract interface (1 file) — auto-executable
+→ Loop 3: migrate consumers (5 files) — requires /goal
+→ Loop 4: update docs (2 files) — auto-executable
+→ writes docs/next-phase-plan.md with notes
+```
+
+---
+
 ## Secondary Commands (Deprecated Aliases)
 
 These commands redirect to canonical v2 commands. They remain callable for backward compatibility.
@@ -917,6 +1043,8 @@ These commands redirect to canonical v2 commands. They remain callable for backw
 /dev-init     -- first contact, creates state
    ↓
 /dev-status   -- inspect state (read-only)
+   ↓
+generate plan -- decompose goal into loops (if no plan exists)
    ↓
 continue loop -- derive next loop from plan (if exists)
    ↓              ↓ (no plan)
