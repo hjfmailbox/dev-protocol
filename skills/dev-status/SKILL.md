@@ -119,6 +119,27 @@ When `checkpoint.last_commit` differs from HEAD:
 4. If ANY intermediate commit is NOT a protocol commit:
    - **Drift = high** — state has not captured actual work
 
+### Semantic drift classification
+
+Beyond commit-type counting, classify commits by semantic intent:
+
+| Pattern | Semantic Type | Drift |
+|---|---|---|
+| `chore(checkpoint):*` | Protocol-only | none |
+| `chore(protocol):*` | Protocol maintenance | none |
+| `chore(state):*` | State update | none |
+| `docs(*):*` without source changes | Documentation-only | low |
+| `test(*):*` without source changes | Test-only | low |
+| `feat(*):*` or `fix(*):*` | Source-impacting | high |
+| `refactor(*):*` with cross-module changes | Architectural | high |
+| Multiple `docs(protocol):*` or `fix(tests):*` in sequence | Stabilization pattern | low |
+| Commits matching roadmap active items | Roadmap-aligned | medium |
+
+**Application**: When reporting drift, include semantic classification:
+```
+Drift: high — 3 source-impacting commits, 2 stabilization-pattern commits
+```
+
 ### General drift classification
 
 | Severity | Meaning |
@@ -175,7 +196,21 @@ If checkpoint is stale or outdated, `workflow-state.yml` focus is LOW CONFIDENCE
 
 When `/dev-save` has NOT been run after recent goal work, reconstruct active work from git history.
 
-Aggregate recent conventional commits (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`) by topic/theme. If 2+ commits share a topic, report that as active work.
+**Semantic theme inference:**
+
+Beyond literal topic matching, infer themes from commit patterns:
+
+| Pattern | Inferred Theme |
+|---|---|
+| Multiple `docs(*):*` + `fix(tests):*` | Stabilization / documentation hardening |
+| Multiple `feat(protocol):*` + `skills/*` additions | Protocol feature expansion |
+| `test(case-NN):*` sequence | Test coverage expansion |
+| Mix of `feat:`, `fix:`, `test:` on same component | Active development on that component |
+
+**Aggregation rule:**
+Group recent commits by topic/theme. If 2+ commits share a topic, report that as active work.
+
+Apply semantic inference when literal matching is insufficient. Use git history as primary source, roadmap as secondary, deferred improvements as tertiary.
 
 ### 8. Reconstruct Context
 

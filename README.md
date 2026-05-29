@@ -165,6 +165,7 @@ Protocol commands are semantic operations. The Claude Code representations use s
 |----------|:-----------:|:------------:|-------------|
 | Init | `/dev-init` | Yes | Inspect repository, reconstruct project reality, initialize protocol state |
 | Scope | `/dev-scope` | No | Declare a focused goal with validation criteria |
+| Goal | `/goal` | Yes | Execute scoped work, create normal commits, produce goal-output artifact |
 | Plan | `generate plan` | Yes | Generate `next-phase-plan.md` from context and goal decomposition |
 | Save | `/dev-save` | Yes | Persist protocol state files only, validate (fails on inconsistency) |
 | Status | `/dev-status` | No | Inspect current protocol state and reconstruct context |
@@ -180,7 +181,6 @@ Protocol commands are semantic operations. The Claude Code representations use s
 | `/dev-doctor` | `/dev-status --diagnose` | Deprecated, redirects to v2 |
 | `/dev-help` | `/dev-status --help` | Deprecated, redirects to v2 |
 | `/dev-goal-template` | `/dev-scope` | Deprecated, redirects to v2 |
-| `/goal` | `/dev-scope` | Deprecated, redirects to v2 |
 
 Key guarantees:
 

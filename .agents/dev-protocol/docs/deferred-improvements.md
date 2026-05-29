@@ -519,3 +519,38 @@ Low
 ### Priority
 
 P3
+
+---
+
+## D11 — Formalize /goal as first-class skill or deprecate into /dev-scope
+
+### Problem
+
+`/goal` is documented in `docs/command-contracts.md` but has no `skills/goal/` directory, no PROMPT.md, and no SKILL.md. It is the only canonical command without a skill definition. This creates inconsistent skill structure.
+
+### Why Deferred
+
+Current workflow works correctly. `/goal` is executed as an implementation phase after `/dev-scope`, and its behavior is well-documented in command contracts. This is architectural cleanup, not a v1.0 blocker.
+
+### Desired Outcome
+
+Either:
+1. Create `skills/goal/PROMPT.md` and `SKILL.md` with full execution semantics, OR
+2. Officially merge `/goal` into `/dev-scope` auto-execution and remove `/goal` as a standalone command
+
+### Suggested Fix
+
+Create `skills/goal/` with PROMPT.md and SKILL.md defining:
+- Scope consumption
+- Implementation boundaries
+- Normal commit creation
+- Goal-output artifact production
+- Validation criteria verification
+
+### Risk
+
+Low
+
+### Priority
+
+P2

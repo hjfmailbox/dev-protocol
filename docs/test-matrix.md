@@ -401,3 +401,5 @@ Failure Signal
 | case-40 | case-40-semantic-active-work | PASS |
 | case-41 | case-41-canonical-workflow-path-consistency | PASS |
 | case-42 | case-42-test-matrix-synchronization-audit | PASS |
+| case-43 | case-43-onboarding-documentation-consistency | pending |
+| case-44 | case-44-alias-skill-runtime-consistency | pending |

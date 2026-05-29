@@ -50,6 +50,8 @@ function Get-CaseDirName {
         '40' { return 'case-40-semantic-active-work' }
         '41' { return 'case-41-canonical-workflow-path-consistency' }
         '42' { return 'case-42-test-matrix-synchronization-audit' }
+        '43' { return 'case-43-onboarding-documentation-consistency' }
+        '44' { return 'case-44-alias-skill-runtime-consistency' }
         default { return "case-$Case" }
     }
 }
@@ -2030,6 +2032,154 @@ if ($Case -eq '42') {
         Fail "case-42: test-matrix.md missing case-42 from inventory"
     }
     Pass-Check "case-42: test-matrix.md includes case-42"
+}
+
+# ── AP. Case-43 specific checks (onboarding documentation consistency) ─
+
+if ($Case -eq '43') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-43 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-43 test-plan.md exists"
+
+    # Verify README.md lists /goal as canonical command
+    $Readme = Join-Path $PWD.Path "README.md"
+    if (-not (Test-Path $Readme)) {
+        Fail "case-43: README.md not found"
+    }
+    $ReadmeContent = Get-Content $Readme -Raw
+
+    # Find canonical commands table and legacy aliases table
+    $CanonPos = $ReadmeContent.IndexOf("Canonical v2 Commands")
+    $LegacyPos = $ReadmeContent.IndexOf("Legacy Aliases")
+
+    if ($CanonPos -eq -1) {
+        Fail "case-43: README.md missing Canonical v2 Commands section"
+    }
+    Pass-Check "case-43: README.md has Canonical v2 Commands section"
+
+    if ($LegacyPos -eq -1) {
+        Fail "case-43: README.md missing Legacy Aliases section"
+    }
+    Pass-Check "case-43: README.md has Legacy Aliases section"
+
+    # /goal must appear in canonical section
+    $CanonSection = $ReadmeContent.Substring($CanonPos, $LegacyPos - $CanonPos)
+    if ($CanonSection -notmatch "`/goal`") {
+        Fail "case-43: /goal not found in Canonical v2 Commands table"
+    }
+    Pass-Check "case-43: /goal is listed as canonical v2 command"
+
+    # /goal must NOT appear in legacy section
+    $LegacySection = $ReadmeContent.Substring($LegacyPos)
+    if ($LegacySection -match "`/goal`") {
+        Fail "case-43: /goal still listed in Legacy Aliases table"
+    }
+    Pass-Check "case-43: /goal is NOT in Legacy Aliases table"
+
+    # Verify project-rules.md has no false statements
+    $ProjectRules = Join-Path $PWD.Path ".agents/dev-protocol/project-rules.md"
+    if (-not (Test-Path $ProjectRules)) {
+        Fail "case-43: project-rules.md not found"
+    }
+    $RulesContent = Get-Content $ProjectRules -Raw
+
+    if ($RulesContent -match "No git history on master branch yet") {
+        Fail "case-43: project-rules.md contains false statement 'No git history on master branch yet'"
+    }
+    Pass-Check "case-43: project-rules.md does not claim 'no git history'"
+
+    if ($RulesContent -match "no git operations") {
+        Fail "case-43: project-rules.md contains false statement about /dev-save having 'no git operations'"
+    }
+    Pass-Check "case-43: project-rules.md does not claim /dev-save has no git operations"
+
+    # Verify project-rules.md includes v2 commands
+    if ($RulesContent -notmatch "generate plan") {
+        Fail "case-43: project-rules.md missing generate plan in command reference"
+    }
+    Pass-Check "case-43: project-rules.md references generate plan"
+
+    if ($RulesContent -notmatch "continue loop") {
+        Fail "case-43: project-rules.md missing continue loop in command reference"
+    }
+    Pass-Check "case-43: project-rules.md references continue loop"
+
+    # Verify command-contracts.md has no stale path references
+    $Contracts = Join-Path $PWD.Path "docs/command-contracts.md"
+    if (-not (Test-Path $Contracts)) {
+        Fail "case-43: command-contracts.md not found"
+    }
+    $ContractsContent = Get-Content $Contracts -Raw
+
+    if ($ContractsContent -match "docs/next-phase-plan\.md") {
+        Fail "case-43: command-contracts.md still references stale docs/next-phase-plan.md"
+    }
+    Pass-Check "case-43: command-contracts.md uses unified .agents/dev-protocol/next-phase-plan.md path"
+}
+
+# ── AQ. Case-44 specific checks (alias skill runtime consistency) ──────
+
+if ($Case -eq '44') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-44 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-44 test-plan.md exists"
+
+    $AliasSkills = @(
+        @{Name="dev-checkpoint"; V2="/dev-save"},
+        @{Name="dev-resume"; V2="/dev-status"},
+        @{Name="dev-bootstrap"; V2="/dev-init"},
+        @{Name="dev-doctor"; V2="/dev-status"},
+        @{Name="dev-help"; V2="README.md"},
+        @{Name="dev-goal-template"; V2="/dev-scope"}
+    )
+
+    foreach ($alias in $AliasSkills) {
+        $PromptFile = Join-Path $PWD.Path "skills/$($alias.Name)/PROMPT.md"
+        if (-not (Test-Path $PromptFile)) {
+            Fail "case-44: skills/$($alias.Name)/PROMPT.md not found"
+        }
+        $PromptContent = Get-Content $PromptFile -Raw
+
+        # Must contain deprecation notice
+        if ($PromptContent -notmatch "DEPRECATED") {
+            Fail "case-44: $($alias.Name) PROMPT.md missing deprecation notice"
+        }
+
+        # Must redirect to v2 equivalent
+        if ($PromptContent -notmatch [regex]::Escape($alias.V2)) {
+            Fail "case-44: $($alias.Name) PROMPT.md does not redirect to $($alias.V2)"
+        }
+        Pass-Check "case-44: $($alias.Name) PROMPT.md deprecates and redirects to $($alias.V2)"
+    }
+
+    # Verify no alias contains v1 contradictions
+    $ContradictionPatterns = @(
+        @{Pattern="NEVER auto-commit"; Why="contradicts v2 /dev-save auto-commit"},
+        @{Pattern="none/minor/major"; Why="uses deprecated drift terms instead of none/low/high"},
+        @{Pattern="`.agent/`"; Why="references legacy v1 path without deprecation note"}
+    )
+
+    foreach ($alias in $AliasSkills) {
+        $PromptFile = Join-Path $PWD.Path "skills/$($alias.Name)/PROMPT.md"
+        $PromptContent = Get-Content $PromptFile -Raw
+
+        foreach ($contradiction in $ContradictionPatterns) {
+            if ($PromptContent -match $contradiction.Pattern) {
+                Fail "case-44: $($alias.Name) PROMPT.md contains contradiction: $($contradiction.Why)"
+            }
+        }
+    }
+    Pass-Check "case-44: no alias PROMPT.md contains v1 contradictions"
+
+    # Verify dev-help no longer displays v1 command table
+    $DevHelpPrompt = Join-Path $PWD.Path "skills/dev-help/PROMPT.md"
+    $HelpContent = Get-Content $DevHelpPrompt -Raw
+    if ($HelpContent -match "dev-bootstrap.*Initialize protocol") {
+        Fail "case-44: dev-help PROMPT.md still displays v1 command table"
+    }
+    Pass-Check "case-44: dev-help PROMPT.md does not display v1 command table"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

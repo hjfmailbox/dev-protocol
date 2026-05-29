@@ -39,11 +39,37 @@
 * [x] Stale focus contamination fix (case-16)
 * [x] Test matrix expanded to case-15 + case-16/17/18
 
+**What is complete (Patch Set 2 — Onboarding Hardening)**:
+
+* [x] project-rules.md contradictions resolved (F7)
+* [x] Alias skill stale PROMPT.md files cleaned (F6)
+* [x] Semantic terminology normalized across SKILL.md and PROMPT.md (D2 residual)
+* [x] Test matrix expanded to case-43/44 (onboarding + alias consistency)
+* [x] README.md corrected: /goal restored to canonical commands
+
 **What remains active**:
 
-* Stabilization of edge cases and documentation drift
-* Onboarding hardening for real-project validation
+* v1.0 freeze preparation
+* Real-project validation on external projects
 * Workflow compression design (not yet implemented)
+
+---
+
+## Next Phase: v1.0 Freeze Preparation
+
+Goal: Lock protocol surface for long-term stability.
+
+**Entry criteria**:
+- All P0 findings from v1-readiness-recheck.md resolved
+- All active tests pass (case-05 through case-44)
+- No HIGH severity friction findings remain open
+- External validation checklist ready
+
+**Freeze rules**:
+- No new commands
+- No state model changes
+- No breaking changes to existing skills
+- Only bug fixes and documentation updates
 
 ---
 

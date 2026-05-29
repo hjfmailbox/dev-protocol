@@ -1,106 +1,15 @@
 You are executing /dev-bootstrap.
 
-> **DEPRECATED**: `/dev-bootstrap` is deprecated but supported. Use `/dev-init` instead.
-> This command continues to function for backward compatibility, but its behavior is now aligned with `/dev-init`.
+> **DEPRECATED**: Use `/dev-init` instead.
+> This command is a backward-compatibility alias for `/dev-init`.
+> Behavior is identical to `/dev-init`.
 
-Your goal is to reconstruct a recoverable development state.
-
-You MUST follow these steps strictly.
-
----
-
-## STEP 1: Inspect Repository
-
-Scan and gather:
-
-- project structure
-- git status
-- recent commits (last 20)
-- docs folder
-- README
-- existing workflow/state files
-- configuration files
-
-Do NOT assume missing information.
+Proceed using `/dev-init` semantics.
 
 ---
 
-## STEP 2: Infer Current State
+## Redirect
 
-Determine:
+`/dev-bootstrap` → `/dev-init`
 
-- current development phase
-- active focus area
-- ongoing tasks
-- blockers
-- likely next actions
-
-Prioritize:
-code reality > documentation > memory > assumptions
-
----
-
-## STEP 3: Detect Drift
-
-Identify mismatches between:
-
-- code vs documentation
-- code vs workflow-state
-- docs vs memory
-
-Report only high-confidence drift.
-
----
-
-## STEP 4: Generate State Files
-
-Create or update in `.agents/dev-protocol/`:
-
-- `.agents/dev-protocol/workflow-state.yml`
-- `.agents/dev-protocol/handoff.md`
-- `.agents/dev-protocol/project-rules.md` (only if missing or outdated)
-
-DO NOT create or update root-level copies of these files.
-Root-level files exist for backward compatibility only.
-
-Ensure:
-
-- state reflects CURRENT reality
-- no historical logging
-- no duplication of past events
-- `checkpoint.last_commit` MUST be left empty/absent — no save baseline exists yet
-
----
-
-## STEP 5: Validation
-
-Check:
-
-- state consistency
-- recoverability from scratch chat
-- no missing critical fields
-
-If confidence is low:
-
-STOP and report failure.
-
----
-
-## STEP 6: Output Summary
-
-Provide:
-
-- reconstructed state
-- detected drift
-- created/updated files
-- confidence level
-- recommended next step
-
----
-
-## RULES
-
-- NEVER auto-commit
-- NEVER invent missing facts
-- NEVER proceed with low confidence silently
-- ALWAYS prefer correctness over completeness
+See `skills/dev-init/PROMPT.md` for full execution instructions.

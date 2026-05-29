@@ -4,7 +4,8 @@
 
 - Protocol must be reusable across projects (not project-specific)
 - State files are the single source of truth; history is secondary
-- Three state files required: workflow-state.yml, handoff.md, project-rules.md
+- Three core state files required: workflow-state.yml, handoff.md, project-rules.md
+- Optional state files: goal-output.md, next-phase-plan.md (created by workflow, not required for initialization)
 - No multi-agent support in v1
 
 ## Reality Priority
@@ -92,16 +93,17 @@ Both scripts are committed and portable across projects.
 
 ## Known Pitfalls
 
-- Empty files exist as placeholders (README.md, .gitignore, memory-rules.md, workflow-rules.md) - need content
-- No git history on master branch yet
 - Global spec prohibits: "继承", "同上", "略" in design docs (word-level match)
+- Alias skill PROMPT.md files may contain stale v1 guidance; always prefer canonical v2 skills
 
 ## Important Commands
 
 - /dev-init: initialize protocol, reconstruct state, NO auto-commit
 - /dev-scope: declare focused goal with validation criteria
-- /dev-save: persist state, validate, no git operations
+- /dev-save: persist state, validate, auto-commit protocol files only (chore(checkpoint))
 - /dev-status: inspect state, diagnose, resume context, read-only
+- generate plan: decompose goal into loops, write next-phase-plan.md
+- continue loop: read plan, derive scope, auto-execute or produce scope document
 - rtk gain: show token savings analytics (RTK tool)
 
 ## Testing Expectations
