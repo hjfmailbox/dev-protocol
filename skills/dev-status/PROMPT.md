@@ -143,6 +143,51 @@ When `checkpoint.last_commit` != HEAD:
 
 **Why this matters**: `/dev-save` may create commits with various `chore(checkpoint)`, `chore(protocol)`, or `chore(state)` prefixes. All of these are protocol-only commits that persist `.agents/` state. They are NOT drift. Only commits that modify source code, tests, or build artifacts represent actual work that the protocol state has not captured.
 
+### Semantic drift classification
+
+Beyond commit-type counting, classify commits by semantic intent:
+
+| Commit Pattern | Semantic Type | Drift Impact |
+|---|---|---|
+| `chore(checkpoint):*` | Protocol-only | none |
+| `chore(protocol):*` | Protocol maintenance | none |
+| `chore(state):*` | State update | none |
+| `docs(*):*` without source changes | Documentation-only | low |
+| `test(*):*` without source changes | Test-only | low |
+| `feat(*):*` or `fix(*):*` | Source-impacting | high |
+| `refactor(*):*` with cross-module changes | Architectural | high |
+| Multiple `docs(protocol):*` or `fix(tests):*` in sequence | Stabilization pattern | low |
+| Commits matching roadmap active items | Roadmap-aligned | medium |
+
+**Semantic interpretation rules**:
+
+1. **Documentation-only changes** (`docs(*):*` with only `.md`/`.txt` changes):
+   - Drift = low
+   - State focus may be slightly stale but context is still valid
+
+2. **Stabilization-pattern commits** (sequence of `docs(protocol):`, `fix(tests):`, `test(case-NN):`):
+   - Drift = low
+   - These are expected during stabilization phase
+   - Do NOT report as unrecorded work
+
+3. **Roadmap-aligned commits** (commit subjects matching active roadmap items):
+   - Drift = medium
+   - State may not have captured the specific focus, but direction is consistent
+   - Recommend `/dev-save` to update focus
+
+4. **Source-impacting commits** (`feat:`, `fix:`, `refactor:` with source file changes):
+   - Drift = high
+   - State has definitely not captured this work
+
+5. **Test-only changes** (`test(*):*` without source changes):
+   - Drift = low
+   - Often accompanies stabilization; not independent work
+
+**Application**: When reporting drift, include semantic classification:
+```
+Drift: high — 3 source-impacting commits, 2 stabilization-pattern commits
+```
+
 ### General drift classification
 
 | Severity | Condition |
@@ -273,15 +318,36 @@ When `/dev-save` has NOT been run after recent goal work, reconstruct active wor
 - Recent conventional commit prefixes: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`
 - Recent scope areas: `skills/`, `docs/`, `tests/`, `references/`
 - Commit co-occurrence: multiple commits on same topic indicate ongoing workstream
+- Goal-output summaries (if present): previous goal context
+- Roadmap sections: active workstreams
+- Deferred items: unresolved friction themes
+
+**Semantic theme inference:**
+
+Beyond literal topic matching, infer themes from commit patterns:
+
+| Pattern | Inferred Theme |
+|---|---|
+| Multiple `docs(*):*` + `fix(tests):*` | Stabilization / documentation hardening |
+| Multiple `feat(protocol):*` + `skills/*` additions | Protocol feature expansion |
+| `test(case-NN):*` sequence | Test coverage expansion |
+| `docs(command-contracts):*` + `README.md` changes | Workflow documentation |
+| `chore(checkpoint):*` dominance | Stabilization / state maintenance |
+| Mix of `feat:`, `fix:`, `test:` on same component | Active development on that component |
 
 **Aggregation rule:**
 Group recent commits by topic/theme. If 2+ commits share a topic, report that as active work.
 
-Example:
-- `docs(protocol): harden slash command contracts`
-- `fix(tests): correct regex in case-14 validation`
-- `test(case-13): add mixed staged files test`
--> Active Work: "slash command contract hardening and test expansion"
+Apply semantic inference when literal matching is insufficient:
+- `docs(dev-save): add help sections` + `docs(continue-loop): add help sections` → "Command help quality audit across multiple skills"
+- `feat(protocol): add continuous loop` + `feat(protocol): add goal-to-plan` → "Protocol workflow compression features"
+- `fix(tests): case-36 regex` + `fix(tests): case-15 keywords` → "Test validation hardening"
+
+**Sources for semantic enrichment:**
+1. Git history (primary)
+2. Roadmap active items (secondary)
+3. Deferred improvements (tertiary)
+4. Goal-output summaries (if present)
 
 **Output:**
 Include under **Active Work** section in summary.

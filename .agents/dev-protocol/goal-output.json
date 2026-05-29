@@ -2,16 +2,8 @@
   "goal_status": "COMPLETED",
   "goal_summary": "Implemented Phase X.1 — Goal-to-Plan bootstrap generation. Created generate-plan skill that reads project context (workflow-state, handoff, roadmap, deferred items, git history) and produces a structured next-phase-plan.md with numbered loops. Each loop is independently executable with explicit validation criteria and auto-execution-friendly wording. Workflow integration updated across README.md, command-contracts.md, and roadmap.",
   "changed_files": [
-    "skills/generate-plan/SKILL.md",
-    "skills/generate-plan/PROMPT.md",
-    ".claude/skills/generate-plan",
-    "README.md",
-    "docs/command-contracts.md",
-    "docs/v2-redesign-roadmap.md",
-    "tests/case-34-generate-plan-basic/test-plan.md",
-    "tests/case-35-generate-plan-defer-aware/test-plan.md",
-    "tests/case-36-generate-plan-continue-loop-constraints/test-plan.md",
-    "tests/run-tests.ps1"
+    ".agents/dev-protocol/goal-output.json",
+    ".agents/dev-protocol/goal-output.md"
   ],
   "validation_results": [
     "PASS: case-34 basic workflow (skill files, symlink, execution sequence, loop format)",

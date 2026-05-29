@@ -147,6 +147,59 @@ Rules for deriving scope:
 
 ---
 
+## STEP 4.5: Semantic Validation Equivalence
+
+Before evaluating auto-execution, apply semantic interpretation to validation criteria.
+
+### Problem
+
+Rigid string matching causes false negatives:
+- Plan says "tests pass" but implementation report says "all regression cases pass"
+- Plan says "README updated" but commit says "docs(readme): synchronize documentation"
+- Plan says "contracts hardened" but scope says "command contracts documented"
+
+### Semantic equivalence rules
+
+Two phrases are **semantically equivalent** if ANY of the following hold:
+
+1. **Same domain + same action direction**
+   - "tests pass" ≈ "all test cases pass" ≈ "regression tests green"
+   - "README updated" ≈ "documentation synchronized" ≈ "docs updated"
+   - "contracts hardened" ≈ "command contracts documented" ≈ "contract documentation complete"
+
+2. **Git reality confirms intent**
+   - Commit message `docs(protocol): harden slash command contracts` satisfies "contracts hardened"
+   - Commit message `feat(protocol): add continuous loop execution mode` satisfies "continue loop implemented"
+   - Changed files in git match the `Files:` list from plan
+
+3. **Test outcomes match criteria**
+   - `case-34 PASS` satisfies "case-34 basic workflow"
+   - "All required tests pass" satisfies "tests pass"
+   - "Regression tests PASS" satisfies "no regressions"
+
+4. **Commit intent matches goal**
+   - Commit `feat(protocol): add goal-to-plan bootstrap generation` satisfies "generate plan implemented"
+   - Commit `docs(dev-save): add help sections` satisfies "dev-save help completeness"
+
+### Non-equivalence signals
+
+These are NOT semantically equivalent:
+- "started work on" vs "completed"
+- "partial fix" vs "fully resolved"
+- "investigated" vs "implemented"
+- "plan created" vs "plan executed"
+
+### Application
+
+When checking if a loop is complete:
+1. Read the loop's `Validation:` criteria
+2. Compare against actual implementation, git commits, test results
+3. Apply semantic equivalence rules
+4. If equivalent → mark as satisfied
+5. If ambiguous → require explicit confirmation
+
+---
+
 ## STEP 5: Evaluate Auto-Execution Eligibility
 
 Apply the same auto-execution criteria as `/dev-scope`:
@@ -170,8 +223,9 @@ ALL must be true:
 1. Execute the derived scope immediately
 2. Make normal git commits during work (`feat:`, `fix:`, `docs:`, etc.)
 3. Produce `goal-output.json` or `goal-output.md` artifact
-4. Update `next-phase-plan.md` status for this loop to `completed`
-5. Report completion
+4. **Semantic completion check**: before marking complete, verify that git reality, test results, or commit intent satisfy the loop's validation criteria using semantic equivalence rules (STEP 4.5)
+5. Update `next-phase-plan.md` status for this loop to `completed`
+6. Report completion
 
 Output:
 ```
@@ -230,6 +284,15 @@ If `next-phase-plan.md` does not match any recognized loop format:
 
 - Attempt tolerant extraction (headers, bullet lists, numbered items)
 - If still unparseable: STOP. "Plan format not recognized. Expected: ## Loop N — [name] with Status: pending/todo"
+
+### Semantic completion ambiguity
+
+If git reality or test results partially satisfy validation criteria:
+
+- Apply semantic equivalence rules (STEP 4.5)
+- If strongly equivalent (git confirms intent, tests pass, files changed) → mark `completed`
+- If weakly equivalent (wording differs but direction matches) → mark `completed` with note
+- If ambiguous (cannot determine equivalence) → STOP and ask user: "Validation criteria partially met. Mark as completed?"
 
 ### Skip current loop
 

@@ -201,7 +201,35 @@ goal → generate plan → continue loop → /dev-save
 
 ---
 
-### X3. No-op workflow formalization
+### ~~X3. Semantic Validation & Loop Completion~~
+
+**Status**: IMPLEMENTED
+
+**Deliverable**: Semantic validation rules added to `skills/continue-loop/PROMPT.md` and `skills/dev-status/PROMPT.md`.
+
+**Behavior**:
+- Semantic equivalence rules for validation criteria interpretation
+- Git reality, test outcomes, and commit intent used as confirming evidence
+- Semantic drift classification beyond commit counting (documentation-only, stabilization-pattern, roadmap-aligned, source-impacting)
+- Active work semantic inference from commit patterns (stabilization themes, audit themes, execution themes)
+
+**Validation equivalence examples**:
+- "tests pass" ≈ "all regression cases pass" ≈ "case-34 PASS"
+- "README updated" ≈ "documentation synchronized"
+- "contracts hardened" ≈ "command contracts documented"
+
+**Drift classification**:
+- Protocol-only commits → drift = none
+- Documentation-only / test-only → drift = low
+- Stabilization-pattern sequence → drift = low
+- Source-impacting commits → drift = high
+- Roadmap-aligned commits → drift = medium
+
+**Tests**: case-37 (validation equivalence), case-38 (loop completion detection), case-39 (drift classification), case-40 (active-work reconstruction)
+
+---
+
+### X3.5. No-op workflow formalization
 
 **Status**: Already implemented in `/dev-save`. Clean workspace produces valid checkpoint commit.
 

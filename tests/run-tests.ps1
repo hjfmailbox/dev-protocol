@@ -44,6 +44,10 @@ function Get-CaseDirName {
         '34' { return 'case-34-generate-plan-basic' }
         '35' { return 'case-35-generate-plan-defer-aware' }
         '36' { return 'case-36-generate-plan-continue-loop-constraints' }
+        '37' { return 'case-37-semantic-validation-equivalence' }
+        '38' { return 'case-38-semantic-loop-completion' }
+        '39' { return 'case-39-semantic-drift-classification' }
+        '40' { return 'case-40-semantic-active-work' }
         default { return "case-$Case" }
     }
 }
@@ -1649,6 +1653,257 @@ if ($Case -eq '36') {
         Fail "case-36: generate-plan SKILL.md missing auto-execution-friendly wording requirement"
     }
     Pass-Check "case-36: generate-plan SKILL.md requires auto-execution-friendly wording"
+}
+
+# ── AJ. Case-37 specific checks (semantic validation equivalence) ────
+
+if ($Case -eq '37') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-37 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-37 test-plan.md exists"
+
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-37: skills/continue-loop/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ContinuePrompt -Raw
+
+    # Verify Semantic Validation Equivalence section exists
+    if ($PromptContent -notmatch "Semantic Validation Equivalence") {
+        Fail "case-37: continue-loop PROMPT.md missing Semantic Validation Equivalence section"
+    }
+    Pass-Check "case-37: continue-loop PROMPT.md contains Semantic Validation Equivalence"
+
+    # Verify at least 4 equivalence rules
+    $EquivalenceRules = @(
+        "Same domain",
+        "Git reality confirms intent",
+        "Test outcomes match",
+        "Commit intent matches goal"
+    )
+    foreach ($rule in $EquivalenceRules) {
+        if ($PromptContent -notmatch $rule) {
+            Fail "case-37: continue-loop PROMPT.md missing equivalence rule: $rule"
+        }
+    }
+    Pass-Check "case-37: continue-loop PROMPT.md defines all 4 equivalence rules"
+
+    # Verify examples of equivalence
+    if ($PromptContent -notmatch "tests pass" -and $PromptContent -notmatch "README updated") {
+        Fail "case-37: continue-loop PROMPT.md missing equivalence examples"
+    }
+    Pass-Check "case-37: continue-loop PROMPT.md provides equivalence examples"
+
+    # Verify non-equivalence signals
+    $NonEquivalenceSignals = @("started", "completed", "partial", "fully resolved")
+    $HasNonEquivalence = $false
+    foreach ($signal in $NonEquivalenceSignals) {
+        if ($PromptContent -match $signal) {
+            $HasNonEquivalence = $true
+            break
+        }
+    }
+    if (-not $HasNonEquivalence) {
+        Fail "case-37: continue-loop PROMPT.md missing non-equivalence signals"
+    }
+    Pass-Check "case-37: continue-loop PROMPT.md defines non-equivalence signals"
+
+    # Verify section is between scope derivation and auto-execution
+    $ScopePos = $PromptContent.IndexOf("Derive Scope")
+    $SemanticPos = $PromptContent.IndexOf("Semantic Validation Equivalence")
+    $AutoExecPos = $PromptContent.IndexOf("Auto-Execution")
+    if ($ScopePos -eq -1 -or $SemanticPos -eq -1 -or $AutoExecPos -eq -1) {
+        Fail "case-37: continue-loop PROMPT.md missing required sections for position check"
+    }
+    if (-not ($ScopePos -lt $SemanticPos -and $SemanticPos -lt $AutoExecPos)) {
+        Fail "case-37: Semantic Validation Equivalence must be between Derive Scope and Auto-Execution"
+    }
+    Pass-Check "case-37: Semantic Validation Equivalence is correctly positioned"
+}
+
+# ── AK. Case-38 specific checks (semantic loop completion detection) ──
+
+if ($Case -eq '38') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-38 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-38 test-plan.md exists"
+
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    $ContinueSkill = Join-Path $PWD.Path "skills/continue-loop/SKILL.md"
+
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-38: skills/continue-loop/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $ContinuePrompt -Raw
+
+    # Verify auto-execution path includes semantic completion check
+    $AutoExecPath = $PromptContent.Substring($PromptContent.IndexOf("Path A: Auto-execution"))
+    if ($AutoExecPath -notmatch "semantic" -and $AutoExecPath -notmatch "Semantic completion") {
+        Fail "case-38: continue-loop auto-execution path missing semantic completion check"
+    }
+    Pass-Check "case-38: continue-loop auto-execution path includes semantic completion check"
+
+    # Verify git reality is used as confirming evidence
+    if ($PromptContent -notmatch "git reality") {
+        Fail "case-38: continue-loop PROMPT.md missing git reality confirmation"
+    }
+    Pass-Check "case-38: continue-loop PROMPT.md uses git reality as confirming evidence"
+
+    # Verify test outcomes are used as confirming evidence
+    if ($PromptContent -notmatch "test results" -and $PromptContent -notmatch "Test outcomes") {
+        Fail "case-38: continue-loop PROMPT.md missing test outcome validation"
+    }
+    Pass-Check "case-38: continue-loop PROMPT.md uses test outcomes as confirming evidence"
+
+    # Verify semantic ambiguity handling
+    if ($PromptContent -notmatch "Semantic completion ambiguity") {
+        Fail "case-38: continue-loop PROMPT.md missing semantic completion ambiguity handling"
+    }
+    Pass-Check "case-38: continue-loop PROMPT.md defines semantic completion ambiguity handling"
+
+    # Verify SKILL.md contains semantic completion concepts
+    if (-not (Test-Path $ContinueSkill)) {
+        Fail "case-38: skills/continue-loop/SKILL.md not found"
+    }
+    $SkillContent = Get-Content $ContinueSkill -Raw
+    if ($SkillContent -notmatch "semantic" -and $SkillContent -notmatch "equivalence") {
+        Fail "case-38: continue-loop SKILL.md missing semantic completion concepts"
+    }
+    Pass-Check "case-38: continue-loop SKILL.md contains semantic completion concepts"
+}
+
+# ── AL. Case-39 specific checks (semantic drift classification) ──────
+
+if ($Case -eq '39') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-39 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-39 test-plan.md exists"
+
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+    $DevStatusSkill = Join-Path $PWD.Path "skills/dev-status/SKILL.md"
+
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-39: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+
+    # Verify Semantic drift classification section exists
+    if ($PromptContent -notmatch "Semantic drift classification") {
+        Fail "case-39: dev-status PROMPT.md missing Semantic drift classification section"
+    }
+    Pass-Check "case-39: dev-status PROMPT.md contains Semantic drift classification"
+
+    # Verify documentation-only changes are low drift
+    if ($PromptContent -notmatch "Documentation-only" -or $PromptContent -notmatch "low") {
+        Fail "case-39: dev-status PROMPT.md missing documentation-only low drift classification"
+    }
+    Pass-Check "case-39: dev-status PROMPT.md defines documentation-only as low drift"
+
+    # Verify stabilization-pattern commits are low drift
+    if ($PromptContent -notmatch "Stabilization pattern" -or $PromptContent -notmatch "low") {
+        Fail "case-39: dev-status PROMPT.md missing stabilization-pattern low drift classification"
+    }
+    Pass-Check "case-39: dev-status PROMPT.md defines stabilization-pattern as low drift"
+
+    # Verify source-impacting commits are high drift
+    if ($PromptContent -notmatch "Source-impacting" -or $PromptContent -notmatch "high") {
+        Fail "case-39: dev-status PROMPT.md missing source-impacting high drift classification"
+    }
+    Pass-Check "case-39: dev-status PROMPT.md defines source-impacting as high drift"
+
+    # Verify roadmap-aligned commits are medium drift
+    if ($PromptContent -notmatch "Roadmap-aligned" -or $PromptContent -notmatch "medium") {
+        Fail "case-39: dev-status PROMPT.md missing roadmap-aligned medium drift classification"
+    }
+    Pass-Check "case-39: dev-status PROMPT.md defines roadmap-aligned as medium drift"
+
+    # Verify test-only changes are low drift
+    if ($PromptContent -notmatch "Test-only" -or $PromptContent -notmatch "low") {
+        Fail "case-39: dev-status PROMPT.md missing test-only low drift classification"
+    }
+    Pass-Check "case-39: dev-status PROMPT.md defines test-only as low drift"
+
+    # Verify SKILL.md or PROMPT.md includes semantic classification in drift output
+    $SkillContent = Get-Content $DevStatusSkill -Raw
+    $HasSemanticDriftOutput = ($PromptContent -match "semantic classification") -or ($SkillContent -match "semantic classification") -or ($PromptContent -match "Drift: .* source-impacting")
+    if (-not $HasSemanticDriftOutput) {
+        Fail "case-39: neither dev-status PROMPT.md nor SKILL.md includes semantic classification in drift output"
+    }
+    Pass-Check "case-39: dev-status includes semantic classification in drift output"
+}
+
+# ── AM. Case-40 specific checks (semantic active-work reconstruction) ─
+
+if ($Case -eq '40') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-40 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-40 test-plan.md exists"
+
+    $DevStatusPrompt = Join-Path $PWD.Path "skills/dev-status/PROMPT.md"
+
+    if (-not (Test-Path $DevStatusPrompt)) {
+        Fail "case-40: skills/dev-status/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $DevStatusPrompt -Raw
+
+    # Verify Active Work Reconstruction section includes semantic theme inference
+    $ActiveWorkPos = $PromptContent.IndexOf("Active Work Reconstruction")
+    if ($ActiveWorkPos -eq -1) {
+        Fail "case-40: dev-status PROMPT.md missing Active Work Reconstruction section"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md contains Active Work Reconstruction"
+
+    $ActiveWorkSection = $PromptContent.Substring($ActiveWorkPos)
+    if ($ActiveWorkSection -notmatch "Semantic theme inference") {
+        Fail "case-40: dev-status PROMPT.md Active Work Reconstruction missing semantic theme inference"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md defines semantic theme inference"
+
+    # Verify stabilization theme (docs + fix(tests) pattern)
+    if ($ActiveWorkSection -notmatch "Stabilization") {
+        Fail "case-40: dev-status PROMPT.md missing stabilization theme pattern"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md defines stabilization theme"
+
+    # Verify protocol feature expansion theme (feat(protocol) + skills additions)
+    if ($ActiveWorkSection -notmatch "Protocol feature expansion") {
+        Fail "case-40: dev-status PROMPT.md missing protocol feature expansion theme"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md defines protocol feature expansion theme"
+
+    # Verify test coverage expansion theme (test(case-NN) sequence)
+    if ($ActiveWorkSection -notmatch "Test coverage expansion") {
+        Fail "case-40: dev-status PROMPT.md missing test coverage expansion theme"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md defines test coverage expansion theme"
+
+    # Verify active development theme (mix of feat/fix/test on same component)
+    if ($ActiveWorkSection -notmatch "Active development") {
+        Fail "case-40: dev-status PROMPT.md missing active development theme"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md defines active development theme"
+
+    # Verify roadmap sections as enrichment source
+    if ($ActiveWorkSection -notmatch "roadmap" -or $ActiveWorkSection -notmatch "Roadmap") {
+        Fail "case-40: dev-status PROMPT.md missing roadmap as enrichment source"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md uses roadmap sections as enrichment source"
+
+    # Verify deferred items as enrichment source
+    if ($ActiveWorkSection -notmatch "deferred" -or $ActiveWorkSection -notmatch "Deferred") {
+        Fail "case-40: dev-status PROMPT.md missing deferred items as enrichment source"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md uses deferred items as enrichment source"
+
+    # Verify git history remains primary source
+    if ($ActiveWorkSection -notmatch "Git history" -or $ActiveWorkSection -notmatch "primary") {
+        Fail "case-40: dev-status PROMPT.md missing git history as primary source"
+    }
+    Pass-Check "case-40: dev-status PROMPT.md keeps git history as primary source"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

@@ -1072,3 +1072,81 @@ case-05       -- validate checkpoint
 - /goal NEVER modifies protocol state files.
 - `continue loop` ALWAYS verifies preconditions before reading plan.
 - `continue loop` NEVER auto-executes ambiguous or architectural loops.
+
+---
+
+## Semantic Validation Layer
+
+### Purpose
+
+Reduce false negatives from rigid string/criteria matching by interpreting validation signals semantically.
+
+### When it applies
+
+- `continue loop` evaluates whether a loop's validation criteria are satisfied
+- `/dev-status` classifies drift and reconstructs active work
+- Any command compares planned criteria against actual outcomes
+
+### Semantic Equivalence Rules
+
+Two phrases are equivalent if ANY of the following hold:
+
+1. **Same domain + same action direction**
+   - "tests pass" ≈ "all test cases pass" ≈ "regression tests green"
+   - "README updated" ≈ "documentation synchronized" ≈ "docs updated"
+
+2. **Git reality confirms intent**
+   - Commit `docs(protocol): harden contracts` satisfies "contracts hardened"
+   - Changed files in git match the plan's `Files:` list
+
+3. **Test outcomes match criteria**
+   - `case-34 PASS` satisfies "case-34 basic workflow"
+   - "All required tests pass" satisfies "tests pass"
+
+4. **Commit intent matches goal**
+   - Commit `feat(protocol): add generate-plan` satisfies "generate plan implemented"
+
+### Non-equivalence Signals
+
+These are NOT equivalent:
+- "started work on" vs "completed"
+- "partial fix" vs "fully resolved"
+- "investigated" vs "implemented"
+
+### Semantic Drift Classification
+
+Beyond commit counting, classify commits by intent:
+
+| Pattern | Type | Drift |
+|---|---|---|
+| `chore(checkpoint):*` | Protocol-only | none |
+| `docs(*):*` without source changes | Documentation-only | low |
+| `test(*):*` without source changes | Test-only | low |
+| `feat(*):*` or `fix(*):*` | Source-impacting | high |
+| Stabilization-pattern sequence | Stabilization | low |
+| Roadmap-aligned commits | Roadmap-aligned | medium |
+
+### Active Work Semantic Inference
+
+Infer themes from commit patterns:
+
+| Pattern | Theme |
+|---|---|
+| Multiple `docs(*):*` + `fix(tests):*` | Stabilization / documentation hardening |
+| Multiple `feat(protocol):*` + `skills/*` | Protocol feature expansion |
+| `test(case-NN):*` sequence | Test coverage expansion |
+| Mix of `feat:`, `fix:`, `test:` on same component | Active development |
+
+### DO
+
+- Apply semantic equivalence when comparing criteria vs outcomes
+- Use git reality as confirming evidence
+- Classify drift by semantic intent, not just count
+- Infer active work themes from commit patterns
+
+### DO NOT
+
+- Require literal string matches for validation
+- Treat documentation-only changes as high drift
+- Ignore commit intent when evaluating completion
+- Report stabilization-pattern commits as unrecorded work

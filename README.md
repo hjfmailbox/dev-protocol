@@ -36,6 +36,8 @@ Current development mode:
 
 > stabilization → ergonomics → long-running robustness
 
+**New**: Semantic validation layer (Phase X.2) reduces false negatives from rigid string matching. Validation criteria, loop completion, and drift detection now support equivalent wording interpretation.
+
 ---
 
 ## Core Workflow

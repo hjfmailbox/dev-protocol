@@ -10,16 +10,8 @@ Implemented Phase X.1 — Goal-to-Plan bootstrap generation. Created generate-pl
 
 ## Changed Files
 
-- skills/generate-plan/SKILL.md
-- skills/generate-plan/PROMPT.md
-- .claude/skills/generate-plan
-- README.md
-- docs/command-contracts.md
-- docs/v2-redesign-roadmap.md
-- tests/case-34-generate-plan-basic/test-plan.md
-- tests/case-35-generate-plan-defer-aware/test-plan.md
-- tests/case-36-generate-plan-continue-loop-constraints/test-plan.md
-- tests/run-tests.ps1
+- .agents/dev-protocol/goal-output.json
+- .agents/dev-protocol/goal-output.md
 ## Validation Results
 
 - PASS: case-34 basic workflow (skill files, symlink, execution sequence, loop format)
