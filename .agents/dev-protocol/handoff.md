@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Auto-execution and continue loop implementation complete. Dogfooding protocol workflow: using real continue loop to execute a small task (slash command help completeness audit) and measuring friction.
+Dogfood protocol workflow complete. Used continue loop to execute 3 loops of slash command help quality audit. Measured friction and produced experience report. Command help quality improved for dev-save, continue-loop, and dev-status skills.
 
 ## Current Status
 
@@ -63,10 +63,15 @@ Auto-execution and continue loop implementation complete. Dogfooding protocol wo
 - Updated docs/command-contracts.md with continue loop contract
 - Updated README.md with Planned Execution Loop workflow
 - Updated docs/v2-redesign-roadmap.md: X1/X2 marked IMPLEMENTED, D01/D02 marked RESOLVED
+- Dogfood protocol workflow: used continue loop to execute 3 loops of command help quality audit
+- Improved dev-save PROMPT.md: added When to Use, When NOT to Use, Typical Workflow sections
+- Improved continue-loop PROMPT.md: added When to Use, When NOT to Use, Typical Workflow sections
+- Improved dev-status SKILL.md: added explicit DO and DO NOT sections
+- Improved dev-status PROMPT.md: added When to Use, When NOT to Use, Typical Workflow sections
 
 ## In Progress
 
-- Dogfood protocol workflow: using continue loop to execute real task and measure friction
+- none
 
 ## Blockers
 
@@ -91,12 +96,11 @@ Auto-execution and continue loop implementation complete. Dogfooding protocol wo
 
 ## Next Recommended Actions
 
-1. **Dogfood protocol workflow** — use continue loop to execute real task, measure friction, report experience
-2. **Freeze v2 command surface** — lock `/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status` and state file schema
-3. Implement R3: State Reconciliation — fix phase drift (#14) and status freshness drift (#15)
-4. Implement R4: Onboarding Hardening — fix Windows artifact emission (#8), NO_OP goal handling (#7), continuation handoff hardening (#6)
-5. Re-run real-project validation checklist after R3/R4 completion
-6. Proceed to R5: external real-project validation
+1. **Freeze v2 command surface** — lock `/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status` and state file schema
+2. Implement R3: State Reconciliation — fix phase drift (#14) and status freshness drift (#15)
+3. Implement R4: Onboarding Hardening — fix Windows artifact emission (#8), NO_OP goal handling (#7), continuation handoff hardening (#6)
+4. Re-run real-project validation checklist after R3/R4 completion
+5. Proceed to R5: external real-project validation
 
 ## Notes For Next Session
 
@@ -121,3 +125,4 @@ Auto-execution and continue loop implementation complete. Dogfooding protocol wo
 - **NEW: Continue loop implemented** — reads next-phase-plan.md, tolerant parsing, derives scope, applies auto-execution criteria, executes or produces scope document
 - **NEW: Test coverage expanded** — case-27 through case-33 validate auto-execution and continue loop behavior
 - **NEW: Checkpoint updated** — 2026-05-29, commit 5e73504, drift cleared
+- **NEW: Dogfood complete** — 3 loops auto-executed via continue loop. Friction points identified: drift detection on first run (required /dev-save first), plan creation is manual, validation criteria in plan must be precise. Positive: auto-execution worked smoothly, loop sequencing was natural, scope derivation was accurate.

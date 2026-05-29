@@ -6,7 +6,7 @@ project:
 
 current_state:
   phase: "p3"
-  focus: "auto-execution-and-continue-loop-implementation"
+  focus: "dogfood protocol workflow complete — command help quality audit via continue loop"
   status: active
 
 progress:
@@ -113,8 +113,12 @@ progress:
     - "Updated docs/command-contracts.md with continue loop contract"
     - "Updated README.md with Planned Execution Loop workflow"
     - "Updated docs/v2-redesign-roadmap.md: X1/X2 marked IMPLEMENTED, D01/D02 marked RESOLVED"
-  in_progress:
-    - "dogfood protocol workflow: verify real-project friction using continue loop"
+    - "Dogfood protocol workflow: used continue loop to execute 3 loops of command help quality audit"
+    - "Improved dev-save PROMPT.md: added When to Use, When NOT to Use, Typical Workflow"
+    - "Improved continue-loop PROMPT.md: added When to Use, When NOT to Use, Typical Workflow"
+    - "Improved dev-status SKILL.md: added explicit DO and DO NOT sections"
+    - "Improved dev-status PROMPT.md: added When to Use, When NOT to Use, Typical Workflow"
+  in_progress: []
   blocked: []
 
 context:
@@ -142,8 +146,8 @@ next:
 
 checkpoint:
   last_updated: "2026-05-29"
-  last_commit: "5e73504"
-  summary: "phase p3: auto-execution and continue loop implemented — /dev-scope auto-executes simple scopes, continue loop reads next-phase-plan.md and derives scope, test cases case-27~33 added"
+  last_commit: "de259b8"
+  summary: "phase p3: dogfood complete — used continue loop to audit and improve dev-save, continue-loop, dev-status help quality. All 3 loops auto-executed. Friction measured and documented."
 
 confidence:
   state_confidence: high
