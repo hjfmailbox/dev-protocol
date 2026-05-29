@@ -194,7 +194,7 @@ Source priority when sources conflict:
 git reality > explicit docs > protocol state > assumptions
 ```
 
-### 5. Output Summary
+### 9. Output Summary
 
 Must provide:
 
