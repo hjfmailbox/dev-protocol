@@ -45,6 +45,25 @@ Added case-52~54 to validate dogfood-scale usage patterns:
 | case-53 | Interrupted workflow is reconstructible from partial session | PASS |
 | case-54 | Multiple daily sessions sort chronologically and concatenate correctly | PASS |
 
+### Part 4 — Cross-Project Bootstrap Fix (Post-Audit)
+
+**Problem**: Telemetry worked inside dev-protocol repo but not in external target projects because `/dev-init` did not create `runtime-telemetry/` directory.
+
+**Fix**:
+- `/dev-init` SKILL.md and PROMPT.md now require bootstrapping `runtime-telemetry/` with `telemetry.ps1`, `README.md`, and `config.json`
+- All 6 core skills gained YAML frontmatter (`name` + `description`) for command palette discoverability
+- Added case-55 regression test covering cross-project telemetry bootstrap
+
+| Case | Scenario | Status |
+|---|---|---|
+| case-55 | Cross-project telemetry bootstrap via /dev-init | PASS |
+
+| Case | Scenario | Status |
+|---|---|---|
+| case-52 | 25+ events accumulate in single session without loss | PASS |
+| case-53 | Interrupted workflow is reconstructible from partial session | PASS |
+| case-54 | Multiple daily sessions sort chronologically and concatenate correctly | PASS |
+
 ---
 
 ## Test Coverage
@@ -58,10 +77,10 @@ Added case-52~54 to validate dogfood-scale usage patterns:
 | Semantic Validation | 37, 38, 39, 40 | 4/4 |
 | Completion Semantics | 21, 22, 23 | 3/3 |
 | Scope Behavior | 15 | 1/1 |
-| Telemetry | 45, 46, 47, 48, 49, 50, 51, 52, 53, 54 | 10/10 |
+| Telemetry | 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55 | 11/11 |
 | Test Infrastructure | 42 | 1/1 |
 | Onboarding | 43, 44 | 2/2 |
-| **Total** | | **54/54 PASS** |
+| **Total** | | **55/55 PASS** |
 
 ---
 
@@ -129,6 +148,8 @@ After dogfood concludes, evaluate whether to introduce:
 | Failure path coverage | PASS |
 | Long-session durability | PASS |
 | Cross-session continuity | PASS |
+| Cross-project bootstrap | PASS |
+| Command discoverability | PASS |
 | Privacy boundary enforcement | PASS |
 | Disable switch functionality | PASS |
 | Test coverage (> 50 cases) | PASS |
