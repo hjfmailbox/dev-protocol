@@ -281,3 +281,35 @@ Must recommend `/dev-init` if recoverable state does not exist.
 - **NEVER return stale focus when git reality indicates newer active work**
 - **NEVER leave phase as `unknown` when git reality or other sources provide clear signal**
 - **Read-only only**
+
+---
+
+## Telemetry
+
+Record the following events using `.agents/dev-protocol/runtime-telemetry/telemetry.ps1`.
+
+Telemetry is optional: if the script is missing or config disables it, skip silently.
+
+### command_invoked
+
+Record at the start of execution:
+
+```powershell
+.telemetry.ps1 -EventType command_invoked -Command '/dev-status'
+```
+
+### drift_snapshot
+
+Record after drift classification (section 3):
+
+```powershell
+.telemetry.ps1 -EventType drift_snapshot -Drift '<level>' -Phase '<phase>' -Focus '<focus>' -CheckpointOutdatedCommits <n>
+```
+
+### command_result
+
+Record before returning output:
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-status' -Status 'success'
+```

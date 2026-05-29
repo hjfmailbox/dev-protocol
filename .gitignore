@@ -2,4 +2,5 @@
 .agents/dev-protocol/goal-output.json
 .agents/dev-protocol/goal-output.md
 .agents/dev-protocol/incidents.md
+.agents/dev-protocol/runtime-telemetry/sessions/
 .claude/worktrees/

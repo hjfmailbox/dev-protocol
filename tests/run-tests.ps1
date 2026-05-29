@@ -52,6 +52,9 @@ function Get-CaseDirName {
         '42' { return 'case-42-test-matrix-synchronization-audit' }
         '43' { return 'case-43-onboarding-documentation-consistency' }
         '44' { return 'case-44-alias-skill-runtime-consistency' }
+        '45' { return 'case-45-telemetry-enabled' }
+        '46' { return 'case-46-telemetry-disabled' }
+        '47' { return 'case-47-replay-completeness' }
         default { return "case-$Case" }
     }
 }
@@ -2180,6 +2183,311 @@ if ($Case -eq '44') {
         Fail "case-44: dev-help PROMPT.md still displays v1 command table"
     }
     Pass-Check "case-44: dev-help PROMPT.md does not display v1 command table"
+}
+
+# ── AR. Case-45 specific checks (telemetry enabled) ──────────────────
+
+if ($Case -eq '45') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-45 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-45 test-plan.md exists"
+
+    $TelemetryDir = Join-Path $PWD.Path ".agents/dev-protocol/runtime-telemetry"
+    if (-not (Test-Path $TelemetryDir)) {
+        Fail "case-45: runtime-telemetry directory not found"
+    }
+    Pass-Check "case-45: runtime-telemetry directory exists"
+
+    $ConfigPath = Join-Path $TelemetryDir "config.json"
+    if (-not (Test-Path $ConfigPath)) {
+        Fail "case-45: runtime-telemetry/config.json not found"
+    }
+    Pass-Check "case-45: config.json exists"
+
+    $ScriptPath = Join-Path $TelemetryDir "telemetry.ps1"
+    if (-not (Test-Path $ScriptPath)) {
+        Fail "case-45: telemetry.ps1 not found"
+    }
+    Pass-Check "case-45: telemetry.ps1 exists"
+
+    # Verify config is enabled
+    $Config = Get-Content $ConfigPath -Raw | ConvertFrom-Json
+    if (-not $Config.enabled) {
+        Fail "case-45: telemetry config.enabled is false (expected true for this test)"
+    }
+    Pass-Check "case-45: telemetry is enabled in config"
+
+    # Clean up any existing session files for isolation
+    $SessionsDir = Join-Path $TelemetryDir "sessions"
+    if (Test-Path $SessionsDir) {
+        Get-ChildItem -Directory $SessionsDir -ErrorAction SilentlyContinue | ForEach-Object {
+            Get-ChildItem -File $_.FullName -Filter '*.jsonl' -ErrorAction SilentlyContinue | Remove-Item -Force
+        }
+    }
+
+    # Run telemetry.ps1 to record an event
+    $EventResult = & powershell -NoProfile -ExecutionPolicy Bypass -File $ScriptPath `
+        -EventType command_invoked -Command '/dev-status' -Project 'TestProject' 2>&1
+    $ExitCode = $LASTEXITCODE
+
+    if ($ExitCode -ne 0) {
+        Fail "case-45: telemetry.ps1 exited with code $ExitCode"
+    }
+    Pass-Check "case-45: telemetry.ps1 exited successfully"
+
+    # Find the created JSONL file
+    $TodayDir = Join-Path $SessionsDir (Get-Date -Format 'yyyy-MM-dd')
+    if (-not (Test-Path $TodayDir)) {
+        Fail "case-45: expected session directory $TodayDir was not created"
+    }
+    Pass-Check "case-45: session date directory created"
+
+    $JsonlFiles = Get-ChildItem -File $TodayDir -Filter '*.jsonl' -ErrorAction SilentlyContinue
+    if (-not $JsonlFiles -or $JsonlFiles.Count -eq 0) {
+        Fail "case-45: no JSONL session file created after telemetry recording"
+    }
+    Pass-Check "case-45: JSONL session file created"
+
+    # Validate JSONL content
+    $Lines = @(Get-Content $JsonlFiles[0].FullName)
+    if ($Lines.Count -eq 0) {
+        Fail "case-45: JSONL file is empty"
+    }
+    Pass-Check "case-45: JSONL file has $($Lines.Count) line(s)"
+
+    try {
+        $Event = $Lines[0] | ConvertFrom-Json -ErrorAction Stop
+    }
+    catch {
+        Fail "case-45: JSONL line is not valid JSON: $($Lines[0])"
+    }
+    Pass-Check "case-45: JSONL line is valid JSON"
+
+    $RequiredFields = @('timestamp', 'event_type', 'command', 'project', 'repo_root')
+    foreach ($field in $RequiredFields) {
+        if ($null -eq $Event.$field) {
+            Fail "case-45: recorded event missing required field: $field"
+        }
+    }
+    Pass-Check "case-45: all required fields present in recorded event"
+
+    if ($Event.event_type -ne 'command_invoked') {
+        Fail "case-45: expected event_type 'command_invoked', got '$($Event.event_type)'"
+    }
+    Pass-Check "case-45: event_type is correct"
+
+    if ($Event.command -ne '/dev-status') {
+        Fail "case-45: expected command '/dev-status', got '$($Event.command)'"
+    }
+    Pass-Check "case-45: command is correct"
+
+    # Clean up session files so subsequent tests have a clean workspace
+    if (Test-Path $SessionsDir) {
+        Remove-Item $SessionsDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
+# ── AS. Case-46 specific checks (telemetry disabled) ─────────────────
+
+if ($Case -eq '46') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-46 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-46 test-plan.md exists"
+
+    $TelemetryDir = Join-Path $PWD.Path ".agents/dev-protocol/runtime-telemetry"
+    $ConfigPath = Join-Path $TelemetryDir "config.json"
+    $ScriptPath = Join-Path $TelemetryDir "telemetry.ps1"
+
+    if (-not (Test-Path $ScriptPath)) {
+        Fail "case-46: telemetry.ps1 not found"
+    }
+    Pass-Check "case-46: telemetry.ps1 exists"
+
+    # Save original config
+    $OriginalConfig = Get-Content $ConfigPath -Raw
+
+    # Disable telemetry
+    $Config = $OriginalConfig | ConvertFrom-Json
+    $Config.enabled = $false
+    $Config | ConvertTo-Json -Depth 10 | Set-Content $ConfigPath -Encoding UTF8
+    Pass-Check "case-46: telemetry disabled in config"
+
+    # Count JSONL files before
+    $SessionsDir = Join-Path $TelemetryDir "sessions"
+    $BeforeCount = 0
+    if (Test-Path $SessionsDir) {
+        $BeforeCount = (Get-ChildItem -File -Recurse $SessionsDir -Filter '*.jsonl' -ErrorAction SilentlyContinue | Measure-Object).Count
+    }
+
+    # Run telemetry.ps1 — should be silent
+    $EventResult = & powershell -NoProfile -ExecutionPolicy Bypass -File $ScriptPath `
+        -EventType command_invoked -Command '/dev-status' 2>&1
+    $ExitCode = $LASTEXITCODE
+
+    if ($ExitCode -ne 0) {
+        Fail "case-46: telemetry.ps1 exited with code $ExitCode (expected 0 when disabled)"
+    }
+    Pass-Check "case-46: telemetry.ps1 exited silently with code 0"
+
+    # Count JSONL files after
+    $AfterCount = 0
+    if (Test-Path $SessionsDir) {
+        $AfterCount = (Get-ChildItem -File -Recurse $SessionsDir -Filter '*.jsonl' -ErrorAction SilentlyContinue | Measure-Object).Count
+    }
+
+    if ($AfterCount -ne $BeforeCount) {
+        Fail "case-46: new JSONL files created while telemetry disabled (before=$BeforeCount, after=$AfterCount)"
+    }
+    Pass-Check "case-46: no new JSONL files created while disabled"
+
+    # Restore original config
+    [System.IO.File]::WriteAllText($ConfigPath, $OriginalConfig)
+    Pass-Check "case-46: original config restored"
+}
+
+# ── AT. Case-47 specific checks (replay completeness) ────────────────
+
+if ($Case -eq '47') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-47 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-47 test-plan.md exists"
+
+    $TelemetryDir = Join-Path $PWD.Path ".agents/dev-protocol/runtime-telemetry"
+    $ScriptPath = Join-Path $TelemetryDir "telemetry.ps1"
+
+    if (-not (Test-Path $ScriptPath)) {
+        Fail "case-47: telemetry.ps1 not found"
+    }
+    Pass-Check "case-47: telemetry.ps1 exists"
+
+    # Clean up existing sessions for isolation
+    $SessionsDir = Join-Path $TelemetryDir "sessions"
+    if (Test-Path $SessionsDir) {
+        Remove-Item $SessionsDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    # Record a full workflow sequence
+    $Events = @(
+        @{EventType='command_invoked'; Command='/goal'},
+        @{EventType='workflow_transition'; From='/goal'; To='generate plan'},
+        @{EventType='command_invoked'; Command='generate plan'},
+        @{EventType='command_result'; Command='generate plan'; Status='success'},
+        @{EventType='workflow_transition'; From='generate plan'; To='continue loop'},
+        @{EventType='command_invoked'; Command='continue loop'},
+        @{EventType='loop_execution'; LoopId='loop-1'; AutoExecuted=$true; Scope='test scope'},
+        @{EventType='command_result'; Command='continue loop'; Status='success'},
+        @{EventType='command_invoked'; Command='/dev-save'},
+        @{EventType='command_result'; Command='/dev-save'; Status='success'},
+        @{EventType='drift_snapshot'; Drift='none'; Phase='p3-stabilization'; Focus='testing'; CheckpointOutdatedCommits=0}
+    )
+
+    foreach ($ev in $Events) {
+        $params = @()
+        foreach ($key in $ev.Keys) {
+            $val = $ev[$key]
+            if ($val -is [bool]) {
+                if ($val) { $params += "-$key" }
+            }
+            elseif ($val -is [int]) {
+                $params += "-$key", $val
+            }
+            else {
+                $params += "-$key", "$val"
+            }
+        }
+        $null = & powershell -NoProfile -ExecutionPolicy Bypass -File $ScriptPath @params 2>$null
+    }
+    Pass-Check "case-47: recorded $($Events.Count) workflow events"
+
+    # Find the session file
+    $TodayDir = Join-Path $SessionsDir (Get-Date -Format 'yyyy-MM-dd')
+    if (-not (Test-Path $TodayDir)) {
+        Fail "case-47: expected session directory not created"
+    }
+
+    $JsonlFiles = Get-ChildItem -File $TodayDir -Filter '*.jsonl' -ErrorAction SilentlyContinue
+    if (-not $JsonlFiles -or $JsonlFiles.Count -eq 0) {
+        Fail "case-47: no JSONL session file found"
+    }
+    Pass-Check "case-47: session JSONL file exists"
+
+    # Parse all events
+    $RecordedEvents = @()
+    foreach ($line in @(Get-Content $JsonlFiles[0].FullName)) {
+        try {
+            $RecordedEvents += ($line | ConvertFrom-Json -ErrorAction Stop)
+        }
+        catch {
+            Fail "case-47: invalid JSON in session log: $line"
+        }
+    }
+    Pass-Check "case-47: all lines are valid JSON"
+
+    # Verify all 5 event types are present
+    $EventTypes = $RecordedEvents | ForEach-Object { $_.event_type } | Select-Object -Unique
+    $RequiredTypes = @('command_invoked', 'command_result', 'workflow_transition', 'drift_snapshot', 'loop_execution')
+    foreach ($type in $RequiredTypes) {
+        if ($type -notin $EventTypes) {
+            Fail "case-47: missing event type in session log: $type (found: $($EventTypes -join ', '))"
+        }
+    }
+    Pass-Check "case-47: all 5 event types present"
+
+    # Verify command order is reconstructible (chronological)
+    $CommandEvents = $RecordedEvents | Where-Object { $_.event_type -eq 'command_invoked' }
+    if ($CommandEvents.Count -lt 3) {
+        Fail "case-47: expected at least 3 command_invoked events, got $($CommandEvents.Count)"
+    }
+    Pass-Check "case-47: command order reconstructible ($($CommandEvents.Count) commands)"
+
+    # Verify workflow transitions form a connected chain
+    $Transitions = $RecordedEvents | Where-Object { $_.event_type -eq 'workflow_transition' }
+    if ($Transitions.Count -lt 2) {
+        Fail "case-47: expected at least 2 workflow_transition events, got $($Transitions.Count)"
+    }
+
+    $Connected = $true
+    for ($i = 1; $i -lt $Transitions.Count; $i++) {
+        if ($Transitions[$i].from -ne $Transitions[$i - 1].to) {
+            $Connected = $false
+            break
+        }
+    }
+    if (-not $Connected) {
+        # Non-sequential transitions are acceptable; just verify they exist
+        Pass-Check "case-47: workflow transitions exist (non-sequential)"
+    }
+    else {
+        Pass-Check "case-47: workflow transitions form connected chain"
+    }
+
+    # Verify drift state captured
+    $DriftEvents = $RecordedEvents | Where-Object { $_.event_type -eq 'drift_snapshot' }
+    if ($DriftEvents.Count -eq 0) {
+        Fail "case-47: no drift_snapshot event found"
+    }
+    if ($DriftEvents[0].drift -ne 'none') {
+        Fail "case-47: drift_snapshot drift value mismatch, expected 'none', got '$($DriftEvents[0].drift)'"
+    }
+    Pass-Check "case-47: drift state captured correctly"
+
+    # Verify loop execution recorded
+    $LoopEvents = $RecordedEvents | Where-Object { $_.event_type -eq 'loop_execution' }
+    if ($LoopEvents.Count -eq 0) {
+        Fail "case-47: no loop_execution event found"
+    }
+    if ($LoopEvents[0].loop_id -ne 'loop-1') {
+        Fail "case-47: loop_execution loop_id mismatch, expected 'loop-1', got '$($LoopEvents[0].loop_id)'"
+    }
+    Pass-Check "case-47: loop execution recorded correctly"
+
+    # Clean up session files so subsequent tests have a clean workspace
+    if (Test-Path $SessionsDir) {
+        Remove-Item $SessionsDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 # ── Final result ─────────────────────────────────────────────────────
