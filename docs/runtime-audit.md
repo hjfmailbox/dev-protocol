@@ -92,5 +92,6 @@
 |---|---|---|
 | Stop hook interrupts before `command_result` | LOW | `command_invoked` + missing `command_result` = implicit failure signal |
 | `/goal` telemetry depends on agent discipline (no dedicated skill file) | MEDIUM | Documented in audit; monitored via case-48/49 |
-| Session file grows unbounded within a single day | LOW | 30-day retention + hourly session rollover |
+| Session file grows unbounded within a single day | LOW | Hourly session rollover limits individual file size |
 | Telemetry write failure silently ignored | LOW | `ErrorActionPreference = 'Stop'` in telemetry.ps1; skill instructions say "skip silently if disabled" |
+| Long-term storage growth (no retention cap) | LOW | Permanent retention by design during dogfood; archival may be introduced post-v1.x |

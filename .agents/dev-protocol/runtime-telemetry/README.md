@@ -54,7 +54,11 @@ When disabled, telemetry is completely silent. No files are written. No errors a
 
 ## Retention
 
-Sessions older than `max_days` (default: 30) are automatically cleaned on the next telemetry write.
+**Telemetry currently uses permanent retention during dogfood phase.**
+
+All session files are kept indefinitely. No automatic deletion occurs.
+
+Later observability or storage optimization may introduce an archival strategy, but v1.x does not allow automatic deletion of telemetry data.
 
 ## Replay Usage
 

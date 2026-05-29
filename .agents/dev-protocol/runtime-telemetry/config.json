@@ -1,6 +1,5 @@
 {
   "enabled": true,
   "record_command_args": true,
-  "record_git_context": true,
-  "max_days": 30
+  "record_git_context": true
 }

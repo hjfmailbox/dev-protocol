@@ -4,9 +4,8 @@
     Passive runtime telemetry event recorder for dev-protocol.
 .DESCRIPTION
     Appends a single JSONL event to the current session log.
-    Reads config.json for enablement and retention settings.
+    Reads config.json for enablement settings.
     Silently exits if telemetry is disabled.
-    Automatically cleans sessions older than max_days.
 .PARAMETER EventType
     Required. One of: command_invoked, command_result, workflow_transition, drift_snapshot, loop_execution.
 .PARAMETER Command
@@ -65,7 +64,7 @@ param(
     [string]$Phase,
     [string]$Focus,
     [int]$CheckpointOutdatedCommits,
-    [string]$DurationMs,
+    [int]$DurationMs,
     [string]$Args,
     [string]$Project,
     [string]$RepoRoot,
@@ -105,7 +104,6 @@ $Config = @{
     enabled             = $true
     record_command_args = $true
     record_git_context  = $true
-    max_days            = 30
 }
 
 if (Test-Path $ConfigPath) {
@@ -114,7 +112,6 @@ if (Test-Path $ConfigPath) {
         if ($null -ne $Loaded.enabled) { $Config.enabled = [bool]$Loaded.enabled }
         if ($null -ne $Loaded.record_command_args) { $Config.record_command_args = [bool]$Loaded.record_command_args }
         if ($null -ne $Loaded.record_git_context) { $Config.record_git_context = [bool]$Loaded.record_git_context }
-        if ($null -ne $Loaded.max_days) { $Config.max_days = [int]$Loaded.max_days }
     }
     catch {
         # Config corrupt: default to enabled, but don't emit errors
@@ -185,7 +182,7 @@ if ($Drift) { $Event.drift = $Drift }
 if ($Phase) { $Event.phase = $Phase }
 if ($Focus) { $Event.focus = $Focus }
 if ($PSBoundParameters.ContainsKey('CheckpointOutdatedCommits')) { $Event.checkpoint_outdated_commits = $CheckpointOutdatedCommits }
-if ($DurationMs) { $Event.duration_ms = $DurationMs }
+if ($PSBoundParameters.ContainsKey('DurationMs')) { $Event.duration_ms = $DurationMs }
 if ($ActiveWork) { $Event.active_work = $ActiveWork }
 if ($CheckpointCommit) { $Event.checkpoint_commit = $CheckpointCommit }
 if ($HeadCommit) { $Event.head_commit = $HeadCommit }
@@ -234,25 +231,5 @@ if (-not $SessionFile) {
 $Line = ($Event | ConvertTo-Json -Compress)
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::AppendAllText($SessionFile, $Line + [System.Environment]::NewLine, $Utf8NoBom)
-
-# ── Cleanup old sessions ─────────────────────────────────────────────
-
-if ($Config.max_days -gt 0) {
-    $cutoffDate = (Get-Date).AddDays(-$Config.max_days)
-    $sessionsRoot = Join-Path $TelemetryDir 'sessions'
-    if (Test-Path $sessionsRoot) {
-        Get-ChildItem -Directory $sessionsRoot -ErrorAction SilentlyContinue | ForEach-Object {
-            try {
-                $dirDate = [DateTime]::Parse($_.Name)
-                if ($dirDate -lt $cutoffDate) {
-                    Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
-                }
-            }
-            catch {
-                # Ignore non-date directory names
-            }
-        }
-    }
-}
 
 exit 0
