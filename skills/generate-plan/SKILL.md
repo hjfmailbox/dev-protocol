@@ -160,6 +160,42 @@ STOP and report failure if:
 
 ---
 
+## Telemetry
+
+Record the following events using `.agents/dev-protocol/runtime-telemetry/telemetry.ps1`.
+
+Telemetry is optional: if the script is missing or config disables it, skip silently.
+
+### command_invoked
+
+Record at the start of execution:
+
+```powershell
+.telemetry.ps1 -EventType command_invoked -Command 'generate plan'
+```
+
+### command_result
+
+Record before returning output:
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command 'generate plan' -Status 'success'
+```
+
+If execution fails (missing context, ambiguous goal, zero loops):
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command 'generate plan' -Status 'failure' -Reason '<specific failure>'
+```
+
+### session_context_snapshot
+
+Record after plan is generated:
+
+```powershell
+.telemetry.ps1 -EventType session_context_snapshot -Phase '<phase>' -Focus '<focus>' -Freshness '<freshness>' -CheckpointCommit '<hash>' -HeadCommit '<hash>' -ActiveWork '<theme>'
+```
+
 ## Execution Sequence
 
 ```text

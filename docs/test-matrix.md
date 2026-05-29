@@ -346,6 +346,66 @@ Failure Signal
 
 ---
 
+## Telemetry
+
+### TM1 — Telemetry Enabled
+
+**Case ID**: case-45-telemetry-enabled
+**Scenario**: Telemetry records events when enabled in config.
+**Preconditions**: config.json has enabled=true. telemetry.ps1 exists.
+**Expected Result**: JSONL session file created with valid events.
+**Failure Signal**: No session file created or invalid JSON.
+
+### TM2 — Telemetry Disabled
+
+**Case ID**: case-46-telemetry-disabled
+**Scenario**: Telemetry is completely silent when disabled.
+**Preconditions**: config.json has enabled=false.
+**Expected Result**: No files created. Exit code 0. No output.
+**Failure Signal**: Files created while disabled or non-zero exit.
+
+### TM3 — Replay Completeness
+
+**Case ID**: case-47-replay-completeness
+**Scenario**: Single session log contains all 5 event types.
+**Preconditions**: Telemetry enabled.
+**Expected Result**: command_invoked, command_result, workflow_transition, drift_snapshot, loop_execution all present.
+**Failure Signal**: Missing event types or incorrect order.
+
+### TM4 — Multi-Command Workflow Replay
+
+**Case ID**: case-48-multi-command-workflow
+**Scenario**: Realistic /dev-status → generate plan → continue loop → /dev-save workflow produces complete event chain.
+**Preconditions**: Telemetry enabled.
+**Expected Result**: All 14 events in chronological order. Every command_invoked has matching command_result.
+**Failure Signal**: Missing events, wrong order, unmatched invocations.
+
+### TM5 — Failure Path Telemetry
+
+**Case ID**: case-49-failure-path-telemetry
+**Scenario**: Failure scenarios record status=failure with reason.
+**Preconditions**: Telemetry enabled.
+**Expected Result**: 3 failure results present, each with status="failure" and non-empty reason.
+**Failure Signal**: Silent failures or missing reason fields.
+
+### TM6 — Persistence After Interruption
+
+**Case ID**: case-50-persistence-after-interruption
+**Scenario**: Partial workflow (interruption before completion) is replayable.
+**Preconditions**: Telemetry enabled.
+**Expected Result**: Session file contains partial workflow. Missing command_result detectable as interruption signal.
+**Failure Signal**: Session file missing or interruption not detectable.
+
+### TM7 — Context Snapshot Completeness
+
+**Case ID**: case-51-context-snapshot-completeness
+**Scenario**: session_context_snapshot contains all required fields.
+**Preconditions**: Telemetry enabled.
+**Expected Result**: phase, focus, freshness, checkpoint_commit, head_commit, active_work all present and non-empty.
+**Failure Signal**: Missing or empty required fields.
+
+---
+
 ## Test Infrastructure
 
 ### T1 — Test Matrix Synchronization Audit
@@ -403,3 +463,10 @@ Failure Signal
 | case-42 | case-42-test-matrix-synchronization-audit | PASS |
 | case-43 | case-43-onboarding-documentation-consistency | PASS |
 | case-44 | case-44-alias-skill-runtime-consistency | PASS |
+| case-45 | case-45-telemetry-enabled | PASS |
+| case-46 | case-46-telemetry-disabled | PASS |
+| case-47 | case-47-replay-completeness | PASS |
+| case-48 | case-48-multi-command-workflow | PASS |
+| case-49 | case-49-failure-path-telemetry | PASS |
+| case-50 | case-50-persistence-after-interruption | PASS |
+| case-51 | case-51-context-snapshot-completeness | PASS |

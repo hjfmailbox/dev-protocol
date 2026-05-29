@@ -223,6 +223,34 @@ Agent must:
 
 ---
 
+## Telemetry
+
+Record the following events using `.agents/dev-protocol/runtime-telemetry/telemetry.ps1`.
+
+Telemetry is optional: if the script is missing or config disables it, skip silently.
+
+### command_invoked
+
+Record at the start of execution:
+
+```powershell
+.telemetry.ps1 -EventType command_invoked -Command '/dev-init'
+```
+
+### command_result
+
+Record before returning output:
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-init' -Status 'success'
+```
+
+If execution fails (repository unreadable, low confidence, overwrite demand):
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-init' -Status 'failure' -Reason '<specific failure>'
+```
+
 ## Failure Rules
 
 Init fails if:

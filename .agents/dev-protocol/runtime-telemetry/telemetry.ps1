@@ -50,7 +50,7 @@
 #>
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('command_invoked', 'command_result', 'workflow_transition', 'drift_snapshot', 'loop_execution')]
+    [ValidateSet('command_invoked', 'command_result', 'workflow_transition', 'drift_snapshot', 'loop_execution', 'session_context_snapshot')]
     [string]$EventType,
 
     [string]$Command,
@@ -71,7 +71,11 @@ param(
     [string]$RepoRoot,
     [string]$GitBranch,
     [switch]$WorkspaceClean,
-    [string]$SessionFile
+    [string]$SessionFile,
+    [string]$ActiveWork,
+    [string]$CheckpointCommit,
+    [string]$HeadCommit,
+    [string]$Freshness
 )
 
 $ErrorActionPreference = 'Stop'
@@ -182,6 +186,10 @@ if ($Phase) { $Event.phase = $Phase }
 if ($Focus) { $Event.focus = $Focus }
 if ($PSBoundParameters.ContainsKey('CheckpointOutdatedCommits')) { $Event.checkpoint_outdated_commits = $CheckpointOutdatedCommits }
 if ($DurationMs) { $Event.duration_ms = $DurationMs }
+if ($ActiveWork) { $Event.active_work = $ActiveWork }
+if ($CheckpointCommit) { $Event.checkpoint_commit = $CheckpointCommit }
+if ($HeadCommit) { $Event.head_commit = $HeadCommit }
+if ($Freshness) { $Event.freshness = $Freshness }
 
 $Event.project = $ProjectName
 $Event.repo_root = $Root

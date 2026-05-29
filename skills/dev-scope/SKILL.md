@@ -192,6 +192,42 @@ After scope generation, determine if the scope qualifies for direct execution.
 - Git repository is initialized
 - Project state is known (run `/dev-status` first if unsure)
 
+## Telemetry
+
+Record the following events using `.agents/dev-protocol/runtime-telemetry/telemetry.ps1`.
+
+Telemetry is optional: if the script is missing or config disables it, skip silently.
+
+### command_invoked
+
+Record at the start of execution:
+
+```powershell
+.telemetry.ps1 -EventType command_invoked -Command '/dev-scope'
+```
+
+### command_result
+
+Record before returning output:
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-scope' -Status 'success'
+```
+
+If execution fails (empty intent, ambiguous scope, missing validation):
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-scope' -Status 'failure' -Reason '<specific failure>'
+```
+
+### session_context_snapshot
+
+Record after scope is finalized:
+
+```powershell
+.telemetry.ps1 -EventType session_context_snapshot -Phase '<phase>' -Focus '<focus>' -ActiveWork '<theme>'
+```
+
 ## FAILURE CONDITIONS
 
 STOP and report failure if ANY of the following occur:

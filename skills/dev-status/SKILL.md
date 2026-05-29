@@ -313,3 +313,17 @@ Record before returning output:
 ```powershell
 .telemetry.ps1 -EventType command_result -Command '/dev-status' -Status 'success'
 ```
+
+If execution fails (state files missing, repository corrupted, severe inconsistency):
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-status' -Status 'failure' -Reason '<specific failure>'
+```
+
+### session_context_snapshot
+
+Record after generating the output summary:
+
+```powershell
+.telemetry.ps1 -EventType session_context_snapshot -Phase '<phase>' -Focus '<focus>' -Drift '<drift>' -Freshness '<freshness>' -CheckpointCommit '<hash>' -HeadCommit '<hash>' -ActiveWork '<theme>'
+```

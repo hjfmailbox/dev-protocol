@@ -215,6 +215,58 @@ continue loop
 - No unresolved blockers in `handoff.md`
 - `checkpoint.last_commit` matches HEAD or HEAD~1
 
+## Telemetry
+
+Record the following events using `.agents/dev-protocol/runtime-telemetry/telemetry.ps1`.
+
+Telemetry is optional: if the script is missing or config disables it, skip silently.
+
+### command_invoked
+
+Record at the start of execution:
+
+```powershell
+.telemetry.ps1 -EventType command_invoked -Command 'continue loop'
+```
+
+### workflow_transition
+
+Record when the workflow step changes (e.g. from planning to execution):
+
+```powershell
+.telemetry.ps1 -EventType workflow_transition -From '/goal' -To 'continue loop'
+```
+
+### loop_execution
+
+Record after a loop completes:
+
+```powershell
+.telemetry.ps1 -EventType loop_execution -LoopId 'loop-N' -AutoExecuted -Scope '<description>'
+```
+
+### command_result
+
+Record before returning output:
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command 'continue loop' -Status 'success'
+```
+
+If execution fails (no plan, dirty workspace, blockers, drift, ambiguity):
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command 'continue loop' -Status 'failure' -Reason '<specific failure>'
+```
+
+### session_context_snapshot
+
+Record after loop execution completes:
+
+```powershell
+.telemetry.ps1 -EventType session_context_snapshot -Phase '<phase>' -Focus '<focus>' -Drift '<drift>' -Freshness '<freshness>' -CheckpointCommit '<hash>' -HeadCommit '<hash>' -ActiveWork '<theme>'
+```
+
 ## FAILURE CONDITIONS
 
 STOP and report failure if ANY of the following occur:

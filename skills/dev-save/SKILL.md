@@ -170,6 +170,42 @@ FAIL. Report why recovery is insufficient.
 
 ---
 
+## Telemetry
+
+Record the following events using `.agents/dev-protocol/runtime-telemetry/telemetry.ps1`.
+
+Telemetry is optional: if the script is missing or config disables it, skip silently.
+
+### command_invoked
+
+Record at the start of execution:
+
+```powershell
+.telemetry.ps1 -EventType command_invoked -Command '/dev-save'
+```
+
+### command_result
+
+Record before returning output:
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-save' -Status 'success'
+```
+
+If execution fails (state files missing, validation failure, recoverability failure, corruption):
+
+```powershell
+.telemetry.ps1 -EventType command_result -Command '/dev-save' -Status 'failure' -Reason '<specific failure>'
+```
+
+### session_context_snapshot
+
+Record after validating state consistency:
+
+```powershell
+.telemetry.ps1 -EventType session_context_snapshot -Phase '<phase>' -Focus '<focus>' -Freshness '<freshness>' -CheckpointCommit '<hash>' -HeadCommit '<hash>' -ActiveWork '<theme>'
+```
+
 ## Failure Rules
 
 /dev-save fails if:
