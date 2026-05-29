@@ -1639,7 +1639,7 @@ if ($Case -eq '36') {
     Pass-Check "case-36: generate-plan SKILL.md defines Validate Plan"
 
     # Verify status format compatible with tolerant parsing
-    if ($PromptContent -notmatch "Status:\s*\*?\*?pending\*?\*?") {
+    if ($PromptContent -notmatch "\*{0,2}Status:\*{0,2}\s*pending") {
         Fail "case-36: generate-plan PROMPT.md missing Status: pending format"
     }
     Pass-Check "case-36: generate-plan PROMPT.md uses compatible status format"
