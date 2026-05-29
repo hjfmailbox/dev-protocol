@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Phase A completion — command contract hardening. Implemented phase inference in /dev-status (5-step priority: next-phase-plan → roadmap → handoff → workflow-state → unknown). Implemented no-op save support in /dev-save (clean workspace allowed, records validated target/summary/reasoning). Added current-focus.md prevention rule. Created test plans for case-a (phase inference), case-b (no-op save), case-c (focus migration).
+Auto-execution and continue loop implementation complete. Dogfooding protocol workflow: using real continue loop to execute a small task (slash command help completeness audit) and measuring friction.
 
 ## Current Status
 
@@ -53,10 +53,20 @@ Phase A completion — command contract hardening. Implemented phase inference i
 - Added current-focus.md prevention rule to references/workflow-rules.md
 - Created case-a/b/c test plans for new protocol behavior
 - case-06 PASS on Phase A completion commit
+- Implemented /dev-scope auto-execution criteria (7 rules): ≤3 files, non-architectural, no API changes, single-step validation, low ambiguity, low blast radius, no cross-module deps
+- Added auto-execution decision step to /dev-scope SKILL.md and PROMPT.md
+- case-27/28/29 PASS on auto-execution commit
+- Implemented continue loop execution mode: reads next-phase-plan.md, tolerant parsing, scope derivation, auto-execution decision
+- Created skills/continue-loop/PROMPT.md and SKILL.md
+- Created .claude/skills/continue-loop symlink for auto-detection
+- case-30/31/32/33 PASS on continue loop commit
+- Updated docs/command-contracts.md with continue loop contract
+- Updated README.md with Planned Execution Loop workflow
+- Updated docs/v2-redesign-roadmap.md: X1/X2 marked IMPLEMENTED, D01/D02 marked RESOLVED
 
 ## In Progress
 
-- none
+- Dogfood protocol workflow: using continue loop to execute real task and measure friction
 
 ## Blockers
 
@@ -81,12 +91,12 @@ Phase A completion — command contract hardening. Implemented phase inference i
 
 ## Next Recommended Actions
 
-1. **Freeze v2 command surface** — lock `/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status` and state file schema
-2. Implement R3: State Reconciliation — fix phase drift (#14) and status freshness drift (#15)
-3. Implement R4: Onboarding Hardening — fix Windows artifact emission (#8), NO_OP goal handling (#7), continuation handoff hardening (#6)
-4. Re-run real-project validation checklist after R3/R4 completion
-5. Proceed to R5: external real-project validation
-6. Consider adding mandatory-skill wording to dev-protocol skill prompts (zero-cost improvement from Superpowers benchmark)
+1. **Dogfood protocol workflow** — use continue loop to execute real task, measure friction, report experience
+2. **Freeze v2 command surface** — lock `/dev-init`, `/dev-scope`, `/dev-save`, `/dev-status` and state file schema
+3. Implement R3: State Reconciliation — fix phase drift (#14) and status freshness drift (#15)
+4. Implement R4: Onboarding Hardening — fix Windows artifact emission (#8), NO_OP goal handling (#7), continuation handoff hardening (#6)
+5. Re-run real-project validation checklist after R3/R4 completion
+6. Proceed to R5: external real-project validation
 
 ## Notes For Next Session
 
@@ -107,3 +117,7 @@ Phase A completion — command contract hardening. Implemented phase inference i
 - **NEW: Benchmark recommendation = READY_TO_FREEZE_V2** — no evaluated system solves the same problem better; remaining risks are implementation bugs, not design flaws
 - **NEW: 5 architecture risks documented** — portability untested, manual save gap, phase detection weak, no subagent support, hooks underutilized
 - **NEW: 7 things explicitly NOT worth copying** — ECC installer complexity, LangGraph graph API, barkain parallelism, Microsoft Azure coupling, Spec Kit 7-stage rigidity, etc.
+- **NEW: Auto-execution implemented** — /dev-scope auto-executes when 7 criteria met (≤3 files, non-architectural, no API changes, single-step validation, low ambiguity, low blast radius, no cross-module deps)
+- **NEW: Continue loop implemented** — reads next-phase-plan.md, tolerant parsing, derives scope, applies auto-execution criteria, executes or produces scope document
+- **NEW: Test coverage expanded** — case-27 through case-33 validate auto-execution and continue loop behavior
+- **NEW: Checkpoint updated** — 2026-05-29, commit 5e73504, drift cleared

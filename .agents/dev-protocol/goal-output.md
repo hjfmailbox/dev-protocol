@@ -6,41 +6,37 @@ COMPLETED
 
 ## Goal Summary
 
-Implemented simple scope auto-execution rules to reduce /dev-scope → /goal duplication. For simple, low-risk scopes meeting all criteria (≤3 files, non-architectural, no API changes, single-step validation, low ambiguity, low blast radius), /dev-scope executes directly without requiring a separate /goal. Complex/ambiguous/architectural work still requires explicit /goal.
+Implemented continuous loop execution mode (continue loop). When next-phase-plan.md exists, continue loop reads the plan, identifies the next incomplete loop via tolerant parsing, derives scope from plan + handoff + recent commits, applies auto-execution criteria, and either executes immediately or produces a scope document for /goal. Stop conditions defined for no plan, empty plan, dirty workspace, blockers, drift, ambiguity, all completed, and unrecognizable format.
 
 ## Changed Files
 
-- skills/dev-scope/PROMPT.md
-- tests/run-tests.ps1
+- skills/continue-loop/SKILL.md
 ## Validation Results
 
-- PASS: case-27 simple scope auto-execution criteria present in PROMPT.md and SKILL.md
-- PASS: case-28 complex scope blocked from auto-execution, requires /goal
-- PASS: case-29 ambiguity detection precedes auto-execution, asks clarifying questions
-- PASS: case-15 regression: scope misuse detection updated for new semantics
-- PASS: case-21 regression: completion semantics unchanged
-- PASS: case-22 regression: dev-save completion semantics unchanged
-- PASS: case-23 regression: no-op validation completion unchanged
-- PASS: case-16 regression: stale focus contamination prevention unchanged
-- PASS: case-14 regression: phase inference precedence unchanged
-- PASS: case-07 regression: dirty workspace handling unchanged
-- PASS: README.md updated with Simple Scope Loop workflow
-- PASS: command-contracts.md updated with auto-execution contract
-- PASS: roadmap X1 marked as implemented
-- PASS: deferred D01 marked as resolved, D10 added
+- PASS: case-30 preconditions, tolerant parsing, scope derivation, auto-execution decision
+- PASS: case-31 all-completed stop condition
+- PASS: case-32 ambiguity detection precedes scope derivation
+- PASS: case-33 complex loops require /goal
+- PASS: case-27 regression: auto-execution criteria unchanged
+- PASS: case-28 regression: blocked scope examples unchanged
+- PASS: case-15 regression: scope misuse detection unchanged
+- PASS: command-contracts.md updated with continue loop contract
+- PASS: README.md updated with Planned Execution Loop workflow
+- PASS: roadmap X2 marked as implemented
+- PASS: deferred D02 marked as resolved
 
 ## Stop Reason
 
-Auto-execution rules implemented and tested. All new tests (case-27/28/29) and regression tests pass. Documentation synchronized across PROMPT.md, SKILL.md, command-contracts.md, README.md, roadmap, and deferred improvements.
+Continue loop workflow implemented and fully tested. All new tests (case-30/31/32/33) and regression tests pass. Documentation synchronized across all surfaces.
 
 ## Risks / Follow-ups
 
-- Real-project validation of auto-execution criteria thresholds (e.g., is ≤3 files the right cutoff?)
-- Monitor for false positives: simple scopes that should have been complex
-- Monitor for false negatives: complex scopes incorrectly auto-executed
+- Real-project validation of tolerant parsing with non-standard plan formats
+- Monitor for false positives in loop detection
+- Verify continue loop integrates cleanly with auto-execution from previous goal
 
 ## Continuation Handoff
 
-- context: /dev-scope now supports auto-execution for simple scopes. Criteria: ≤3 files, non-architectural, no API changes, single-step validation, low ambiguity, low blast radius. When met, executes directly. When not met, produces scope document and waits for /goal. All docs and tests synchronized.
-- boundary: Only /dev-scope behavior changed. /goal, /dev-save, /dev-status, /dev-init unchanged. No breaking changes to existing workflows.
+- context: continue loop workflow is live. Reads next-phase-plan.md, finds next incomplete loop, derives scope, auto-executes or produces scope document. All stop conditions defined. Claude Code skill auto-detected.
+- boundary: New skill added (continue-loop). Existing /dev-scope, /dev-save, /dev-status, /dev-init, /goal unchanged.
 - next_candidate_goal: Continue roadmap stabilization items (N1-N3: project background generation, test coverage completion, v1 reference cleanup)
