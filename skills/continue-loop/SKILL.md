@@ -39,8 +39,9 @@ When a plan exists, continue execution without requiring the user to manually de
 3. **Identifies next loop** — finds first incomplete loop (`pending`, `todo`, `[ ]`)
 4. **Evaluates clarity** — detects ambiguity before scope derivation
 5. **Derives scope** — generates structured scope from plan + handoff + recent commits
-6. **Decides execution path** — auto-executes if criteria met, else produces scope document
-7. **Updates plan status** — marks loop as `completed` or `skipped`
+6. **Applies semantic validation** — interprets validation criteria using equivalence rules
+7. **Decides execution path** — auto-executes if criteria met, else produces scope document
+8. **Updates plan status** — marks loop as `completed` or `skipped`
 
 ---
 
@@ -131,7 +132,18 @@ Generate structured scope from plan entry:
 | Missing `Files:` | Derive from goal or recent commits |
 | Missing `Validation:` | `[Manual] Verify behavior` |
 
-### 5. Evaluate Auto-Execution
+### 5. Apply Semantic Validation Equivalence
+
+Before evaluating auto-execution, interpret validation criteria semantically:
+
+- **Same domain + direction**: "tests pass" ≈ "all regression cases pass"
+- **Git reality confirms intent**: commit messages and changed files satisfy plan criteria
+- **Test outcomes match**: test results validate criteria even with different wording
+- **Commit intent matches goal**: conventional commit subjects align with plan objectives
+
+**Non-equivalence signals**: "started" vs "completed", "partial" vs "fully resolved"
+
+### 6. Evaluate Auto-Execution
 
 Apply `/dev-scope` auto-execution criteria:
 
@@ -143,12 +155,13 @@ Apply `/dev-scope` auto-execution criteria:
 6. Non-architectural
 7. Low blast radius
 
-### 6. Execute or Produce Scope
+### 7. Execute or Produce Scope
 
 **If ALL criteria met**:
 - Execute immediately
 - Create normal git commits
 - Produce goal-output artifact
+- Apply semantic completion check: verify git reality, test results, or commit intent satisfy validation criteria
 - Update plan status to `completed`
 - Report "Workflow completed"
 
@@ -168,8 +181,9 @@ continue loop
   → 3. identify next uncompleted loop (tolerant parsing)
   → 4. evaluate loop clarity (detect ambiguity)
   → 5. derive scope from plan + handoff + recent commits
-  → 6. evaluate auto-execution criteria (same as /dev-scope)
-  → 7. if auto-execute: execute immediately, update plan status
+  → 6. apply semantic validation equivalence to criteria
+  → 7. evaluate auto-execution criteria (same as /dev-scope)
+  → 8. if auto-execute: execute immediately, apply semantic completion check, update plan status
      else: output scope document, STOP, wait for /goal
 ```
 
