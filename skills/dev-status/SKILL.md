@@ -206,6 +206,25 @@ Must provide:
 
 ---
 
+## DO
+
+- Report phase and focus with inference source when inferred
+- Prefer git reality over persisted state when they conflict
+- Report drift honestly
+- Reconstruct context from all available sources
+- Report checkpoint freshness level
+- Recommend /dev-save when state is stale
+
+## DO NOT
+
+- **NEVER modify files**
+- **NEVER write state**
+- **NEVER auto-fix drift**
+- **NEVER commit or stage**
+- **NEVER return stale focus when git reality indicates newer active work**
+- **NEVER leave phase as `unknown` when git reality or other sources provide clear signal**
+- **Read-only only**
+
 ## Failure Rules
 
 /dev-status fails if:

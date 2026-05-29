@@ -6,6 +6,34 @@ Your goal is to inspect the current protocol state and reconstruct development c
 
 ---
 
+## When to Use
+
+- At the start of any new session (after `/clear`, new day, different machine)
+- After switching branches
+- When unsure of current project state
+- Before declaring a new scope
+- After resuming from an interruption
+
+## When NOT to Use
+
+- No state files exist yet (use `/dev-init` instead)
+- You want to save progress (use `/dev-save` instead)
+- You want to declare a goal (use `/dev-scope` instead)
+- You want to modify, create, or fix anything (read-only only)
+
+## Typical Workflow
+
+```
+/dev-status
+-> loads state files
+-> inspects repository reality (git status, recent commits)
+-> validates state freshness (detects drift)
+-> reconstructs phase, focus, active work
+-> outputs concise context summary with recommended next action
+```
+
+---
+
 ## STEP 0: Reality Priority
 
 When sources conflict, this hierarchy wins:
