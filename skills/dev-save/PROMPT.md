@@ -6,6 +6,34 @@ Your goal is to persist the current protocol state to durable files and commit t
 
 ---
 
+## When to Use
+
+- After completing meaningful work within a scoped goal
+- Before starting a new session
+- When protocol state is stale relative to repository reality
+- After /dev-status reveals drift that needs recording
+
+## When NOT to Use
+
+- No state files exist yet (use /dev-init first)
+- You want to declare a new goal (use /dev-scope instead)
+- You want to inspect state (use /dev-status instead)
+- You want to implement or modify source code
+
+## Typical Workflow
+
+```
+/dev-save
+-> validates preconditions
+-> inspects repository reality
+-> updates workflow-state.yml and handoff.md
+-> validates state consistency
+-> stages and commits protocol state
+-> reports completion
+```
+
+---
+
 ## STEP 0: Reality Priority
 
 When sources conflict, this hierarchy wins:
