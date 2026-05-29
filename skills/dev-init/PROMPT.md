@@ -197,7 +197,7 @@ Rules:
 
 Create `.agents/dev-protocol/` directory if needed.
 
-Generate three state files:
+Generate three state files and bootstrap runtime telemetry:
 
 ### workflow-state.yml
 
@@ -346,6 +346,24 @@ Fields NOT inferred during /dev-init. Must be validated by user or /dev-status b
 - Phase is `unknown` until user or /dev-status validates and updates it
 ```
 
+### runtime-telemetry Bootstrap
+
+After state files, ensure `.agents/dev-protocol/runtime-telemetry/` exists with:
+
+1. **Find dev-protocol source**: Resolve the path of this skill file (`skills/dev-init/SKILL.md`) upward to the dev-protocol repository root.
+2. **Copy from source** to target project's `.agents/dev-protocol/runtime-telemetry/`:
+   - `telemetry.ps1`
+   - `README.md`
+3. **Create `config.json`** if not copied:
+   ```json
+   {
+     "enabled": true,
+     "record_command_args": true,
+     "record_git_context": true
+   }
+   ```
+4. If source files cannot be found, create the directory and `config.json` only, and note the missing telemetry recorder in handoff.md.
+
 **Critical rule**: If a field is uncertain, use "Unknown" or "not inferred during init — validate before relying on." Do NOT fabricate constraints, expectations, or conventions.
 
 State generation rules:
@@ -358,6 +376,7 @@ State generation rules:
 - NEVER invent missing facts
 - If confidence is low on any field, use "Unknown" and note in handoff
 - For Scenario C (dirty workspace), only generate after explicit user confirmation
+- Runtime telemetry files MUST be created so `/dev-status`, `/dev-scope`, `/dev-save`, and other commands can record events
 
 ---
 

@@ -428,6 +428,14 @@ Failure Signal
 **Expected Result**: Lexicographic sort produces chronological order. Concatenated stream is valid and monotonic.
 **Failure Signal**: Sessions overwrite each other. Non-sortable filenames. Non-monotonic timestamps.
 
+### TM11 — Cross-Project Telemetry Bootstrap
+
+**Case ID**: case-55-cross-project-telemetry-bootstrap
+**Scenario**: /dev-init bootstraps runtime-telemetry directory in external projects so telemetry works cross-project.
+**Preconditions**: /dev-init skill exists. Telemetry source files exist.
+**Expected Result**: /dev-init instructions require runtime-telemetry bootstrap. All 6 core skills have YAML frontmatter.
+**Failure Signal**: /dev-init missing telemetry bootstrap. Skills missing frontmatter.
+
 ---
 
 ## Test Infrastructure
@@ -497,3 +505,4 @@ Failure Signal
 | case-52 | case-52-long-session-accumulation | PASS |
 | case-53 | case-53-interrupted-workflow-reconstruction | PASS |
 | case-54 | case-54-cross-session-continuity | PASS |
+| case-55 | case-55-cross-project-telemetry-bootstrap | PASS |

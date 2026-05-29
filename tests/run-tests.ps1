@@ -62,6 +62,7 @@ function Get-CaseDirName {
         '52' { return 'case-52-long-session-accumulation' }
         '53' { return 'case-53-interrupted-workflow-reconstruction' }
         '54' { return 'case-54-cross-session-continuity' }
+        '55' { return 'case-55-cross-project-telemetry-bootstrap' }
         default { return "case-$Case" }
     }
 }
@@ -3078,6 +3079,83 @@ if ($Case -eq '54') {
     if (Test-Path $SessionsDir) {
         Remove-Item $SessionsDir -Recurse -Force -ErrorAction SilentlyContinue
     }
+}
+
+# ── BB. Case-55 specific checks (cross-project telemetry bootstrap) ────
+
+if ($Case -eq '55') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-55 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-55 test-plan.md exists"
+
+    # Verify /dev-init SKILL.md contains runtime-telemetry bootstrap instructions
+    $InitSkill = Join-Path $PWD.Path "skills/dev-init/SKILL.md"
+    if (-not (Test-Path $InitSkill)) {
+        Fail "case-55: skills/dev-init/SKILL.md not found"
+    }
+    $SkillContent = Get-Content $InitSkill -Raw
+
+    if ($SkillContent -notmatch "runtime-telemetry") {
+        Fail "case-55: /dev-init SKILL.md missing runtime-telemetry bootstrap instructions"
+    }
+    Pass-Check "case-55: /dev-init SKILL.md references runtime-telemetry"
+
+    if ($SkillContent -notmatch "telemetry.ps1") {
+        Fail "case-55: /dev-init SKILL.md missing telemetry.ps1 reference"
+    }
+    Pass-Check "case-55: /dev-init SKILL.md references telemetry.ps1"
+
+    if ($SkillContent -notmatch "config.json") {
+        Fail "case-55: /dev-init SKILL.md missing config.json reference"
+    }
+    Pass-Check "case-55: /dev-init SKILL.md references config.json"
+
+    # Verify /dev-init PROMPT.md contains runtime-telemetry bootstrap instructions
+    $InitPrompt = Join-Path $PWD.Path "skills/dev-init/PROMPT.md"
+    if (-not (Test-Path $InitPrompt)) {
+        Fail "case-55: skills/dev-init/PROMPT.md not found"
+    }
+    $PromptContent = Get-Content $InitPrompt -Raw
+
+    if ($PromptContent -notmatch "runtime-telemetry") {
+        Fail "case-55: /dev-init PROMPT.md missing runtime-telemetry bootstrap instructions"
+    }
+    Pass-Check "case-55: /dev-init PROMPT.md references runtime-telemetry"
+
+    if ($PromptContent -notmatch "telemetry.ps1") {
+        Fail "case-55: /dev-init PROMPT.md missing telemetry.ps1 reference"
+    }
+    Pass-Check "case-55: /dev-init PROMPT.md references telemetry.ps1"
+
+    # Verify all 6 core skills have YAML frontmatter with name and description
+    $RequiredSkills = @(
+        'dev-status',
+        'dev-save',
+        'dev-scope',
+        'dev-init',
+        'continue-loop',
+        'generate-plan'
+    )
+
+    foreach ($skillName in $RequiredSkills) {
+        $SkillFile = Join-Path $PWD.Path "skills/$skillName/SKILL.md"
+        if (-not (Test-Path $SkillFile)) {
+            Fail "case-55: skills/$skillName/SKILL.md not found"
+        }
+        $Content = Get-Content $SkillFile -Raw
+
+        if ($Content -notmatch "^---\s*\r?\n") {
+            Fail "case-55: skills/$skillName/SKILL.md missing YAML frontmatter"
+        }
+        if ($Content -notmatch "name:\s*" + [regex]::Escape($skillName)) {
+            Fail "case-55: skills/$skillName/SKILL.md missing or incorrect 'name' in frontmatter"
+        }
+        if ($Content -notmatch "description:\s*Use when") {
+            Fail "case-55: skills/$skillName/SKILL.md missing 'description' in frontmatter"
+        }
+    }
+    Pass-Check "case-55: all 6 core skills have YAML frontmatter with name and description"
 }
 
 # ── Final result ─────────────────────────────────────────────────────

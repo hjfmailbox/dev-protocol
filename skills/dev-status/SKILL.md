@@ -1,3 +1,8 @@
+---
+name: dev-status
+description: Use when starting a new session, resuming after interruption, or needing to understand current project state and recommended next actions
+---
+
 # /dev-status
 
 ## Purpose

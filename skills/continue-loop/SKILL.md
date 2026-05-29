@@ -1,3 +1,8 @@
+---
+name: continue-loop
+description: Use when a next-phase-plan.md exists and you want to automatically derive and execute the next planned loop without manual scope declaration
+---
+
 # continue loop
 
 ## Purpose

@@ -1,3 +1,8 @@
+---
+name: dev-save
+description: Use when you have completed work and need to persist protocol state so the current context survives session resets
+---
+
 # /dev-save
 
 ## Purpose

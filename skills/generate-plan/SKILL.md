@@ -1,3 +1,8 @@
+---
+name: generate-plan
+description: Use when you need to convert a high-level goal into a structured execution plan with numbered loops before using continue loop
+---
+
 # generate plan
 
 ## Purpose

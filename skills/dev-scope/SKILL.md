@@ -1,3 +1,8 @@
+---
+name: dev-scope
+description: Use when you have a new task or goal and need to define a bounded objective with clear validation criteria before execution
+---
+
 # /dev-scope
 
 ## Purpose

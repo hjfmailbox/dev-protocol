@@ -1,3 +1,8 @@
+---
+name: dev-init
+description: Use when adopting dev-protocol on a new project, recovering from missing state files, or onboarding a repository without existing protocol state
+---
+
 # /dev-init
 
 ## Purpose
@@ -161,6 +166,14 @@ Create or update in `.agents/dev-protocol/`:
 - handoff.md
 - project-rules.md
 
+Also bootstrap `runtime-telemetry/` so all dev-protocol commands can record telemetry:
+
+- `.agents/dev-protocol/runtime-telemetry/config.json` — default telemetry config
+- `.agents/dev-protocol/runtime-telemetry/telemetry.ps1` — copied from dev-protocol source
+- `.agents/dev-protocol/runtime-telemetry/README.md` — copied from dev-protocol source
+
+How to find dev-protocol source: resolve the path of this skill file (`skills/dev-init/SKILL.md`) upward to the dev-protocol repository root, then copy from `.agents/dev-protocol/runtime-telemetry/`.
+
 Rules:
 
 - Never mutate source code
@@ -173,6 +186,7 @@ Rules:
 - Phase ownership: user or `/dev-status` sets phase; `/dev-init` only records onboarding occurred
 - `project-rules.md` MUST clearly separate project runtime facts from protocol operating rules
 - `project-rules.md` MUST NOT contain invented facts — use "Unknown / Requires Validation" for uncertain items
+- If dev-protocol source `runtime-telemetry/` files cannot be found, create a minimal `config.json` with defaults and note the missing telemetry recorder in handoff.md
 
 ### Output Boundaries
 
