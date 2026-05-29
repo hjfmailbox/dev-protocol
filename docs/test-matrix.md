@@ -404,6 +404,30 @@ Failure Signal
 **Expected Result**: phase, focus, freshness, checkpoint_commit, head_commit, active_work all present and non-empty.
 **Failure Signal**: Missing or empty required fields.
 
+### TM8 — Long-Session Accumulation
+
+**Case ID**: case-52-long-session-accumulation
+**Scenario**: Single session accumulates 20+ events without loss or corruption.
+**Preconditions**: Telemetry enabled. All events within 1-hour window.
+**Expected Result**: Single JSONL file contains all 25+ events. All valid JSON. File size < 50 KB.
+**Failure Signal**: Events split across files, JSON parse errors, missing events.
+
+### TM9 — Interrupted Workflow Reconstruction
+
+**Case ID**: case-53-interrupted-workflow-reconstruction
+**Scenario**: Partial workflow with missing command_result is replayable and reconstructible.
+**Preconditions**: Telemetry enabled.
+**Expected Result**: Interruption detectable (orphan command_invoked). Last context snapshot provides usable state.
+**Failure Signal**: Interruption not detectable. Missing context snapshot before interruption.
+
+### TM10 — Cross-Session Continuity
+
+**Case ID**: case-54-cross-session-continuity
+**Scenario**: Multiple sessions within same day can be ordered and concatenated for full replay.
+**Preconditions**: Telemetry enabled. Explicit session files with different timestamps.
+**Expected Result**: Lexicographic sort produces chronological order. Concatenated stream is valid and monotonic.
+**Failure Signal**: Sessions overwrite each other. Non-sortable filenames. Non-monotonic timestamps.
+
 ---
 
 ## Test Infrastructure
@@ -470,3 +494,6 @@ Failure Signal
 | case-49 | case-49-failure-path-telemetry | PASS |
 | case-50 | case-50-persistence-after-interruption | PASS |
 | case-51 | case-51-context-snapshot-completeness | PASS |
+| case-52 | case-52-long-session-accumulation | PASS |
+| case-53 | case-53-interrupted-workflow-reconstruction | PASS |
+| case-54 | case-54-cross-session-continuity | PASS |
