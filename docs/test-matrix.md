@@ -399,5 +399,5 @@ Failure Signal
 | case-38 | case-38-semantic-loop-completion | PASS |
 | case-39 | case-39-semantic-drift-classification | PASS |
 | case-40 | case-40-semantic-active-work | PASS |
-| case-41 | case-41-canonical-workflow-path-consistency | pending |
-| case-42 | case-42-test-matrix-synchronization-audit | pending |
+| case-41 | case-41-canonical-workflow-path-consistency | PASS |
+| case-42 | case-42-test-matrix-synchronization-audit | PASS |
