@@ -6,6 +6,38 @@ Your goal is to reduce manual orchestration for planned execution by automatical
 
 ---
 
+## When to Use
+
+- A `next-phase-plan.md` exists with planned work
+- The user wants to proceed to the next planned loop without manual scoping
+- After `/dev-save`, when the next loop is already defined in the plan
+- During iterative development with a pre-defined plan
+
+## When NOT to Use
+
+- No `next-phase-plan.md` exists (use `/dev-scope` instead)
+- Workspace has uncommitted non-protocol changes
+- The next planned loop is ambiguous or unclear (use `/dev-scope` instead)
+- All planned loops are already completed
+- You want to inspect state (use `/dev-status` instead)
+- You want to save progress (use `/dev-save` instead)
+
+## Typical Workflow
+
+```
+continue loop
+-> verifies preconditions
+-> reads next-phase-plan.md
+-> identifies next incomplete loop (tolerant parsing)
+-> evaluates loop clarity (detects ambiguity)
+-> derives scope from plan + handoff + recent commits
+-> evaluates auto-execution criteria
+-> if met: executes immediately, updates plan status
+-> if not: outputs scope document, STOP, wait for /goal
+```
+
+---
+
 ## STEP 1: Verify Preconditions
 
 Before reading the plan, verify ALL of the following:
