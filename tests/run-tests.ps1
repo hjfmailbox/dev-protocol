@@ -2065,14 +2065,14 @@ if ($Case -eq '43') {
 
     # /goal must appear in canonical section
     $CanonSection = $ReadmeContent.Substring($CanonPos, $LegacyPos - $CanonPos)
-    if ($CanonSection -notmatch "`/goal`") {
+    if ($CanonSection -notmatch '/goal') {
         Fail "case-43: /goal not found in Canonical v2 Commands table"
     }
     Pass-Check "case-43: /goal is listed as canonical v2 command"
 
     # /goal must NOT appear in legacy section
     $LegacySection = $ReadmeContent.Substring($LegacyPos)
-    if ($LegacySection -match "`/goal`") {
+    if ($LegacySection -match '/goal') {
         Fail "case-43: /goal still listed in Legacy Aliases table"
     }
     Pass-Check "case-43: /goal is NOT in Legacy Aliases table"
@@ -2156,9 +2156,9 @@ if ($Case -eq '44') {
 
     # Verify no alias contains v1 contradictions
     $ContradictionPatterns = @(
-        @{Pattern="NEVER auto-commit"; Why="contradicts v2 /dev-save auto-commit"},
-        @{Pattern="none/minor/major"; Why="uses deprecated drift terms instead of none/low/high"},
-        @{Pattern="`.agent/`"; Why="references legacy v1 path without deprecation note"}
+        @{Pattern='NEVER auto-commit'; Why='contradicts v2 /dev-save auto-commit'},
+        @{Pattern='none/minor/major'; Why='uses deprecated drift terms instead of none/low/high'},
+        @{Pattern='\.agent/'; Why='references legacy v1 path without deprecation note'}
     )
 
     foreach ($alias in $AliasSkills) {
