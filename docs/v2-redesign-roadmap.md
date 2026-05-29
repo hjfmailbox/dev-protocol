@@ -181,7 +181,7 @@ Goal: Reduce friction for iterative development. Design-only unless explicitly s
 - Reads context: workflow-state.yml, handoff.md, roadmap, deferred-improvements, recent git history, goal-output
 - Infers current phase, focus, unresolved friction, relevant roadmap/defer items
 - Decomposes high-level goal into numbered loops with explicit validation criteria
-- Writes `docs/next-phase-plan.md` using loop structure compatible with `continue loop`
+- Writes `.agents/dev-protocol/next-phase-plan.md` using loop structure compatible with `continue loop`
 - Validates generated loops against continue-loop constraints
 
 **Plan requirements**:

@@ -33,7 +33,7 @@ Eliminate the manual step of writing `next-phase-plan.md` by deriving loops from
 1. **Reads context** — state files, roadmap, deferred items, recent commits, goal-output
 2. **Infers focus** — current phase, stabilization priorities, unresolved friction
 3. **Decomposes goal** — breaks objective into small, independently executable loops
-4. **Generates plan** — writes `docs/next-phase-plan.md` with numbered loops
+4. **Generates plan** — writes `.agents/dev-protocol/next-phase-plan.md` with numbered loops
 5. **Validates plan** — ensures loops satisfy continue-loop constraints
 
 ---
@@ -45,7 +45,7 @@ generate plan
 → reads project context
 → infers phase and focus
 → decomposes goal into loops
-→ writes next-phase-plan.md
+→ writes `.agents/dev-protocol/next-phase-plan.md`
 → validates loops are continue-loop friendly
 → prompts: "continue loop to execute"
 ```
@@ -89,7 +89,7 @@ Break the high-level goal into numbered loops:
 
 ### 4. Generate Plan
 
-Write `docs/next-phase-plan.md` using this structure:
+Write `.agents/dev-protocol/next-phase-plan.md` using this structure:
 
 ```markdown
 # Next Phase Plan
@@ -167,7 +167,7 @@ generate plan
   → 1. read context (workflow-state, handoff, roadmap, deferred, git log, goal-output)
   → 2. infer current phase, focus, unresolved friction
   → 3. decompose goal into numbered loops
-  → 4. write docs/next-phase-plan.md
+  → 4. write `.agents/dev-protocol/next-phase-plan.md`
   → 5. validate loops against continue-loop constraints
   → 6. output plan summary and next steps
 ```

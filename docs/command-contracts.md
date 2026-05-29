@@ -204,6 +204,41 @@ unknown
 
 Stop at first valid result.
 
+### Semantic Drift Classification
+
+Beyond commit counting, classify commits by semantic intent:
+
+| Pattern | Type | Drift |
+|---|---|---|
+| `chore(checkpoint):*` | Protocol-only | none |
+| `docs(*):*` without source changes | Documentation-only | low |
+| `test(*):*` without source changes | Test-only | low |
+| `feat(*):*` or `fix(*):*` | Source-impacting | high |
+| Stabilization-pattern sequence | Stabilization | low |
+| Roadmap-aligned commits | Roadmap-aligned | medium |
+
+**Application**: When reporting drift, include semantic classification:
+```
+Drift: high — 3 source-impacting commits, 2 stabilization-pattern commits
+```
+
+### Semantic Active-Work Reconstruction
+
+When `/dev-save` has NOT been run after recent goal work, reconstruct active work from git history using semantic theme inference:
+
+| Pattern | Inferred Theme |
+|---|---|
+| Multiple `docs(*):*` + `fix(tests):*` | Stabilization / documentation hardening |
+| Multiple `feat(protocol):*` + `skills/*` | Protocol feature expansion |
+| `test(case-NN):*` sequence | Test coverage expansion |
+| Mix of `feat:`, `fix:`, `test:` on same component | Active development on that component |
+
+**Sources for semantic enrichment**:
+1. Git history (primary)
+2. Roadmap active items (secondary)
+3. Deferred improvements (tertiary)
+4. Goal-output summaries (if present)
+
 ### Checkpoint Freshness
 
 | Level | Source commits since last checkpoint | Confidence |
@@ -782,10 +817,24 @@ continue loop
   → 3. identify next uncompleted loop (tolerant parsing)
   → 4. evaluate loop clarity (detect ambiguity)
   → 5. derive scope from plan + handoff + recent commits
-  → 6. evaluate auto-execution criteria (same as /dev-scope)
-  → 7. if auto-execute: execute immediately, update plan status
+  → 6. apply semantic validation equivalence to criteria
+  → 7. evaluate auto-execution criteria (same as /dev-scope)
+  → 8. if auto-execute: execute immediately, apply semantic completion check, update plan status
      else: output scope document, STOP, wait for /goal
 ```
+
+### Semantic Validation in Continue Loop
+
+Before evaluating auto-execution, interpret validation criteria semantically:
+
+- **Same domain + direction**: "tests pass" ≈ "all regression cases pass"
+- **Git reality confirms intent**: commit messages and changed files satisfy plan criteria
+- **Test outcomes match criteria**: test results validate criteria even with different wording
+- **Commit intent matches goal**: conventional commit subjects align with plan objectives
+
+**Non-equivalence signals**: "started" vs "completed", "partial" vs "fully resolved"
+
+After auto-execution, apply **semantic completion check**: verify git reality, test results, or commit intent satisfy the loop's validation criteria using semantic equivalence rules.
 
 ### DO
 
@@ -905,7 +954,7 @@ If no goal provided and none inferable from context, prompt for one.
 
 | Aspect | Behavior |
 |---|---|
-| Files modified | Creates or updates `docs/next-phase-plan.md` |
+| Files modified | Creates or updates `.agents/dev-protocol/next-phase-plan.md` |
 | Git commit | **NO** — does not auto-commit |
 | Git push | **NO** |
 | Workflow state | **NO** — does not modify protocol state files |
@@ -917,7 +966,7 @@ If no goal provided and none inferable from context, prompt for one.
 
 **Goal Inferred**: <goal summary>
 **Loops Generated**: <N>
-**Plan File**: docs/next-phase-plan.md
+**Plan File**: `.agents/dev-protocol/next-phase-plan.md`
 
 **Loop Summary**:
 - Loop 1: <name> — <files> — <auto-execution status>
@@ -930,7 +979,7 @@ If no goal provided and none inferable from context, prompt for one.
 - Deferred items: <list>
 
 **Next Steps**:
-1. Review docs/next-phase-plan.md
+1. Review `.agents/dev-protocol/next-phase-plan.md`
 2. Edit if needed
 3. Run continue loop to execute
 ```
@@ -955,7 +1004,7 @@ If no goal provided and none inferable from context, prompt for one.
 
 ### Success Signals
 
-- `docs/next-phase-plan.md` created with numbered loops
+- `.agents/dev-protocol/next-phase-plan.md` created with numbered loops
 - Each loop has Goal, Files, and Validation sections
 - Plan validated against continue-loop constraints
 - Output includes plan summary and next steps
@@ -978,7 +1027,7 @@ generate plan
 → reads workflow-state.yml (phase: p3, focus: stabilization)
 → reads deferred-improvements.md (D03, D04 active)
 → decomposes into 3 loops
-→ writes docs/next-phase-plan.md
+→ writes `.agents/dev-protocol/next-phase-plan.md`
 → "Review plan, then run continue loop"
 ```
 
@@ -990,7 +1039,7 @@ generate plan "Refactor auth module"
 → Loop 2: extract interface (1 file) — auto-executable
 → Loop 3: migrate consumers (5 files) — requires /goal
 → Loop 4: update docs (2 files) — auto-executable
-→ writes docs/next-phase-plan.md with notes
+→ writes `.agents/dev-protocol/next-phase-plan.md` with notes
 ```
 
 ---

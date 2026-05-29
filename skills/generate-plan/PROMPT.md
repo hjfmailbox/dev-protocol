@@ -118,7 +118,7 @@ If a loop would affect >3 files, either:
 
 ## STEP 4: Write Plan
 
-Write the generated plan to `docs/next-phase-plan.md`.
+Write the generated plan to `.agents/dev-protocol/next-phase-plan.md`.
 
 ### File structure
 
@@ -177,7 +177,7 @@ After writing the plan, output:
 
 **Loops Generated**: [N]
 
-**Plan File**: docs/next-phase-plan.md
+**Plan File**: `.agents/dev-protocol/next-phase-plan.md`
 
 **Loop Summary**:
 - Loop 1: [name] — [files] — [auto-execution status]
@@ -191,7 +191,7 @@ After writing the plan, output:
 - Deferred items: [list]
 
 **Next Steps**:
-1. Review `docs/next-phase-plan.md`
+1. Review `.agents/dev-protocol/next-phase-plan.md`
 2. Edit if needed
 3. Run `continue loop` to execute
 ```

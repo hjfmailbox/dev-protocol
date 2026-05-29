@@ -48,6 +48,8 @@ function Get-CaseDirName {
         '38' { return 'case-38-semantic-loop-completion' }
         '39' { return 'case-39-semantic-drift-classification' }
         '40' { return 'case-40-semantic-active-work' }
+        '41' { return 'case-41-canonical-workflow-path-consistency' }
+        '42' { return 'case-42-test-matrix-synchronization-audit' }
         default { return "case-$Case" }
     }
 }
@@ -1493,8 +1495,8 @@ if ($Case -eq '34') {
     Pass-Check "case-34: generate-plan PROMPT.md defines STEP 4"
 
     # Verify output path
-    if ($PromptContent -notmatch "docs/next-phase-plan.md") {
-        Fail "case-34: generate-plan PROMPT.md missing output path docs/next-phase-plan.md"
+    if ($PromptContent -notmatch "\.agents/dev-protocol/next-phase-plan\.md") {
+        Fail "case-34: generate-plan PROMPT.md missing output path .agents/dev-protocol/next-phase-plan.md"
     }
     Pass-Check "case-34: generate-plan PROMPT.md defines output path"
 
@@ -1904,6 +1906,130 @@ if ($Case -eq '40') {
         Fail "case-40: dev-status PROMPT.md missing git history as primary source"
     }
     Pass-Check "case-40: dev-status PROMPT.md keeps git history as primary source"
+}
+
+# ── AN. Case-41 specific checks (canonical workflow path consistency) ──
+
+if ($Case -eq '41') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-41 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-41 test-plan.md exists"
+
+    $GenPrompt = Join-Path $PWD.Path "skills/generate-plan/PROMPT.md"
+    $GenSkill = Join-Path $PWD.Path "skills/generate-plan/SKILL.md"
+    $ContinuePrompt = Join-Path $PWD.Path "skills/continue-loop/PROMPT.md"
+    $ContinueSkill = Join-Path $PWD.Path "skills/continue-loop/SKILL.md"
+    $Contracts = Join-Path $PWD.Path "docs/command-contracts.md"
+
+    if (-not (Test-Path $GenPrompt)) {
+        Fail "case-41: skills/generate-plan/PROMPT.md not found"
+    }
+    if (-not (Test-Path $ContinuePrompt)) {
+        Fail "case-41: skills/continue-loop/PROMPT.md not found"
+    }
+    if (-not (Test-Path $Contracts)) {
+        Fail "case-41: docs/command-contracts.md not found"
+    }
+
+    $GenPromptContent = Get-Content $GenPrompt -Raw
+    $GenSkillContent = Get-Content $GenSkill -Raw
+    $ContinuePromptContent = Get-Content $ContinuePrompt -Raw
+    $ContinueSkillContent = Get-Content $ContinueSkill -Raw
+    $ContractsContent = Get-Content $Contracts -Raw
+
+    # Verify generate-plan writes to .agents/dev-protocol/
+    if ($GenPromptContent -notmatch "\.agents/dev-protocol/next-phase-plan\.md") {
+        Fail "case-41: generate-plan PROMPT.md does not write to .agents/dev-protocol/next-phase-plan.md"
+    }
+    Pass-Check "case-41: generate-plan PROMPT.md writes to .agents/dev-protocol/next-phase-plan.md"
+
+    if ($GenSkillContent -notmatch "\.agents/dev-protocol/next-phase-plan\.md") {
+        Fail "case-41: generate-plan SKILL.md does not write to .agents/dev-protocol/next-phase-plan.md"
+    }
+    Pass-Check "case-41: generate-plan SKILL.md writes to .agents/dev-protocol/next-phase-plan.md"
+
+    # Verify continue-loop reads from .agents/dev-protocol/
+    if ($ContinuePromptContent -notmatch "\.agents/dev-protocol/next-phase-plan\.md") {
+        Fail "case-41: continue-loop PROMPT.md does not read from .agents/dev-protocol/next-phase-plan.md"
+    }
+    Pass-Check "case-41: continue-loop PROMPT.md reads from .agents/dev-protocol/next-phase-plan.md"
+
+    if ($ContinueSkillContent -notmatch "\.agents/dev-protocol/next-phase-plan\.md") {
+        Fail "case-41: continue-loop SKILL.md does not read from .agents/dev-protocol/next-phase-plan.md"
+    }
+    Pass-Check "case-41: continue-loop SKILL.md reads from .agents/dev-protocol/next-phase-plan.md"
+
+    # Verify no stale docs/ path in generate-plan or contracts
+    if ($GenPromptContent -match "docs/next-phase-plan\.md") {
+        Fail "case-41: generate-plan PROMPT.md still references stale docs/next-phase-plan.md"
+    }
+    Pass-Check "case-41: generate-plan PROMPT.md has no stale docs/next-phase-plan.md reference"
+
+    if ($GenSkillContent -match "docs/next-phase-plan\.md") {
+        Fail "case-41: generate-plan SKILL.md still references stale docs/next-phase-plan.md"
+    }
+    Pass-Check "case-41: generate-plan SKILL.md has no stale docs/next-phase-plan.md reference"
+
+    # Verify command-contracts reflects unified path
+    $ContractsGenSection = $ContractsContent.Substring($ContractsContent.IndexOf("## generate plan"))
+    if ($ContractsGenSection -match "docs/next-phase-plan\.md") {
+        Fail "case-41: command-contracts generate-plan section still references docs/next-phase-plan.md"
+    }
+    Pass-Check "case-41: command-contracts.md uses unified .agents/dev-protocol/next-phase-plan.md path"
+}
+
+# ── AO. Case-42 specific checks (test matrix synchronization audit) ────
+
+if ($Case -eq '42') {
+    if (-not (Test-Path $TestPlan)) {
+        Fail "case-42 test-plan.md not found at $TestPlan"
+    }
+    Pass-Check "case-42 test-plan.md exists"
+
+    $TestMatrix = Join-Path $PWD.Path "docs/test-matrix.md"
+    if (-not (Test-Path $TestMatrix)) {
+        Fail "case-42: docs/test-matrix.md not found"
+    }
+    Pass-Check "case-42: docs/test-matrix.md exists"
+
+    $MatrixContent = Get-Content $TestMatrix -Raw
+
+    # Verify no stale case names remain
+    $StaleCases = @("case-11-continue-loop", "case-11-aborted-goal", "case-10-handoff-mismatch", "case-10-workflow-state-mismatch")
+    foreach ($stale in $StaleCases) {
+        if ($MatrixContent -match $stale) {
+            Fail "case-42: test-matrix.md contains stale case name: $stale"
+        }
+    }
+    Pass-Check "case-42: test-matrix.md has no stale case names"
+
+    # Verify actual test directories are referenced in inventory
+    $TestDirs = Get-ChildItem -Directory (Join-Path $PWD.Path "tests") -Filter "case-*"
+    foreach ($dir in $TestDirs) {
+        $DirName = $dir.Name
+        if ($MatrixContent -notmatch [regex]::Escape($DirName)) {
+            Fail "case-42: test directory $DirName not referenced in test-matrix.md"
+        }
+    }
+    Pass-Check "case-42: all test directories referenced in test-matrix.md"
+
+    # Verify test inventory table exists and is complete
+    if ($MatrixContent -notmatch "## Test Inventory") {
+        Fail "case-42: test-matrix.md missing Test Inventory section"
+    }
+    Pass-Check "case-42: test-matrix.md contains Test Inventory"
+
+    # Verify case-41 and case-42 are in the inventory
+    if ($MatrixContent -notmatch "case-41") {
+        Fail "case-42: test-matrix.md missing case-41 from inventory"
+    }
+    Pass-Check "case-42: test-matrix.md includes case-41"
+
+    if ($MatrixContent -notmatch "case-42") {
+        Fail "case-42: test-matrix.md missing case-42 from inventory"
+    }
+    Pass-Check "case-42: test-matrix.md includes case-42"
 }
 
 # ── Final result ─────────────────────────────────────────────────────
