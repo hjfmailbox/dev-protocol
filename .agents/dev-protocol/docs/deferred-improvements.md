@@ -554,3 +554,89 @@ Low
 ### Priority
 
 P2
+
+---
+
+## D12 — Structured project audit command
+
+### Problem
+
+Current workflow still requires large manual prompts for:
+
+* project understanding
+* architecture review
+* roadmap/progress evaluation
+* testing assessment
+* optimization recommendations
+
+### Why Deferred
+
+No protocol failure caused by missing audit command. Manual prompts work. This is a workflow compression opportunity, not a correctness gap.
+
+### Desired Outcome
+
+Canonical command replacing ad-hoc prompts like:
+
+"结合当前项目既定目标与实际进度进行全面系统检查..."
+
+Two-stage model:
+
+1. **Context reconstruction**
+   * understand project goal
+   * roadmap
+   * defer
+   * architecture
+   * tests
+   * recent progress
+
+2. **Structured review report**
+   * goal alignment
+   * architecture
+   * testing
+   * maintainability
+   * documentation
+   * prioritized recommendations
+
+### Desired Workflow
+
+```text
+/dev-audit
+```
+
+### Risk
+
+Low
+
+### Priority
+
+P2
+
+---
+
+## D13 — Rename repository default branch master → main
+
+### Problem
+
+Default branch is `master`. Modern convention is `main`.
+
+### Why Deferred
+
+No correctness benefit during v1.0 freeze. Avoid workflow churn while protocol stabilizes.
+
+### Desired Outcome
+
+Rename default branch after v1.0 freeze.
+
+Includes:
+
+* git branch rename
+* remote migration
+* docs/scripts update
+
+### Risk
+
+Low
+
+### Priority
+
+P3
